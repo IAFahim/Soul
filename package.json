@@ -1,0 +1,29 @@
+{
+  "name": "com.heart.soul",
+  "displayName": "Soul",
+  "description": "The heart of the world tree, use for make game in Unity3D. And Soul is what i can build on Top of it",
+  "version": "0.1.0",
+  "unity": "2022.2",
+  "category": "core",
+  "author": {
+    "name": "iafahim",
+    "email": "iafahim.dev@gmail.com",
+    "url": "https://github.com/iafahim"
+  },
+  "license": "MIT",
+  "keywords": [
+    "unity"
+  ],
+  "dependencies": {
+    "com.unity.2d.sprite": "1.0.0",
+    "com.unity.burst": "1.8.17",
+    "com.unity.collections": "2.4.2",
+    "com.unity.serialization": "3.1.1",
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:iafahim/soul.git",
+    "directory": "Soul"
+  }
+}

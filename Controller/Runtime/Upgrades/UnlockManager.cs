@@ -1,0 +1,57 @@
+﻿using _Root.Scripts.Controller.Runtime.Addressables;
+using _Root.Scripts.Model.Runtime.Containers;
+using Alchemy.Inspector;
+using Cysharp.Threading.Tasks;
+using Pancake;
+using UnityEngine;
+using UnityEngine.AddressableAssets;
+
+namespace _Root.Scripts.Controller.Runtime.Upgrades
+{
+    public class UnlockManager : GameComponent
+    {
+        [SerializeField] private AddressablePoolLifetime addressablePoolLifetime;
+        [SerializeField] private AssetReferenceGameObject lockedAssetReferenceGameObject;
+        [SerializeField] private AssetReferenceGameObject unLockedAssetReferenceGameObject;
+        [ShowInInspector] private Pair<AssetReferenceGameObject, GameObject> _instantiatedAssetPairReference;
+
+        public void Setup(AddressablePoolLifetime poolLifetime,
+            AssetReferenceGameObject lockedAssetReference,
+            AssetReferenceGameObject unLockedAssetReference)
+        {
+            lockedAssetReferenceGameObject = lockedAssetReference;
+            unLockedAssetReferenceGameObject = unLockedAssetReference;
+            addressablePoolLifetime = poolLifetime;
+        }
+
+        private async UniTask<GameObject> InstantiateAsync(AssetReferenceGameObject assetReferenceGameObject)
+        {
+            ReleaseInstance();
+            var instantiatedAsset = await addressablePoolLifetime.GetOrInstantiateAsync(
+                assetReferenceGameObject, transform.position, Quaternion.identity, Transform
+            );
+            _instantiatedAssetPairReference =
+                new Pair<AssetReferenceGameObject, GameObject>(assetReferenceGameObject, instantiatedAsset);
+            return instantiatedAsset;
+        }
+
+
+        public async UniTask<GameObject> InstantiateLockedAsync()
+        {
+            return await InstantiateAsync(lockedAssetReferenceGameObject);
+        }
+
+
+        public async UniTask<GameObject> InstantiateUnLockedAsync()
+        {
+            return await InstantiateAsync(unLockedAssetReferenceGameObject);
+        }
+
+        [Button]
+        private void ReleaseInstance()
+        {
+            if (_instantiatedAssetPairReference.Value)
+                addressablePoolLifetime.ReturnToPool(_instantiatedAssetPairReference);
+        }
+    }
+}

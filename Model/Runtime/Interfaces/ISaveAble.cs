@@ -1,0 +1,7 @@
+﻿namespace _Root.Scripts.Model.Runtime.Interfaces
+{
+    public interface ISaveAble
+    {
+        public void Save(string key);
+    }
+}
