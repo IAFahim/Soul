@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Workers
+namespace Soul.Model.Runtime.Workers
 {
     [Serializable]
     public struct WorkerGroup

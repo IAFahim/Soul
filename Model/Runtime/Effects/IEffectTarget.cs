@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Pancake.Common;
 
-namespace _Root.Scripts.Model.Runtime.Effects
+namespace Soul.Model.Runtime.Effects
 {
     public interface IEffectTarget : IComponent
     {

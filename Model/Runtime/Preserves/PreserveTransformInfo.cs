@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Preserves
+namespace Soul.Model.Runtime.Preserves
 {
     [Serializable]
     public class PreserveTransformInfo

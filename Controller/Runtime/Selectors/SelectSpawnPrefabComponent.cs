@@ -1,10 +1,10 @@
-﻿using _Root.Scripts.Model.Runtime.Preserves;
-using _Root.Scripts.Model.Runtime.Selectors;
-using Pancake;
+﻿using Pancake;
 using Pancake.Pools;
+using Soul.Model.Runtime.Preserves;
+using Soul.Model.Runtime.Selectors;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Selectors
+namespace Soul.Controller.Runtime.Selectors
 {
     public class SelectSpawnPrefabComponent : GameComponent, ISelectCallBack, IDeSelectedCallBack
     {

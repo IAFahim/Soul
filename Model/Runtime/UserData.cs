@@ -2,9 +2,9 @@
 using Pancake.Common;
 using Pancake.Localization;
 
-namespace _Root.Scripts.Model.Runtime
+namespace Soul.Model.Runtime
 {
-    public class UserData
+    public static class UserData
     {
         public static string GetCurrentLanguage() => Data.Load(Constant.User.KEY_LANGUAGE, "");
 

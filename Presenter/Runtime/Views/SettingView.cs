@@ -6,7 +6,7 @@ using Pancake.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace _Root.Scripts.Presenter.Runtime.Views
+namespace Soul.Presenter.Runtime.Views
 {
     [AlchemySerialize]
     public partial class SettingView : View

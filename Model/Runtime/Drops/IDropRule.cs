@@ -1,6 +1,6 @@
-﻿using _Root.Scripts.Model.Runtime.CustomList;
+﻿using Soul.Model.Runtime.CustomList;
 
-namespace _Root.Scripts.Model.Runtime.Drops
+namespace Soul.Model.Runtime.Drops
 {
     public interface IDropRule<T>
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace _Root.Scripts.Model.Runtime.Effects
+namespace Soul.Model.Runtime.Effects
 {
     [Flags]
     public enum EffectType

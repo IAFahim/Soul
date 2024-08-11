@@ -1,10 +1,10 @@
 ﻿using System;
-using _Root.Scripts.Model.Runtime.Effects;
-using _Root.Scripts.Model.Runtime.Movements;
 using Pancake.Common;
+using Soul.Model.Runtime.Effects;
+using Soul.Model.Runtime.Movements;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Effects
+namespace Soul.Controller.Runtime.Effects
 {
     [Serializable]
     public class FreezeEffect : Effect

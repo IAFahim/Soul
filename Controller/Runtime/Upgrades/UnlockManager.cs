@@ -1,12 +1,12 @@
-﻿using _Root.Scripts.Controller.Runtime.Addressables;
-using _Root.Scripts.Model.Runtime.Containers;
-using Alchemy.Inspector;
+﻿using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using Pancake;
+using Soul.Controller.Runtime.Addressables;
+using Soul.Model.Runtime.Containers;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace _Root.Scripts.Controller.Runtime.Upgrades
+namespace Soul.Controller.Runtime.Upgrades
 {
     public class UnlockManager : GameComponent
     {

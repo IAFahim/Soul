@@ -1,7 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.UIs
+namespace Soul.Model.Runtime.UIs
 {
     public class ShopItemReward : MonoBehaviour
     {

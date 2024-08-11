@@ -1,9 +1,9 @@
-﻿using _Root.Scripts.Model.Runtime.Preserves;
-using Pancake;
+﻿using Pancake;
 using Pancake.Pools;
+using Soul.Model.Runtime.Preserves;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Pools
+namespace Soul.Controller.Runtime.Pools
 {
     public class OnEnableSpawnInPool : GameComponent
     {

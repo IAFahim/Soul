@@ -1,4 +1,4 @@
-﻿namespace _Root.Scripts.Model.Runtime.Tags
+﻿namespace Soul.Model.Runtime.Tags
 {
     public interface ITag<T>
     {

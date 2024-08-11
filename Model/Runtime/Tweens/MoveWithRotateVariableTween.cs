@@ -1,10 +1,10 @@
 ﻿using System;
-using _Root.Scripts.Model.Runtime.Containers;
 using LitMotion;
 using Pancake;
+using Soul.Model.Runtime.Containers;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Tweens
+namespace Soul.Model.Runtime.Tweens
 {
     [Serializable]
     public class MoveWithRotateVariableTween : VariableTween

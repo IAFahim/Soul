@@ -1,13 +1,13 @@
-﻿using _Root.Scripts.Controller.Runtime.Addressables;
-using _Root.Scripts.Model.Runtime.Times;
-using Alchemy.Inspector;
+﻿using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using Pancake;
 using Pancake.Common;
+using Soul.Controller.Runtime.Addressables;
+using Soul.Model.Runtime.Times;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace _Root.Scripts.Controller.Runtime.Upgrades
+namespace Soul.Controller.Runtime.Upgrades
 {
     public class UnlockAndUpgradeManager : GameComponent, ILoadComponent
     {

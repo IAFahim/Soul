@@ -1,7 +1,7 @@
-﻿using _Root.Scripts.Model.Runtime.Interfaces;
+﻿using Soul.Model.Runtime.Interfaces;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Infos
+namespace Soul.Model.Runtime.Infos
 {
     public class ScriptableStringInfo : ScriptableObject, ITitle, IDescription
     {

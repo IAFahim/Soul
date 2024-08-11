@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.CustomList
+namespace Soul.Model.Runtime.CustomList
 {
     [Serializable]
     public class ScriptableList<T> : ScriptableObject, IList<T>

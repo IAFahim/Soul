@@ -1,10 +1,10 @@
 ﻿using System;
-using _Root.Scripts.Model.Runtime.Interfaces;
-using _Root.Scripts.Model.Runtime.Levels;
-using _Root.Scripts.Model.Runtime.Variables;
+using Soul.Model.Runtime.Interfaces;
+using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.Variables;
 using UnityEngine;
 
-namespace _Root.Scripts.Presenter.Runtime.UI
+namespace Soul.Presenter.Runtime.UI
 {
     [Serializable]
     public class SelectData

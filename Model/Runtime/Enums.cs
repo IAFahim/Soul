@@ -1,4 +1,4 @@
-﻿namespace _Root.Scripts.Model.Runtime
+﻿namespace Soul.Model.Runtime
 {
     public enum DamageTypeModes
     {

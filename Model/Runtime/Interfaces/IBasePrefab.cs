@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Buildings
+namespace Soul.Model.Runtime.Interfaces
 {
     public interface IBasePrefab
     {

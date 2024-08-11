@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Coroutines
+namespace Soul.Model.Runtime.Coroutines
 {
     public class CoroutineLink<T>
     {

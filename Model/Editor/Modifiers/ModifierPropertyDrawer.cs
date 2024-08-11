@@ -1,8 +1,8 @@
-﻿using _Root.Scripts.Model.Runtime.Modifiers;
+﻿using Soul.Model.Runtime.Modifiers;
 using UnityEditor;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Editor.Modifiers
+namespace Soul.Model.Editor.Modifiers
 {
     [CustomPropertyDrawer(typeof(Modifier))]
     public class ModifierDrawer : PropertyDrawer

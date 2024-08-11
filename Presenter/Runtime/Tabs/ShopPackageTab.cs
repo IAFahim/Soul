@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using _Root.Scripts.Model.Runtime;
-using _Root.Scripts.Model.Runtime.UIs.Packages;
 using Pancake.Common;
-using Pancake.Game.UI;
+using Soul.Model.Runtime;
+using Soul.Model.Runtime.UIs;
+using Soul.Model.Runtime.UIs.Packages;
+using Soul.Presenter.Runtime.Visuals;
 using UnityEngine;
 
-namespace _Root.Scripts.Presenter.Runtime.Tabs
+namespace Soul.Presenter.Runtime.Tabs
 {
     public class ShopPackageTab : MonoBehaviour
     {

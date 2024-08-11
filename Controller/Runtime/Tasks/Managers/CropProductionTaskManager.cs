@@ -1,8 +1,6 @@
-﻿using Alchemy.Inspector;
-using Pancake.Common;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Tasks.Managers
+namespace Soul.Controller.Runtime.Tasks.Managers
 {
     public class CropProductionTaskManager : MonoBehaviour
     {

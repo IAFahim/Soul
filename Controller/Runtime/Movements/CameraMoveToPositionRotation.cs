@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
-using _Root.Scripts.Model.Runtime;
-using _Root.Scripts.Model.Runtime.Containers;
-using _Root.Scripts.Model.Runtime.Tweens;
 using Alchemy.Inspector;
 using LitMotion;
 using QuickEye.Utility;
+using Soul.Model.Runtime;
+using Soul.Model.Runtime.Containers;
+using Soul.Model.Runtime.Tweens;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 // ReSharper disable UnusedMember.Local
 
-namespace _Root.Scripts.Controller.Runtime.Movements
+namespace Soul.Controller.Runtime.Movements
 {
     public class CameraMoveToPositionRotation : MonoBehaviour
     {

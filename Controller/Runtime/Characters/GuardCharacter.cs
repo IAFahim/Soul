@@ -1,11 +1,9 @@
-﻿using _Root.Scripts.Controller.Runtime.Characters;
-using _Root.Scripts.Controller.Runtime.Components;
-using _Root.Scripts.Controller.Runtime.Defence;
-using _Root.Scripts.Model.Runtime.Stats;
-using Pancake.Pools;
+﻿using Pancake.Pools;
+using Soul.Controller.Runtime.Defence;
+using Soul.Model.Runtime.Stats;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime
+namespace Soul.Controller.Runtime.Characters
 {
     public class GuardCharacter : CharacterComponent, IHealthReference
     {

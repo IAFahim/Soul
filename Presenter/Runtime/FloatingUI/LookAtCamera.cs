@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace _Root.Scripts.Presenter.Runtime.FloatingUI
+namespace Soul.Presenter.Runtime.FloatingUI
 {
     public class LookAtCamera : MonoBehaviour
     {

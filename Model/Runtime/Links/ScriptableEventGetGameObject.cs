@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Links
+namespace Soul.Model.Runtime.Links
 {
     [CreateAssetMenu(fileName = "ScriptableEventGetGameObject", menuName = "Scriptable Objects/ScriptableEventGetGameObject")]
     public class ScriptableEventGetGameObject : ScriptableObject

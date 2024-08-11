@@ -1,10 +1,10 @@
-﻿using _Root.Scripts.Model.Runtime.Reports;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Pancake.UI;
+using Soul.Model.Runtime.Reports;
 using Trello_Report.Runtime;
 using UnityEngine;
 
-namespace _Root.Scripts.Presenter.Runtime.Views
+namespace Soul.Presenter.Runtime.Views
 {
     public class BugFeedBackView : View
     {

@@ -1,7 +1,7 @@
-﻿using _Root.Scripts.Model.Runtime.Interfaces;
-using Sisus.Init;
+﻿using Sisus.Init;
+using Soul.Model.Runtime.Interfaces;
 
-namespace _Root.Scripts.Controller.Runtime.Attacks
+namespace Soul.Controller.Runtime.Attacks
 {
     public class Loadings : MonoBehaviour<ILoading>
     {

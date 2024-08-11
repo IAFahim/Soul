@@ -1,9 +1,9 @@
 ﻿using System;
-using _Root.Scripts.Controller.Runtime.Effects;
 using Pancake;
+using Soul.Controller.Runtime.Effects;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Attacks
+namespace Soul.Controller.Runtime.Attacks
 {
     [Serializable]
     public struct AttackIntention

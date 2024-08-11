@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using _Root.Scripts.Model.Runtime.Upgrades;
+﻿using System.Collections.Generic;
 using Alchemy.Inspector;
 using Pancake;
+using Soul.Model.Runtime.Upgrades;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Upgrades
+namespace Soul.Controller.Runtime.Upgrades
 {
     public class PartsManager : GameComponent
     {

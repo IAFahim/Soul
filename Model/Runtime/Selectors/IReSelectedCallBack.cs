@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Selectors
+namespace Soul.Model.Runtime.Selectors
 {
     public interface IReSelectedCallBack
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Coordinators
+namespace Soul.Controller.Runtime.Coordinators
 {
     public class AttackCoordinator : MonoBehaviour
     {

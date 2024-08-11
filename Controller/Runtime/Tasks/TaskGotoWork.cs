@@ -1,10 +1,10 @@
 ﻿using System;
-using _Root.Scripts.Model.Runtime.Tasks;
-using _Root.Scripts.Model.Runtime.Workers;
 using Alchemy.Inspector;
+using Soul.Model.Runtime.Tasks;
+using Soul.Model.Runtime.Workers;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Tasks
+namespace Soul.Controller.Runtime.Tasks
 {
     [Serializable]
     public class TaskGotoWork : GameTask

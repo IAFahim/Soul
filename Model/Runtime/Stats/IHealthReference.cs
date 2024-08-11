@@ -1,4 +1,4 @@
-﻿namespace _Root.Scripts.Model.Runtime.Stats
+﻿namespace Soul.Model.Runtime.Stats
 {
     public interface IHealthReference
     {

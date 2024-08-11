@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using _Root.Scripts.Controller.Runtime.Inventories;
-using _Root.Scripts.Model.Runtime.CustomList;
-using _Root.Scripts.Model.Runtime.Items;
 using Pancake.Pools;
+using Soul.Controller.Runtime.Inventories;
+using Soul.Model.Runtime.CustomList;
+using Soul.Model.Runtime.Items;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace _Root.Scripts.Controller.Runtime.DragAndDrop
+namespace Soul.Controller.Runtime.DragAndDrop
 {
     public class SingleGetDropAbleManager : GetDropAbleManager<Item>
     {

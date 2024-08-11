@@ -1,9 +1,9 @@
 using System;
-using _Root.Scripts.Model.Runtime.Infos;
+using Soul.Model.Runtime.Infos;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace _Root.Scripts.Model.Runtime.Buildings
+namespace Soul.Model.Runtime.Buildings
 {
     [Serializable]
     public class LockedInfrastructureInfo : ScriptableStringInfo

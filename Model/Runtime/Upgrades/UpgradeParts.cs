@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using _Root.Scripts.Model.Runtime.Preserves;
+using Soul.Model.Runtime.Preserves;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Upgrades
+namespace Soul.Model.Runtime.Upgrades
 {
     [Serializable]
     public class UpgradeParts

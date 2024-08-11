@@ -1,13 +1,12 @@
-﻿using System;
-using _Root.Scripts.Controller.Runtime.Inventories;
-using _Root.Scripts.Controller.Runtime.UI;
-using _Root.Scripts.Model.Runtime.Items;
-using _Root.Scripts.Model.Runtime.Levels;
-using Pancake;
+﻿using Pancake;
 using Pancake.Common;
+using Soul.Controller.Runtime.Inventories;
+using Soul.Controller.Runtime.UI;
+using Soul.Model.Runtime.Items;
+using Soul.Model.Runtime.Levels;
 using UnityEngine;
 
-namespace _Root.Scripts.Presenter.Runtime.UI
+namespace Soul.Presenter.Runtime.UI
 {
     public class ProfileInventoryManager : GameComponent, ILoadComponent
     {

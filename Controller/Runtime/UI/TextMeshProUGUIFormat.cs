@@ -3,7 +3,7 @@ using System.Globalization;
 using TMPro;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.UI
+namespace Soul.Controller.Runtime.UI
 {
     [Serializable]
     public partial struct TextMeshProUGUIFormat

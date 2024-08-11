@@ -1,8 +1,8 @@
-﻿using _Root.Scripts.Presenter.Runtime.Views;
-using Pancake.UI;
+﻿using Pancake.UI;
+using Soul.Presenter.Runtime.Views;
 using UnityEngine;
 
-namespace _Root.Scripts.Presenter.Runtime.Popups
+namespace Soul.Presenter.Runtime.Popups
 {
     [RequireComponent(typeof(BugFeedBackView))]
     public class BugFeedBackPopup : Popup<BugFeedBackView>

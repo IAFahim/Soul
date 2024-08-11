@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Movements.Looks
+namespace Soul.Model.Runtime.Movements.Looks
 {
     [Serializable]
     public class LookAt

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using _Root.Scripts.Model.Runtime;
-using _Root.Scripts.Model.Runtime.Levels;
-using _Root.Scripts.Model.Runtime.Workers;
 using Pancake.Common;
 using QuickEye.Utility;
+using Soul.Model.Runtime;
+using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.Workers;
 
-namespace _Root.Scripts.Controller.Runtime.Buildings.Records
+namespace Soul.Controller.Runtime.Buildings.Records
 {
     [Serializable]
     public record CropFieldRecord

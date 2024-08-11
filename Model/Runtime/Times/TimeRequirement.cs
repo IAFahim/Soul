@@ -3,7 +3,7 @@ using Pancake.Common;
 using QuickEye.Utility;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Times
+namespace Soul.Model.Runtime.Times
 {
     [Serializable]
     public struct TimeRequirement

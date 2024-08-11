@@ -1,6 +1,6 @@
-﻿using _Root.Scripts.Model.Runtime.Levels;
+﻿using Soul.Model.Runtime.Levels;
 
-namespace _Root.Scripts.Controller.Runtime.Upgrades
+namespace Soul.Controller.Runtime.Upgrades
 {
     public interface IUpgrade
     {

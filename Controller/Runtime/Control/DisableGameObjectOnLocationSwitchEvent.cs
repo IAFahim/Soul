@@ -1,7 +1,7 @@
-﻿using _Root.Scripts.Model.Runtime;
+﻿using Soul.Model.Runtime;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Control
+namespace Soul.Controller.Runtime.Control
 {
     public class DisableGameObjectOnLocationSwitchEvent: MonoBehaviour
     {

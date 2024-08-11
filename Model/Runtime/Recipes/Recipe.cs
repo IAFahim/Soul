@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime
+namespace Soul.Model.Runtime.Recipes
 {
     public enum IngredientUnit
     {

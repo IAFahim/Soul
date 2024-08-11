@@ -1,10 +1,9 @@
-﻿using _Root.Scripts.Controller.Runtime.Components;
-using _Root.Scripts.Model.Runtime.Interfaces;
-using _Root.Scripts.Model.Runtime.Movements;
-using Pancake;
+﻿using Pancake;
+using Soul.Model.Runtime.Interfaces;
+using Soul.Model.Runtime.Movements;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Movements
+namespace Soul.Controller.Runtime.Movements
 {
     [RequireComponent(typeof(Rigidbody))]
     public abstract class MovementModel : GameComponent, ISpeedReference, IDebugAble

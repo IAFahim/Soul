@@ -1,7 +1,7 @@
 using Pancake.Common;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Game
+namespace Soul.Model.Runtime.Game
 {
     public class FirstOpenStartup : MonoBehaviour
     {

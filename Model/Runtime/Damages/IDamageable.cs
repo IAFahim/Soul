@@ -1,4 +1,4 @@
-﻿namespace _Root.Scripts.Model.Runtime.Damages
+﻿namespace Soul.Model.Runtime.Damages
 {
     public interface IDamageable
     {

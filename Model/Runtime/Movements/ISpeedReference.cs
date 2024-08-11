@@ -1,4 +1,4 @@
-﻿namespace _Root.Scripts.Model.Runtime.Movements
+﻿namespace Soul.Model.Runtime.Movements
 {
     public interface ISpeedReference
     {

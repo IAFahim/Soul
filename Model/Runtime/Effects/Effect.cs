@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using _Root.Scripts.Model.Runtime.Modifiers;
 using Pancake.Common;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace _Root.Scripts.Model.Runtime.Effects
+namespace Soul.Model.Runtime.Effects
 {
     [Serializable]
     public abstract class Effect : IEffect
@@ -22,7 +19,7 @@ namespace _Root.Scripts.Model.Runtime.Effects
 
         public abstract EffectType GetEffectType();
 
-        public DelayHandle effectDelayDelayHandle => _effectDelayHandle;
+        public DelayHandle EffectDelayDelayHandle => _effectDelayHandle;
 
         public IEffectTarget EffectTarget => _effectTarget;
 

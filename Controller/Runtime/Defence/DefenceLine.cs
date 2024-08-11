@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using Alchemy.Inspector;
 using Pancake;
+using Soul.Controller.Runtime.Characters;
 
-namespace _Root.Scripts.Controller.Runtime.Defence
+namespace Soul.Controller.Runtime.Defence
 {
     public class DefenceLine : GameComponent
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Damages
+namespace Soul.Model.Runtime.Damages
 {
     [Serializable]
     [CreateAssetMenu(fileName = "DamageType.", menuName = "Scriptable/DamageType/Create New")]

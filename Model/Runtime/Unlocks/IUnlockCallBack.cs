@@ -1,4 +1,4 @@
-﻿namespace _Root.Scripts.Model.Runtime.Unlocks
+﻿namespace Soul.Model.Runtime.Unlocks
 {
     public interface IUnlockCallBack
     {

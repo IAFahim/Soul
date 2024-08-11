@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Extensions
+namespace Soul.Model.Runtime.Extensions
 {
     public static class UnityObjectExtension
     {

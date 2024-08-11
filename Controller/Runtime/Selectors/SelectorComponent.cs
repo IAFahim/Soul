@@ -1,10 +1,10 @@
-﻿using _Root.Scripts.Model.Runtime.Selectors;
-using Pancake.Common;
+﻿using Pancake.Common;
 using Pancake.MobileInput;
+using Soul.Model.Runtime.Selectors;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace _Root.Scripts.Controller.Runtime.Selectors
+namespace Soul.Controller.Runtime.Selectors
 {
     public class SelectorComponent : MonoBehaviour, ILoadComponent
     {

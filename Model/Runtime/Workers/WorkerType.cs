@@ -1,9 +1,9 @@
 ﻿using System;
-using _Root.Scripts.Model.Runtime.AddressableHelper;
-using _Root.Scripts.Model.Runtime.Interfaces;
+using Soul.Model.Runtime.AddressableHelper;
+using Soul.Model.Runtime.Interfaces;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Workers
+namespace Soul.Model.Runtime.Workers
 {
     [CreateAssetMenu(fileName = ".worker", menuName = "Scriptable/Worker/Create Worker")]
     [Serializable]

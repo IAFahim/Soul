@@ -1,9 +1,9 @@
-﻿using _Root.Scripts.Controller.Runtime.Sensors;
-using Alchemy.Inspector;
+﻿using Alchemy.Inspector;
 using Pancake;
+using Soul.Controller.Runtime.Sensors;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Defence
+namespace Soul.Controller.Runtime.Defence
 {
     public class DefenceLineSegment : GameComponent
     {

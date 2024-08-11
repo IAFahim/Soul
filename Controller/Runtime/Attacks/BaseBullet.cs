@@ -1,10 +1,10 @@
-﻿using _Root.Scripts.Controller.Runtime.Components;
-using _Root.Scripts.Model.Runtime.Damages;
-using _Root.Scripts.Model.Runtime.Modifiers;
-using Pancake.Common;
+﻿using Pancake.Common;
+using Soul.Controller.Runtime.Components;
+using Soul.Model.Runtime.Damages;
+using Soul.Model.Runtime.Modifiers;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Attacks
+namespace Soul.Controller.Runtime.Attacks
 {
     [RequireComponent(typeof(BaseReferenceComponent))]
     public class BaseBullet : Attack, ILoadComponent

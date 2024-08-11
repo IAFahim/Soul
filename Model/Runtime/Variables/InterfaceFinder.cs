@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Variables
+namespace Soul.Model.Runtime.Variables
 {
     [Serializable]
     public struct InterfaceFinder<T>

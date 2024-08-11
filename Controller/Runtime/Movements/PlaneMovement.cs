@@ -1,11 +1,11 @@
-﻿using _Root.Scripts.Model.Runtime.Tweens;
-using Alchemy.Inspector;
+﻿using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using Pancake;
+using Soul.Model.Runtime.Tweens;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Movements
+namespace Soul.Controller.Runtime.Movements
 {
     public class PlaneMovement : GameComponent
     {

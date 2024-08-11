@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using _Root.Scripts.Model.Runtime.Items;
 using Random = UnityEngine.Random;
 
-namespace _Root.Scripts.Model.Runtime.Loots.Bags
+namespace Soul.Model.Runtime.Loots.Bags
 {
     [Serializable]
     public class Bag<T> where T : IProbabilityWeight

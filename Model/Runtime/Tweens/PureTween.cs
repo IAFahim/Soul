@@ -1,9 +1,9 @@
-﻿using _Root.Scripts.Model.Runtime.Containers;
-using LitMotion;
+﻿using LitMotion;
 using LitMotion.Extensions;
+using Soul.Model.Runtime.Containers;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Tweens
+namespace Soul.Model.Runtime.Tweens
 {
     public static class PureTween
     {

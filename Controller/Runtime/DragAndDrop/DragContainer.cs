@@ -1,5 +1,4 @@
-﻿using System;
-using Alchemy.Inspector;
+﻿using Alchemy.Inspector;
 using LitMotion;
 using LitMotion.Extensions;
 using Pancake;
@@ -8,7 +7,7 @@ using Pancake.MobileInput;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace _Root.Scripts.Controller.Runtime.DragAndDrop
+namespace Soul.Controller.Runtime.DragAndDrop
 {
     public class DragContainer : GameComponent, IDragHandler, IBeginDragHandler, IEndDragHandler
     {

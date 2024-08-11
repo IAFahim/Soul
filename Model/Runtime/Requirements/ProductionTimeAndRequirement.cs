@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Requirements
+namespace Soul.Model.Runtime.Requirements
 {
     public class ProductionTimeAndRequirement :ScriptableObject
     {

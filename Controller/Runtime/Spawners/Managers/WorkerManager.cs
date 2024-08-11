@@ -1,10 +1,9 @@
-﻿using _Root.Scripts.Controller.Runtime.Tasks;
-using _Root.Scripts.Model.Runtime.Tasks;
-using _Root.Scripts.Model.Runtime.Workers;
-using Pancake;
-using Pancake.Common;
+﻿using Pancake;
+using Soul.Controller.Runtime.Tasks;
+using Soul.Model.Runtime.Tasks;
+using Soul.Model.Runtime.Workers;
 
-namespace _Root.Scripts.Controller.Runtime.Spawners.Managers
+namespace Soul.Controller.Runtime.Spawners.Managers
 {
     public class WorkerManager : GameComponent
     {

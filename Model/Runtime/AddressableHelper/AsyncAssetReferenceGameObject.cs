@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace _Root.Scripts.Model.Runtime.AddressableHelper
+namespace Soul.Model.Runtime.AddressableHelper
 {
     [Serializable]
     public class AsyncAssetReferenceGameObject

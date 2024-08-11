@@ -1,8 +1,7 @@
 ﻿using UnityEditor;
-using UnityEngine;
 
 // Simple script that creates a new non-dockable window.
-namespace _Root.Scripts.Model.Editor.Example
+namespace Soul.Model.Editor.Example
 {
     public class EditorWindowTest : EditorWindow
     {

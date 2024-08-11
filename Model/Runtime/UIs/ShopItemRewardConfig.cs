@@ -1,9 +1,7 @@
-﻿using _Root.Scripts.Model.Runtime;
-using _Root.Scripts.Model.Runtime.UIs;
-using Pancake.Localization;
+﻿using Pancake.Localization;
 using UnityEngine;
 
-namespace Pancake.Game.UI
+namespace Soul.Model.Runtime.UIs
 {
     [CreateAssetMenu(menuName = "Pancake/Game/Shop/Preview Reward Data")]
     public class ShopItemRewardConfig : ScriptableObject

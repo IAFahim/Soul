@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using _Root.Scripts.Model.Runtime.Effects;
 using Pancake;
+using Soul.Model.Runtime.Effects;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Effects
+namespace Soul.Controller.Runtime.Effects
 {
     public class EffectTargetComponent : GameComponent, IEffectTarget
     {

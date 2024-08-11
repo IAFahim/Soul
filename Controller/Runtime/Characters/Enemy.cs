@@ -1,8 +1,8 @@
-using _Root.Scripts.Model.Runtime.Damages;
-using _Root.Scripts.Model.Runtime.Enemies;
-using _Root.Scripts.Model.Runtime.Stats;
+using Soul.Model.Runtime.Damages;
+using Soul.Model.Runtime.Enemies;
+using Soul.Model.Runtime.Stats;
 
-namespace _Root.Scripts.Controller.Runtime.Characters
+namespace Soul.Controller.Runtime.Characters
 {
     public class Enemy : CharacterComponent, IHealthReference, IDamageable
     {

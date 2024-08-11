@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Levels
+namespace Soul.Model.Runtime.Levels
 {
     [Serializable]
     public class Level

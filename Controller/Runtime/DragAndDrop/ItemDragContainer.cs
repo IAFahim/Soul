@@ -1,12 +1,11 @@
-﻿using System;
-using _Root.Scripts.Controller.Runtime.Inventories;
-using _Root.Scripts.Controller.Runtime.UI;
-using _Root.Scripts.Model.Runtime.Drops;
-using _Root.Scripts.Model.Runtime.Items;
-using Pancake.Pools;
+﻿using Pancake.Pools;
+using Soul.Controller.Runtime.Inventories;
+using Soul.Controller.Runtime.UI;
+using Soul.Model.Runtime.Drops;
+using Soul.Model.Runtime.Items;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.DragAndDrop
+namespace Soul.Controller.Runtime.DragAndDrop
 {
     public class ItemDragContainer : DragContainer
     {

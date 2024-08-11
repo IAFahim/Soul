@@ -4,7 +4,7 @@ using Pancake.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace _Root.Scripts.Presenter.Runtime.UI
+namespace Soul.Presenter.Runtime.UI
 {
     public class Menu : MonoBehaviour
     {

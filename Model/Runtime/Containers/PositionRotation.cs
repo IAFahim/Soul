@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Containers
+namespace Soul.Model.Runtime.Containers
 {
     [Serializable]
     public class PositionRotation

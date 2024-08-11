@@ -1,10 +1,9 @@
-using System;
 using Cysharp.Threading.Tasks;
 using Pancake.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace _Root.Scripts.Presenter.Runtime.Views
+namespace Soul.Presenter.Runtime.Views
 {
     public partial class ShopView : View
     {

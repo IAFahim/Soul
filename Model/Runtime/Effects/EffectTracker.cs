@@ -2,7 +2,7 @@
 using QuickEye.Utility;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Effects
+namespace Soul.Model.Runtime.Effects
 {
     public class EffectTracker : ScriptableObject
     {

@@ -1,7 +1,7 @@
 ﻿using Pancake;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Links
+namespace Soul.Model.Runtime.Links
 {
     public class GameObjectBridgeComponent : GameComponent
     {

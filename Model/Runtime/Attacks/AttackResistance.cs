@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace _Root.Scripts.Model.Runtime.Attacks
+namespace Soul.Model.Runtime.Attacks
 {
     [Serializable]
     public class AttackResistance

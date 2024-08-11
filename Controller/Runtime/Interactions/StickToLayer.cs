@@ -1,7 +1,7 @@
 ﻿using Pancake;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Interactions
+namespace Soul.Controller.Runtime.Interactions
 {
     public class StickToLayer : GameComponent
     {

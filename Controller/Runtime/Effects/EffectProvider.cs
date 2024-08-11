@@ -1,10 +1,10 @@
-﻿using _Root.Scripts.Model.Runtime.Effects;
-using _Root.Scripts.Model.Runtime.Modifiers;
-using Alchemy.Inspector;
+﻿using Alchemy.Inspector;
 using Pancake;
+using Soul.Model.Runtime.Effects;
+using Soul.Model.Runtime.Modifiers;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Effects
+namespace Soul.Controller.Runtime.Effects
 {
     public class EffectProvider : GameComponent
     {

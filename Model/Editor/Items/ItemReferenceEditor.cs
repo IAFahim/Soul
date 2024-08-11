@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
+using Soul.Model.Runtime.Items;
 using UnityEditor;
-using _Root.Scripts.Model.Runtime.Items;
+using UnityEngine;
 
-namespace _Root.Scripts.Model.Editor.Items
+namespace Soul.Model.Editor.Items
 {
     [CustomEditor(typeof(GameItems))]
     public class ItemReferenceEditor : UnityEditor.Editor

@@ -3,7 +3,7 @@ using Pancake;
 using Pancake.Common;
 using QuickEye.Utility;
 
-namespace _Root.Scripts.Model.Runtime.Tasks
+namespace Soul.Model.Runtime.Tasks
 {
     [Serializable]
     public class GameTask

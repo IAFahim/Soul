@@ -1,4 +1,4 @@
-﻿namespace _Root.Scripts.Controller.Runtime.Inventories
+﻿namespace Soul.Controller.Runtime.Inventories
 {
     public interface ISingleDrop
     {

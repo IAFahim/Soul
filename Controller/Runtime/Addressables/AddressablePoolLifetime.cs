@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
-using _Root.Scripts.Model.Runtime.Containers;
 using Cysharp.Threading.Tasks;
 using Pancake.Pools;
+using Soul.Model.Runtime.Containers;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace _Root.Scripts.Controller.Runtime.Addressables
+namespace Soul.Controller.Runtime.Addressables
 {
     public class AddressablePoolLifetime : MonoBehaviour
     {

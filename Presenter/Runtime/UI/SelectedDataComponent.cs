@@ -1,14 +1,14 @@
-﻿using _Root.Scripts.Controller.Runtime.UI;
-using _Root.Scripts.Model.Runtime.Interfaces;
-using _Root.Scripts.Model.Runtime.Levels;
-using _Root.Scripts.Model.Runtime.Variables;
-using Pancake;
+﻿using Pancake;
+using Soul.Controller.Runtime.UI;
+using Soul.Model.Runtime.Interfaces;
+using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.Variables;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-namespace _Root.Scripts.Presenter.Runtime.UI
+namespace Soul.Presenter.Runtime.UI
 {
     public class SelectedDataComponent : GameComponent
     {

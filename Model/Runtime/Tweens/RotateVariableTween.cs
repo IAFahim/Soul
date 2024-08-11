@@ -3,7 +3,7 @@ using LitMotion;
 using LitMotion.Extensions;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Tweens
+namespace Soul.Model.Runtime.Tweens
 {
     [Serializable]
     public class RotateVariableTween : Vector3StartEndVariableTween

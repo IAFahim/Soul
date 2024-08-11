@@ -1,8 +1,8 @@
 ﻿using System;
-using _Root.Scripts.Model.Runtime.Damages;
+using Soul.Model.Runtime.Damages;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Stats
+namespace Soul.Model.Runtime.Stats
 {
     [Serializable]
     public class Health : IDamageable

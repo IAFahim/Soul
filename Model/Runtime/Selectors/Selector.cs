@@ -1,12 +1,10 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
-using Pancake.Common;
 using Pancake.MobileInput;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 
-namespace _Root.Scripts.Model.Runtime.Selectors
+namespace Soul.Model.Runtime.Selectors
 {
     [Serializable]
     public class Selector

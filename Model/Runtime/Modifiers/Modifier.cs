@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Modifiers
+namespace Soul.Model.Runtime.Modifiers
 {
     [Serializable]
     public struct Modifier : IEquatable<Modifier>

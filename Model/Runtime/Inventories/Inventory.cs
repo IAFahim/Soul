@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using _Root.Scripts.Model.Runtime.Containers;
-using _Root.Scripts.Model.Runtime.Interfaces;
 using Alchemy.Inspector;
 using Pancake.Common;
 using QuickEye.Utility;
+using Soul.Model.Runtime.Containers;
+using Soul.Model.Runtime.Interfaces;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Inventories
+namespace Soul.Model.Runtime.Inventories
 {
     [Serializable]
     public abstract class Inventory<T, TV> : ISaveAble where TV : IComparable<TV>, IEquatable<TV>

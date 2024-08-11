@@ -1,9 +1,9 @@
-﻿using _Root.Scripts.Model.Runtime.CustomList;
-using _Root.Scripts.Model.Runtime.Drops;
-using Pancake;
+﻿using Pancake;
+using Soul.Model.Runtime.CustomList;
+using Soul.Model.Runtime.Drops;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.DragAndDrop
+namespace Soul.Controller.Runtime.DragAndDrop
 {
     public abstract class GetDropAbleManager<T> : GameComponent
     {

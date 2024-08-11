@@ -2,7 +2,7 @@
 using Pancake.Pools;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Components
+namespace Soul.Controller.Runtime.Components
 {
     [SelectionBase]
     [DisallowMultipleComponent]

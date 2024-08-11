@@ -3,7 +3,7 @@ using LitMotion;
 using Pancake;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Tweens
+namespace Soul.Model.Runtime.Tweens
 {
     [Serializable]
     public abstract class VariableTween

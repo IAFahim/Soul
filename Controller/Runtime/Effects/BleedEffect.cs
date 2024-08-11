@@ -1,9 +1,9 @@
 ﻿using System;
-using _Root.Scripts.Model.Runtime.Effects;
 using Pancake.Common;
+using Soul.Model.Runtime.Effects;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Effects
+namespace Soul.Controller.Runtime.Effects
 {
     [Serializable]
     public class BleedEffect : Effect

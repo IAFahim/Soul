@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace _Root.Scripts.Presenter.Runtime.SubContainers
+namespace Soul.Presenter.Runtime.SubContainers
 {
     public class DayRewardComponent : MonoBehaviour
     {

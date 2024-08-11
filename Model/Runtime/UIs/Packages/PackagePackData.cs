@@ -5,7 +5,7 @@ using Pancake.IAP;
 using Pancake.Localization;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.UIs.Packages
+namespace Soul.Model.Runtime.UIs.Packages
 {
     [CreateAssetMenu(menuName = "Pancake/Game/Shop/Package Data")]
     public class PackagePackData : ScriptableObject

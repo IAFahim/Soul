@@ -1,4 +1,4 @@
-﻿namespace _Root.Scripts.Model.Runtime.Items
+﻿namespace Soul.Model.Runtime.Items
 {
     public interface IWeight
     {

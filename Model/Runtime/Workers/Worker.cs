@@ -1,7 +1,7 @@
 ﻿using Pancake;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Workers
+namespace Soul.Model.Runtime.Workers
 {
     public class Worker : GameComponent
     {

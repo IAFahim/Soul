@@ -1,9 +1,9 @@
 ﻿using System;
-using _Root.Scripts.Model.Runtime.Interfaces;
+using Soul.Model.Runtime.Interfaces;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace _Root.Scripts.Model.Runtime.Items
+namespace Soul.Model.Runtime.Items
 {
     [CreateAssetMenu(fileName = "item", menuName = "Scriptable/Item/Create Item")]
     [Serializable]

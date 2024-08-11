@@ -1,12 +1,12 @@
 ﻿using System;
-using _Root.Scripts.Controller.Runtime.Inventories;
-using _Root.Scripts.Model.Runtime.Interfaces;
-using _Root.Scripts.Model.Runtime.Items;
-using _Root.Scripts.Model.Runtime.Workers;
 using Pancake;
+using Soul.Controller.Runtime.Inventories;
+using Soul.Model.Runtime.Interfaces;
+using Soul.Model.Runtime.Items;
+using Soul.Model.Runtime.Workers;
 using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Buildings.Managers
+namespace Soul.Controller.Runtime.Buildings.Managers
 {
     public class CropProductionManager : GameComponent, ISaveAble, ISingleDrop, IWeightLimiter
     {

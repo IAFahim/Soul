@@ -1,8 +1,8 @@
 ﻿using System;
-using _Root.Scripts.Model.Runtime.Inventories;
-using _Root.Scripts.Model.Runtime.Items;
+using Soul.Model.Runtime.Inventories;
+using Soul.Model.Runtime.Items;
 
-namespace _Root.Scripts.Controller.Runtime.Inventories
+namespace Soul.Controller.Runtime.Inventories
 {
     [Serializable]
     public class ItemInventory : Inventory<Item, int>

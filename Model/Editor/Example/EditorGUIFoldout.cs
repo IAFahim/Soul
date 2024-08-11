@@ -3,7 +3,7 @@ using UnityEngine;
 
 // Create a foldable menu that hides/shows the selected transform position.
 // if no Transform is selected, the Foldout item will be folded until a transform is selected.
-namespace _Root.Scripts.Model.Editor.Example
+namespace Soul.Model.Editor.Example
 {
     public class EditorGUIFoldout : EditorWindow
     {

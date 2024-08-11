@@ -1,11 +1,6 @@
-﻿using System.Collections.Generic;
-using _Root.Scripts.Controller.Runtime.Components;
-using _Root.Scripts.Controller.Runtime.Effects;
-using _Root.Scripts.Model.Runtime.Effects;
-using Pancake;
-using UnityEngine;
+﻿using Soul.Controller.Runtime.Effects;
 
-namespace _Root.Scripts.Controller.Runtime.Characters
+namespace Soul.Controller.Runtime.Characters
 {
     public class CharacterComponent : EffectTargetComponent
     {

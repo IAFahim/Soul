@@ -1,8 +1,8 @@
-﻿using _Root.Scripts.Presenter.Runtime.Views;
-using Pancake.UI;
+﻿using Pancake.UI;
 using UnityEngine;
+using SettingView = Soul.Presenter.Runtime.Views.SettingView;
 
-namespace _Root.Scripts.Presenter.Runtime.Popups
+namespace Soul.Presenter.Runtime.Popups
 {
     [RequireComponent(typeof(SettingView))]
     public sealed class SettingPopup : Popup<SettingView>

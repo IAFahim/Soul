@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Inventories
+namespace Soul.Controller.Runtime.Inventories
 {
     [CreateAssetMenu(fileName = "itemInventory", menuName = "Scriptable/Inventory/Create Inventory")]
     public class ItemInventoryReference : ScriptableObject

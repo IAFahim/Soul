@@ -1,4 +1,4 @@
-﻿namespace _Root.Scripts.Controller.Runtime.Movements
+﻿namespace Soul.Controller.Runtime.Movements
 {
     public class DirectionMovementController : MovementModel
     {

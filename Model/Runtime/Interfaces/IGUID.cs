@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace _Root.Scripts.Model.Runtime.Interfaces
+﻿namespace Soul.Model.Runtime.Interfaces
 {
     public interface IGuid
     {

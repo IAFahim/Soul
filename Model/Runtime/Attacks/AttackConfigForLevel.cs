@@ -1,7 +1,7 @@
-﻿using _Root.Scripts.Model.Runtime.Modifiers;
+﻿using Soul.Model.Runtime.Modifiers;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Attacks
+namespace Soul.Model.Runtime.Attacks
 {
     public class AttackConfigForLevel : ScriptableObject
     {

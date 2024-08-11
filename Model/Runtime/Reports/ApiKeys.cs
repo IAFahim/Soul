@@ -3,7 +3,7 @@ using System.Text;
 using Alchemy.Inspector;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Reports
+namespace Soul.Model.Runtime.Reports
 {
     public class ApiKeys : ScriptableObject
     {

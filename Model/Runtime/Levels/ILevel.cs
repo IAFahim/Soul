@@ -1,4 +1,4 @@
-﻿namespace _Root.Scripts.Model.Runtime.Levels
+﻿namespace Soul.Model.Runtime.Levels
 {
     public interface ILevel
     {

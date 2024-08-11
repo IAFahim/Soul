@@ -1,7 +1,7 @@
 ﻿using QuickEye.Utility;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Items
+namespace Soul.Model.Runtime.Items
 {
     [CreateAssetMenu(fileName = ".crop", menuName = "Scriptable/Item/Create Crop")]
     public class Crop : Item, IWeight

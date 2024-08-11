@@ -1,13 +1,11 @@
 using System;
-using _Root.Scripts.Model.Runtime;
-using _Root.Scripts.Model.Runtime.UIs.Packages;
-using Pancake.IAP;
-// using Pancake.Localization;
-using TMPro;
-using UnityEngine.UI;
+using Soul.Model.Runtime;
+using Soul.Model.Runtime.UIs;
+using Soul.Model.Runtime.UIs.Packages;
 using UnityEngine;
+// using Pancake.Localization;
 
-namespace Pancake.Game.UI
+namespace Soul.Presenter.Runtime.Visuals
 {
     public class PackageItemVisual : MonoBehaviour
     {

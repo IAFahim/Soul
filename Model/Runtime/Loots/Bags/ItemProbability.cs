@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Loots.Bags
+namespace Soul.Model.Runtime.Loots.Bags
 {
     [Serializable]
     public class ItemProbability<T>

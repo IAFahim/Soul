@@ -1,6 +1,6 @@
-﻿using _Root.Scripts.Model.Runtime.Coroutines;
+﻿using Soul.Model.Runtime.Coroutines;
 
-namespace _Root.Scripts.Model.Runtime.Damages
+namespace Soul.Model.Runtime.Damages
 {
     public class DamageTypeCoroutineLink : CoroutineLink<DamageType>
     {

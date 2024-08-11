@@ -1,6 +1,4 @@
-﻿using _Root.Scripts.Model.Runtime.Attacks;
-
-namespace _Root.Scripts.Controller.Runtime.Attacks
+﻿namespace Soul.Controller.Runtime.Attacks
 {
     public interface IAttack
     {

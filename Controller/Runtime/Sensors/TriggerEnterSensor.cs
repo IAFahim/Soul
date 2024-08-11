@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace _Root.Scripts.Controller.Runtime.Sensors
+namespace Soul.Controller.Runtime.Sensors
 {
     public class TriggerEnterSensor : Sensor
     {

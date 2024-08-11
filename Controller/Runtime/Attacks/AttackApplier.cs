@@ -1,6 +1,6 @@
 ﻿using Pancake;
 
-namespace _Root.Scripts.Controller.Runtime.Attacks
+namespace Soul.Controller.Runtime.Attacks
 {
     public class AttackApplier: GameComponent
     {

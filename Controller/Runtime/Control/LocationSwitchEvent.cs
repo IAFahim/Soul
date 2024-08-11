@@ -1,7 +1,7 @@
-﻿using _Root.Scripts.Model.Runtime;
-using Pancake;
+﻿using Pancake;
+using Soul.Model.Runtime;
 
-namespace _Root.Scripts.Controller.Runtime.Control
+namespace Soul.Controller.Runtime.Control
 {
     public class LocationSwitchEvent : Event<(PlaceEnum location, int index)>
     {

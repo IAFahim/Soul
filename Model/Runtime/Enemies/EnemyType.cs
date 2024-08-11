@@ -1,7 +1,6 @@
-﻿using _Root.Scripts.Model.Runtime.Attacks;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace _Root.Scripts.Model.Runtime.Enemies
+namespace Soul.Model.Runtime.Enemies
 {
     [CreateAssetMenu(menuName = "Scriptable/Enemy/Type")]
     public class EnemyType : ScriptableObject

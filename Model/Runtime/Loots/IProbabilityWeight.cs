@@ -1,4 +1,4 @@
-﻿namespace _Root.Scripts.Model.Runtime.Loots
+﻿namespace Soul.Model.Runtime.Loots
 {
     public interface IProbabilityWeight
     {

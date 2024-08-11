@@ -1,8 +1,8 @@
 ﻿using System;
-using _Root.Scripts.Model.Runtime.Modifiers;
 using Pancake;
+using Soul.Model.Runtime.Modifiers;
 
-namespace _Root.Scripts.Model.Runtime.Productions.Mappings
+namespace Soul.Model.Runtime.Productions.Mappings
 {
     [Serializable]
     public struct ProductionMapping<T>

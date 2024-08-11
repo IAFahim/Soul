@@ -1,8 +1,7 @@
 ﻿using System;
 using Pancake;
-using UnityEngine;
 
-namespace _Root.Scripts.Controller.Runtime.Attacks
+namespace Soul.Controller.Runtime.Attacks
 {
     [Serializable]
     public class Attack : GameComponent, IAttack
