@@ -2,7 +2,7 @@
 
 namespace Soul.Controller.Runtime.Inventories
 {
-    [CreateAssetMenu(fileName = "itemInventory", menuName = "Scriptable/Inventory/Create Inventory")]
+    [CreateAssetMenu(fileName = "itemInventory", menuName = "Soul/Inventory/Create Inventory")]
     public class ItemInventoryReference : ScriptableObject
     {
         public ItemInventory inventory;

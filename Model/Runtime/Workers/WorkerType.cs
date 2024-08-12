@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Soul.Model.Runtime.Workers
 {
-    [CreateAssetMenu(fileName = ".worker", menuName = "Scriptable/Worker/Create Worker")]
+    [CreateAssetMenu(fileName = ".worker", menuName = "Soul/Worker/Create Worker")]
     [Serializable]
     public class WorkerType : ScriptableObject, ITitle
     {

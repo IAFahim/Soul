@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 
 namespace Soul.Model.Runtime.Items
 {
-    [CreateAssetMenu(fileName = "item", menuName = "Scriptable/Item/Create Item")]
+    [CreateAssetMenu(fileName = "item", menuName = "Soul/Item/Create Item")]
     [Serializable]
     public class Item : ScriptableObject, ITitle
     {

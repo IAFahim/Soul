@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Soul.Model.Runtime.Reports
 {
+    [CreateAssetMenu(fileName = "ApiKeys", menuName = "Soul/Reports/ApiKeys")]
     public class ApiKeys : ScriptableObject
     {
         public bool logEnabled;
