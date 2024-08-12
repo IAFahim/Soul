@@ -23,9 +23,14 @@ namespace Soul.Controller.Runtime.DragAndDrop
         {
             itemInventoryReference = inventoryReference;
             currentItem = item;
-            if (itemInventoryReference.inventory.TryGetItem(item, out var amount))
+            float allowedAmount = 0;
+            if (item is IWeight weight)
             {
-                textMeshProUGUIFormat.SetTextFloat(amount);
+                allowedAmount = weight.Weight;
+            }
+            if (itemInventoryReference.inventory.TryGetItem(item, out var inventoryAmount))
+            {
+                textMeshProUGUIFormat.SetTextFloat(inventoryAmount);
                 return true;
             }
 
@@ -38,7 +43,7 @@ namespace Soul.Controller.Runtime.DragAndDrop
             if (isHit)
             {
                 if (selectedTransform == rayCast.transform) return;
-                itemInventoryReference.tempInventory.Clear(true);
+                itemInventoryReference.tempInventory.RemoveItem(currentItem);
                 selectedTransform = rayCast.transform;
                 if (rayCast.transform.TryGetComponent<IDropAble<Item>>(out var dropAble))
                 {
