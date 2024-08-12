@@ -2,7 +2,7 @@
 using Cysharp.Threading.Tasks;
 using Pancake;
 using Pancake.Common;
-using Soul.Controller.Runtime.Addressables;
+using Soul.Controller.Runtime.AddressablesHelper;
 using Soul.Controller.Runtime.Buildings.Managers;
 using Soul.Controller.Runtime.Buildings.Records;
 using Soul.Controller.Runtime.Upgrades;

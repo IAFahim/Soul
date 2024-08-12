@@ -2,7 +2,7 @@
 using Cysharp.Threading.Tasks;
 using Pancake;
 using Pancake.Common;
-using Soul.Controller.Runtime.Addressables;
+using Soul.Controller.Runtime.AddressablesHelper;
 using Soul.Model.Runtime.Times;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -13,7 +13,6 @@ namespace Soul.Controller.Runtime.Upgrades
     {
         [SerializeField] private Transform parent;
         [SerializeField] private int currentLevel;
-        [SerializeField] private bool usePooling;
         [SerializeField] private UnlockManager unlockManager;
         [SerializeField] private Optional<PartsManager> upgradePartsManager;
 
@@ -36,7 +35,6 @@ namespace Soul.Controller.Runtime.Upgrades
             BoxCollider boxCollider, int level, bool usePoolingForLevels)
 
         {
-            usePooling = usePoolingForLevels;
             await Setup(addressablePoolLifetime, lockedAssetReferenceGameObject, unLockedAssetReferenceGameObject,
                 boxCollider, level);
         }
@@ -57,7 +55,7 @@ namespace Soul.Controller.Runtime.Upgrades
             {
                 var unLockedGameObject = await unlockManager.InstantiateUnLockedAsync();
                 upgradePartsManager = unLockedGameObject.GetComponent<PartsManager>();
-                if (upgradePartsManager) upgradePartsManager.Value.Spawn(currentLevel - 1, usePooling, boxCollider);
+                if (upgradePartsManager) upgradePartsManager.Value.Spawn(currentLevel - 1, boxCollider);
             }
         }
 
@@ -75,7 +73,7 @@ namespace Soul.Controller.Runtime.Upgrades
         private void OnComplete()
         {
             currentLevel++;
-            upgradePartsManager.Value.Spawn(currentLevel, usePooling);
+            upgradePartsManager.Value.Spawn(currentLevel);
         }
 
 
