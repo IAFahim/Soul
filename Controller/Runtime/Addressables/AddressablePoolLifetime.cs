@@ -6,69 +6,63 @@ using Soul.Model.Runtime.Containers;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace Soul.Controller.Runtime.AddressablesHelper
+namespace Soul.Controller.Runtime.Addressables
 {
     public class AddressablePoolLifetime : MonoBehaviour
     {
         private readonly Dictionary<AssetReferenceGameObject, AsyncAddressableGameObjectPool> _pools = new();
 
-        public async UniTask<GameObject> GetOrInstantiateAsync(AssetReferenceGameObject assetReference, int usePool,
+        public async UniTask<GameObject> GetOrInstantiateAsync(AssetReferenceGameObject assetReference,
             CancellationToken cancellationToken = default)
         {
-            if (usePool > -1 && !_pools.TryGetValue(assetReference, out var pool))
+            if (!_pools.TryGetValue(assetReference, out var pool))
             {
                 pool = new AsyncAddressableGameObjectPool(assetReference);
                 _pools[assetReference] = pool;
-                return await pool.RequestAsync(cancellationToken);
             }
 
-            return await assetReference.InstantiateAsync().ToUniTask(cancellationToken: cancellationToken);
+            return await pool.RequestAsync(cancellationToken);
         }
 
         public async UniTask<GameObject> GetOrInstantiateAsync(AssetReferenceGameObject assetReference,
-            Transform parent, int usePool, CancellationToken cancellationToken = default)
+            Transform parent, CancellationToken cancellationToken = default)
         {
-            if (usePool > -1 && !_pools.TryGetValue(assetReference, out var pool))
+            if (!_pools.TryGetValue(assetReference, out var pool))
             {
                 pool = new AsyncAddressableGameObjectPool(assetReference);
                 _pools[assetReference] = pool;
-                return await pool.RentAsync(parent, cancellationToken);
             }
 
-            return await assetReference.InstantiateAsync(parent).ToUniTask(cancellationToken: cancellationToken);
+            return await pool.RentAsync(parent, cancellationToken);
         }
 
         public async UniTask<GameObject> GetOrInstantiateAsync(AssetReferenceGameObject assetReference,
-            Vector3 position, Quaternion rotation, int usePool, CancellationToken cancellationToken = default)
+            Vector3 position, Quaternion rotation, CancellationToken cancellationToken = default)
         {
-            if (usePool > -1 && !_pools.TryGetValue(assetReference, out var pool))
+            if (!_pools.TryGetValue(assetReference, out var pool))
             {
                 pool = new AsyncAddressableGameObjectPool(assetReference);
                 _pools[assetReference] = pool;
-                return await pool.RentAsync(position, rotation, cancellationToken);
             }
 
-            return await assetReference.InstantiateAsync(position, rotation)
-                .ToUniTask(cancellationToken: cancellationToken);
+            return await pool.RentAsync(position, rotation, cancellationToken);
         }
 
         public async UniTask<GameObject> GetOrInstantiateAsync(AssetReferenceGameObject assetReference,
-            Vector3 position, Quaternion rotation, Transform parent, int usePool)
+            Vector3 position, Quaternion rotation, Transform parent)
         {
-            if (usePool > -1 && !_pools.TryGetValue(assetReference, out var pool))
+            if (!_pools.TryGetValue(assetReference, out var pool))
             {
                 pool = new AsyncAddressableGameObjectPool(assetReference);
                 _pools[assetReference] = pool;
-                return await pool.RentAsync(position, rotation, parent);
             }
 
-            return await assetReference.InstantiateAsync(position, rotation, parent);
+            return await pool.RentAsync(position, rotation, parent);
         }
 
-        public void ReturnToPoolOrDestroy(AssetReferenceGameObject assetReference, GameObject spawnedGameObject,
-            int destroy)
+        public void ReturnToPool(AssetReferenceGameObject assetReference, GameObject spawnedGameObject)
         {
-            if (destroy > -1 && _pools.TryGetValue(assetReference, out var pool))
+            if (_pools.TryGetValue(assetReference, out var pool))
             {
                 pool.Return(spawnedGameObject);
             }
@@ -78,11 +72,10 @@ namespace Soul.Controller.Runtime.AddressablesHelper
                 Destroy(spawnedGameObject);
             }
         }
-
-        public void ReturnToPoolOrDestroy(Pair<AssetReferenceGameObject, GameObject> assetReferenceGameObjectPair,
-            int destroy)
+        
+        public void ReturnToPool(Pair<AssetReferenceGameObject, GameObject>  assetReferenceGameObjectPair)
         {
-            ReturnToPoolOrDestroy(assetReferenceGameObjectPair.Key, assetReferenceGameObjectPair.Value, destroy);
+            ReturnToPool(assetReferenceGameObjectPair.Key, assetReferenceGameObjectPair.Value);
         }
 
         public async UniTask PrewarmAsync(AssetReferenceGameObject assetReference, int count,

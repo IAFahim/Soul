@@ -1,7 +1,7 @@
 ﻿using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using Pancake;
-using Soul.Controller.Runtime.AddressablesHelper;
+using Soul.Controller.Runtime.Addressables;
 using Soul.Model.Runtime.Containers;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -13,15 +13,10 @@ namespace Soul.Controller.Runtime.Upgrades
         [SerializeField] private AddressablePoolLifetime addressablePoolLifetime;
         [SerializeField] private AssetReferenceGameObject lockedAssetReferenceGameObject;
         [SerializeField] private AssetReferenceGameObject unLockedAssetReferenceGameObject;
-        [SerializeField] private int usePooling;
         [ShowInInspector] private Pair<AssetReferenceGameObject, GameObject> _instantiatedAssetPairReference;
 
-        public void Setup(AddressablePoolLifetime poolLifetime,
-            AssetReferenceGameObject lockedAssetReference,
-            AssetReferenceGameObject unLockedAssetReference)
+        public void Setup(AddressablePoolLifetime poolLifetime)
         {
-            lockedAssetReferenceGameObject = lockedAssetReference;
-            unLockedAssetReferenceGameObject = unLockedAssetReference;
             addressablePoolLifetime = poolLifetime;
         }
 
@@ -29,26 +24,30 @@ namespace Soul.Controller.Runtime.Upgrades
         {
             ReleaseInstance();
             var instantiatedAsset = await addressablePoolLifetime.GetOrInstantiateAsync(
-                assetReferenceGameObject, transform.position, Quaternion.identity, Transform, usePooling
+                assetReferenceGameObject, transform.position, Quaternion.identity, Transform
             );
-            if (usePooling > -1) usePooling++;
             _instantiatedAssetPairReference =
                 new Pair<AssetReferenceGameObject, GameObject>(assetReferenceGameObject, instantiatedAsset);
             return instantiatedAsset;
         }
 
 
-        public async UniTask<GameObject> InstantiateLockedAsync() =>
-            await InstantiateAsync(lockedAssetReferenceGameObject);
+        public async UniTask<GameObject> InstantiateLockedAsync()
+        {
+            return await InstantiateAsync(lockedAssetReferenceGameObject);
+        }
 
-        public async UniTask<GameObject> InstantiateUnLockedAsync() =>
-            await InstantiateAsync(unLockedAssetReferenceGameObject);
+
+        public async UniTask<GameObject> InstantiateUnLockedAsync()
+        {
+            return await InstantiateAsync(unLockedAssetReferenceGameObject);
+        }
 
         [Button]
         private void ReleaseInstance()
         {
             if (_instantiatedAssetPairReference.Value)
-                addressablePoolLifetime.ReturnToPoolOrDestroy(_instantiatedAssetPairReference, usePooling);
+                addressablePoolLifetime.ReturnToPool(_instantiatedAssetPairReference);
         }
     }
 }

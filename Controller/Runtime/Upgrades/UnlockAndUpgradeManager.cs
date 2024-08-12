@@ -2,10 +2,9 @@
 using Cysharp.Threading.Tasks;
 using Pancake;
 using Pancake.Common;
-using Soul.Controller.Runtime.AddressablesHelper;
+using Soul.Controller.Runtime.Addressables;
 using Soul.Model.Runtime.Times;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 namespace Soul.Controller.Runtime.Upgrades
 {
@@ -13,6 +12,7 @@ namespace Soul.Controller.Runtime.Upgrades
     {
         [SerializeField] private Transform parent;
         [SerializeField] private int currentLevel;
+        [SerializeField] private bool usePooling;
         [SerializeField] private UnlockManager unlockManager;
         [SerializeField] private Optional<PartsManager> upgradePartsManager;
 
@@ -20,32 +20,22 @@ namespace Soul.Controller.Runtime.Upgrades
         public bool IsUpgrading => _delayHandle != null && !_delayHandle.IsDone;
 
         public async UniTask Setup(AddressablePoolLifetime addressablePoolLifetime,
-            AssetReferenceGameObject lockedAssetReferenceGameObject,
-            AssetReferenceGameObject unLockedAssetReferenceGameObject,
             BoxCollider boxCollider, int level, bool usePoolingForLevels, Transform parentOverride)
         {
             parent = parentOverride;
-            await Setup(addressablePoolLifetime, lockedAssetReferenceGameObject, unLockedAssetReferenceGameObject,
-                boxCollider, level, usePoolingForLevels);
+            await Setup(addressablePoolLifetime, boxCollider, level, usePoolingForLevels);
         }
 
-        public async UniTask Setup(AddressablePoolLifetime addressablePoolLifetime,
-            AssetReferenceGameObject lockedAssetReferenceGameObject,
-            AssetReferenceGameObject unLockedAssetReferenceGameObject,
-            BoxCollider boxCollider, int level, bool usePoolingForLevels)
+        public async UniTask Setup(AddressablePoolLifetime addressablePoolLifetime, BoxCollider boxCollider, int level, bool usePoolingForLevels)
 
         {
-            await Setup(addressablePoolLifetime, lockedAssetReferenceGameObject, unLockedAssetReferenceGameObject,
-                boxCollider, level);
+            usePooling = usePoolingForLevels;
+            await Setup(addressablePoolLifetime, boxCollider, level);
         }
 
-        public async UniTask Setup(AddressablePoolLifetime addressablePoolLifetime,
-            AssetReferenceGameObject lockedAssetReferenceGameObject,
-            AssetReferenceGameObject unLockedAssetReferenceGameObject,
-            BoxCollider boxCollider, int level)
+        public async UniTask Setup(AddressablePoolLifetime addressablePoolLifetime, BoxCollider boxCollider, int level)
         {
-            unlockManager.Setup(addressablePoolLifetime, lockedAssetReferenceGameObject,
-                unLockedAssetReferenceGameObject);
+            unlockManager.Setup(addressablePoolLifetime);
             currentLevel = level;
             if (currentLevel == 0)
             {
@@ -55,7 +45,7 @@ namespace Soul.Controller.Runtime.Upgrades
             {
                 var unLockedGameObject = await unlockManager.InstantiateUnLockedAsync();
                 upgradePartsManager = unLockedGameObject.GetComponent<PartsManager>();
-                if (upgradePartsManager) upgradePartsManager.Value.Spawn(currentLevel - 1, boxCollider);
+                if (upgradePartsManager) upgradePartsManager.Value.Spawn(currentLevel - 1, usePooling, boxCollider);
             }
         }
 
@@ -73,7 +63,7 @@ namespace Soul.Controller.Runtime.Upgrades
         private void OnComplete()
         {
             currentLevel++;
-            upgradePartsManager.Value.Spawn(currentLevel);
+            upgradePartsManager.Value.Spawn(currentLevel, usePooling);
         }
 
 

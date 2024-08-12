@@ -11,26 +11,26 @@ namespace Soul.Controller.Runtime.Upgrades
         [SerializeField] private UpgradeParts[] upgradeParts;
         [SerializeField] private Bounds bounds;
         [SerializeField] private List<GameObject> instantiatedParts;
-        [SerializeField] private int usePooling;
+
         [Button]
-        public void Spawn(int index)
+        public void Spawn(int index, bool usePooling)
         {
-            instantiatedParts = new(upgradeParts[index].SpawnParts(Transform, usePooling>-1));
+            instantiatedParts = new(upgradeParts[index].SpawnParts(Transform, usePooling));
         }
 
         [Button]
-        public void Spawn(int index, BoxCollider boxCollider)
+        public void Spawn(int index, bool usePooling, BoxCollider boxCollider)
         {
             var parts = upgradeParts[index];
             bounds = parts.bounds;
-            instantiatedParts = new(parts.SpawnParts(Transform, usePooling>-1));
+            instantiatedParts = new(parts.SpawnParts(Transform, usePooling));
             SetBounds(boxCollider);
         }
 
         [Button]
-        public void SpawnExtra(int next)
+        public void SpawnExtra(int next, bool usePooling)
         {
-            var extraParts = upgradeParts[next - 1].SpawnExtraParts(Transform, upgradeParts[next], usePooling>-1);
+            var extraParts = upgradeParts[next - 1].SpawnExtraParts(Transform, upgradeParts[next], usePooling);
             instantiatedParts.AddRange(extraParts);
         }
 

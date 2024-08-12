@@ -2,7 +2,7 @@
 using Cysharp.Threading.Tasks;
 using Pancake;
 using Pancake.Common;
-using Soul.Controller.Runtime.AddressablesHelper;
+using Soul.Controller.Runtime.Addressables;
 using Soul.Controller.Runtime.Buildings.Managers;
 using Soul.Controller.Runtime.Buildings.Records;
 using Soul.Controller.Runtime.Upgrades;
@@ -74,8 +74,7 @@ namespace Soul.Controller.Runtime.Buildings.Productions
 
         public async UniTask SetUp(CropFieldRecord cropFieldRecord)
         {
-            await unlockAndUpgradeManager.Setup(addressablePoolLifetime, lockedInfrastructureInfo.LockedModel,
-                lockedInfrastructureInfo.UnlockedModel, boxCollider, this.cropFieldRecord.level);
+            await unlockAndUpgradeManager.Setup(addressablePoolLifetime, boxCollider, this.cropFieldRecord.level);
         }
 
         [Button]
