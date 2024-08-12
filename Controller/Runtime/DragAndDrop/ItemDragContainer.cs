@@ -1,5 +1,6 @@
 ﻿using Pancake.Pools;
 using Soul.Controller.Runtime.Inventories;
+using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
@@ -19,23 +20,44 @@ namespace Soul.Controller.Runtime.DragAndDrop
             textMeshProUGUIFormat.StoreFormat();
         }
 
-        public bool Setup(ItemInventoryReference inventoryReference, Item item)
+
+        public bool Setup(ItemInventoryReference inventoryReference, Item item, Transform container)
         {
             itemInventoryReference = inventoryReference;
             currentItem = item;
-            float allowedAmount = 0;
-            if (item is IWeight weight)
-            {
-                allowedAmount = weight.Weight;
-            }
+
             if (itemInventoryReference.inventory.TryGetItem(item, out var inventoryAmount))
             {
-                textMeshProUGUIFormat.SetTextFloat(inventoryAmount);
+                float allowedWeight = AllowedWeight(container);
+                float minAmount = Mathf.Min(inventoryAmount, allowedWeight);
+                textMeshProUGUIFormat.SetTextFloat(minAmount / PointToWeight(item));
                 return true;
             }
 
             GameObject.Return();
             return false;
+        }
+
+        public float AllowedWeight(Transform otherTransform)
+        {
+            float allowedAmount = 0;
+            if (otherTransform.TryGetComponent<IWeightCapacity>(out var weightCapacity))
+            {
+                allowedAmount = weightCapacity.WeightLimit;
+            }
+
+            return allowedAmount;
+        }
+
+        public float PointToWeight(Item item)
+        {
+            float pointToWeight = 1;
+            if (item is IPointToWeightReference pointToWeightReference)
+            {
+                pointToWeight = pointToWeightReference.PointToWeight;
+            }
+
+            return pointToWeight;
         }
 
         public override void OnDragRayCast(bool isHit, RaycastHit rayCast)

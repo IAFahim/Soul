@@ -9,7 +9,7 @@ namespace Soul.Model.Runtime.Items
     [Serializable]
     public class Item : ScriptableObject, ITitle
     {
-        [FormerlySerializedAs("titleName")] public string title;
+        public string title;
         [TextArea(3, 5)] public string description;
         public Sprite icon;
         

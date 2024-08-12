@@ -1,6 +1,6 @@
 ﻿namespace Soul.Controller.Runtime.Inventories
 {
-    public interface IWeightLimiter
+    public interface IWeightCapacity
     {
         public float WeightLimit { get; }
     }

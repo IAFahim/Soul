@@ -19,7 +19,7 @@ namespace Soul.Controller.Runtime.DragAndDrop
             foreach (var item in allowedThingsToDrop)
             {
                 var dragContainer = itemDragContainerPrefab.GameObject.Request<ItemDragContainer>(container);
-                if (dragContainer.Setup(itemInventoryReference, item))
+                if (dragContainer.Setup(itemInventoryReference, item, container))
                 {
                     instantiateDragContainers.Add(dragContainer);
                 }

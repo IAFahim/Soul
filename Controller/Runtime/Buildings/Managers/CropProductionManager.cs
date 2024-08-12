@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Soul.Controller.Runtime.Buildings.Managers
 {
-    public class CropProductionManager : GameComponent, ISaveAble, ISingleDrop, IWeightLimiter
+    public class CropProductionManager : GameComponent, ISaveAble, ISingleDrop, IWeightCapacity
     {
         public const string KeyPrefix = "prod";
         public int capacity;
