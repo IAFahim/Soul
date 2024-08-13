@@ -12,13 +12,13 @@ namespace Soul.Presenter.Runtime.UI
     {
         public ItemInventoryReference itemInventoryReference;
 
-        [Header("Coin")] public Item coin;
+        [Header("Coin")] public Currency coin;
         public TextMeshProUGUIFormat coinText;
         public TextMeshProUGUIFormat maxCoinText;
         public TextMeshProUGUIFormat coinGoingToBeModifiedText;
         public CanvasGroup coinGoingToBeModifiedCanvasGroup;
 
-        [Header("Gem")] public Item gem;
+        [Header("Gem")] public Currency gem;
         public TextMeshProUGUIFormat gemText;
         public TextMeshProUGUIFormat gemGoingToBeModifiedText;
         public CanvasGroup gemGoingToBeModifiedCanvasGroup;
@@ -64,24 +64,24 @@ namespace Soul.Presenter.Runtime.UI
 
         private void Start()
         {
-            if (itemInventoryReference.inventory.TryGetItem(coin, out var coinCount)) coinText.SetTextFloat(coinCount);
-            if (itemInventoryReference.inventory.TryGetItem(gem, out var gemCount)) gemText.SetTextFloat(gemCount);
-            workerText.SetTextFloat(worker);
+            if (itemInventoryReference.inventory.TryGetItem(coin, out var coinCount)) coinText.SetTextInt(coinCount);
+            if (itemInventoryReference.inventory.TryGetItem(gem, out var gemCount)) gemText.SetTextInt(gemCount);
+            workerText.SetTextInt(worker);
             weightText.SetTextFloat(weight.x);
             maxWeightText.SetTextFloat(weight.y);
-            levelText.SetTextFloat(level);
+            levelText.SetTextInt(level);
         }
 
         private void OnItemAddedOrIncreased(Item item, int amount, int count, bool isAdded)
         {
             if (item == coin)
             {
-                coinText.SetTextFloat(count);
-                maxCoinText.SetTextFloat(amount);
+                coinText.SetTextInt(count);
+                maxCoinText.SetTextInt(amount);
             }
             else if (item == gem)
             {
-                gemText.SetTextFloat(count);
+                gemText.SetTextInt(count);
             }
             else if (item is IWeight weightedItem)
             {
@@ -95,11 +95,11 @@ namespace Soul.Presenter.Runtime.UI
         {
             if (item == coin)
             {
-                coinText.SetTextFloat(count);
+                coinText.SetTextInt(count);
             }
             else if (item == gem)
             {
-                gemText.SetTextFloat(count);
+                gemText.SetTextInt(count);
             }
             else if (item is IWeight weightedItem)
             {
@@ -113,12 +113,12 @@ namespace Soul.Presenter.Runtime.UI
             if (Mathf.Approximately(0, amount)) return;
             if (item == coin)
             {
-                coinGoingToBeModifiedText.SetTextFloat(-amount);
+                coinGoingToBeModifiedText.SetTextInt(-amount);
                 coinGoingToBeModifiedCanvasGroup.alpha = 1;
             }
             else if (item == gem)
             {
-                gemGoingToBeModifiedText.SetTextFloat(-amount);
+                gemGoingToBeModifiedText.SetTextInt(-amount);
                 gemGoingToBeModifiedCanvasGroup.alpha = 1;
             }
             else if (item is IWeight weightedItem)

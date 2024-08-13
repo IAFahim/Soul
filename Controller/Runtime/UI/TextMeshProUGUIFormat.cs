@@ -24,6 +24,7 @@ namespace Soul.Controller.Runtime.UI
         public void StoreFormat() => format = TMP.text;
 
         public void SetTextFloat(float value) => TMP.text = string.Format(format, value.ToString(CultureInfo.InvariantCulture));
+        public void SetTextInt(int value) => TMP.text = string.Format(format, value.ToString(CultureInfo.InvariantCulture));
         public static implicit operator string(TextMeshProUGUIFormat textMeshProUGUIFormat) =>
             textMeshProUGUIFormat.format;
 

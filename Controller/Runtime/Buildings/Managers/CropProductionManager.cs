@@ -1,10 +1,9 @@
-﻿using System;
-using Pancake;
+﻿using Pancake;
 using Soul.Controller.Runtime.Inventories;
+using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Workers;
-using UnityEngine;
 
 namespace Soul.Controller.Runtime.Buildings.Managers
 {
@@ -13,38 +12,46 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         public const string KeyPrefix = "prod";
         public int capacity;
         public ItemInventoryReference inventoryReference;
-        public Item productionItem;
-        public int cropCount;
-        public WorkerGroup worker;
+        public float totalWorkerCount = 5;
+
+        public Pair<Item, int> productionItem;
+        public Pair<Item, int> coinRequirement;
+        public WorkerGroup storedWorkers;
+
         public Item queueItem;
-        
-        public Tuple<Item, int, WorkerGroup> ProductionItem => new(productionItem, cropCount, worker);
+        public WorkerGroup maxAllowedWorkersRequirement;
+
         public float WeightLimit => capacity;
 
         public void Add(Item[] items)
         {
             queueItem = items[0];
             inventoryReference.tempInventory.AddOrIncreaseItem(queueItem, (int)WeightLimit);
+            productionItem = new Pair<Item, int>(queueItem, (int)WeightLimit);
         }
 
         public void StartProduction()
         {
-            if (queueItem == null) return;
-            if (inventoryReference.inventory.TryGetItem(queueItem, out var amount))
-            {
-                productionItem = queueItem;
-                if (amount > 0)
-                {
-                    cropCount = Mathf.Min(amount, capacity);
-                }
-            }
+            if (HasEnoughToStart()) OnReward(false);
+        }
+
+        private void OnReward(bool isEnd)
+        {
+            inventoryReference.inventory.DecreaseItem(queueItem, (int)WeightLimit);
+            inventoryReference.inventory.DecreaseItem(coinRequirement.Key, coinRequirement.Value);
+            if (!isEnd) storedWorkers.Subtract(maxAllowedWorkersRequirement.count);
+        }
+
+        public bool HasEnoughToStart()
+        {
+            return inventoryReference.inventory.HasEnoughItem(coinRequirement) &&
+                   inventoryReference.inventory.HasEnoughItem(productionItem) &&
+                   totalWorkerCount >= maxAllowedWorkersRequirement.count;
         }
 
         public void Save(string key)
         {
             // Data.Save(key + KeyPrefix, ProductionItem);
         }
-
-        
     }
 }

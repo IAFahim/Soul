@@ -1,22 +1,19 @@
 ﻿using Pancake.Pools;
 using Soul.Controller.Runtime.Inventories;
-using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.DragAndDrop
 {
-    public class ItemDragContainer : DragContainer
+    public class ItemDragAndDropContainer : DragAndDropContainer
     {
         [SerializeField] private TextMeshProUGUIFormat textMeshProUGUIFormat;
         [SerializeField] private Item currentItem;
         [SerializeField] private ItemInventoryReference itemInventoryReference;
 
-        [SerializeField]
-        private Transform currentSelectedTransform;
+        [SerializeField] private Transform currentSelectedTransform;
 
         private void Awake()
         {
@@ -30,10 +27,10 @@ namespace Soul.Controller.Runtime.DragAndDrop
             currentItem = item;
             currentSelectedTransform = selectedTransform;
 
-            float getAmount = GetAllowedItemCount();
+            int getAmount = GetAllowedItemCount();
             if (getAmount > 0)
             {
-                textMeshProUGUIFormat.SetTextFloat(getAmount);
+                textMeshProUGUIFormat.SetTextInt(getAmount);
                 return true;
             }
 
@@ -42,19 +39,19 @@ namespace Soul.Controller.Runtime.DragAndDrop
         }
 
 
-        private float GetAllowedItemCount()
+        private int GetAllowedItemCount()
         {
             if (itemInventoryReference.inventory.TryGetItem(currentItem, out var inventoryAmount))
             {
-                float allowedWeight = AllowedWeight(currentSelectedTransform);
-                float minAmount = Mathf.Min(inventoryAmount, allowedWeight);
-                return Mathf.RoundToInt(minAmount / PointToWeight(currentItem));
+                int allowedWeight = AllowedWeight(currentSelectedTransform);
+                int minAmount = Mathf.Min(inventoryAmount, allowedWeight);
+                return minAmount;
             }
 
             return 0;
         }
 
-        public float AllowedWeight(Transform otherTransform)
+        public int AllowedWeight(Transform otherTransform)
         {
             float allowedAmount = 0;
             if (otherTransform.TryGetComponent<IWeightCapacity>(out var weightCapacity))
@@ -62,21 +59,10 @@ namespace Soul.Controller.Runtime.DragAndDrop
                 allowedAmount = weightCapacity.WeightLimit;
             }
 
-            return allowedAmount;
+            return (int)allowedAmount;
         }
 
-        public float PointToWeight(Item item)
-        {
-            float pointToWeight = 1;
-            if (item is IPointToWeightReference pointToWeightReference)
-            {
-                pointToWeight = pointToWeightReference.PointToWeight;
-            }
-
-            return pointToWeight;
-        }
-
-        public override void OnDragRayCast(bool isHit, RaycastHit rayCast)
+        protected override void OnDragRayCast(bool isHit, RaycastHit rayCast)
         {
             if (isHit)
             {
@@ -87,9 +73,33 @@ namespace Soul.Controller.Runtime.DragAndDrop
                 {
                     if (dropAble.CanDropNow)
                     {
+                        dropAble.HoverDrop(new[] { currentItem });
+                    }
+                }
+            }
+            else
+            {
+                itemInventoryReference.tempInventory.RemoveItem(currentItem);
+            }
+        }
+
+        protected override void OnDragRayCastEnd(bool isHit, RaycastHit rayCast)
+        {
+            if (isHit)
+            {
+                itemInventoryReference.tempInventory.RemoveItem(currentItem);
+                currentSelectedTransform = rayCast.transform;
+                if (rayCast.transform.TryGetComponent<IDropAble<Item>>(out var dropAble))
+                {
+                    if (dropAble.CanDropNow)
+                    {
                         dropAble.Drop(new[] { currentItem });
                     }
                 }
+            }
+            else
+            {
+                itemInventoryReference.tempInventory.RemoveItem(currentItem);
             }
         }
     }

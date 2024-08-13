@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 
 namespace Soul.Controller.Runtime.DragAndDrop
 {
-    public class DragContainer : GameComponent, IDragHandler, IBeginDragHandler, IEndDragHandler
+    public abstract class DragAndDropContainer : GameComponent, IDragHandler, IBeginDragHandler, IEndDragHandler
     {
         [SerializeField] private float moveSpeedLimit = 50;
         [DisableInEditMode] public bool isDragging;
@@ -21,6 +21,9 @@ namespace Soul.Controller.Runtime.DragAndDrop
 
         private Vector3 FingerPos => TouchWrapper.Touch0.Position;
 
+        protected abstract void OnDragRayCast(bool isHit, RaycastHit rayCast);
+        protected abstract void OnDragRayCastEnd(bool isHit, RaycastHit rayCast);
+        
         private void OnEnable()
         {
             _mainCamera = Camera.main;
@@ -31,10 +34,6 @@ namespace Soul.Controller.Runtime.DragAndDrop
             OnDragRayCast(CastRayFinger0PosWorld(out var rayCastHit), rayCastHit);
         }
 
-        public virtual void OnDragRayCast(bool isHit, RaycastHit rayCast)
-        {
-        }
-
         public void OnBeginDrag(PointerEventData eventData)
         {
             isDragging = true;
@@ -43,6 +42,7 @@ namespace Soul.Controller.Runtime.DragAndDrop
         public void OnEndDrag(PointerEventData eventData)
         {
             isDragging = false;
+            OnDragRayCastEnd(CastRayFinger0PosWorld(out var rayCastHit), rayCastHit);
             LMotion.Create(cardTransform.localPosition, offset, .3f).BindToLocalPosition(cardTransform);
         }
 

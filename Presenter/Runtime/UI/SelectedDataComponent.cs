@@ -86,14 +86,14 @@ namespace Soul.Presenter.Runtime.UI
                     unLockUpgradeButton.interactable = false;
                     unLockUpgradeImage.sprite = upgradeButtonSprite;
                     unLockUpgradeButtonTMP.text = maxLevelText;
-                    levelTMP.SetTextFloat(levelValue.CurrentLevel);
+                    levelTMP.SetTextInt(levelValue.CurrentLevel);
                 }
                 else
                 {
                     unLockUpgradeButton.interactable = true;
                     unLockUpgradeImage.sprite = upgradeButtonSprite;
                     unLockUpgradeButtonTMP.text = upgradeButtonText;
-                    levelTMP.SetTextFloat(levelValue.CurrentLevel);
+                    levelTMP.SetTextInt(levelValue.CurrentLevel);
                 }
             }
             else

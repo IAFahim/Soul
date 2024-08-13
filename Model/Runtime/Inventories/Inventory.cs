@@ -6,6 +6,7 @@ using Pancake.Common;
 using QuickEye.Utility;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Interfaces;
+using Soul.Model.Runtime.Items;
 using UnityEngine;
 
 namespace Soul.Model.Runtime.Inventories
@@ -63,6 +64,23 @@ namespace Soul.Model.Runtime.Inventories
 
             return true;
         }
+
+        public bool HasEnoughItem(T item, TV amount)
+        {
+            return items.TryGetValue(item, out TV currentAmount) && currentAmount.CompareTo(amount) >= 0;
+        }
+
+        public bool HasEnoughItem(Pair<T, TV> itemKeyValuePair)
+        {
+            return items.TryGetValue(itemKeyValuePair.Key, out TV currentAmount) &&
+                   currentAmount.CompareTo(itemKeyValuePair.Value) >= 0;
+        }
+        
+        public bool HasEnoughItems(IEnumerable<Pair<T, TV>> itemKeyValues)
+        {
+            return itemKeyValues.All(HasEnoughItem);
+        }
+
 
         [Button]
         public bool RemoveItem(T item)

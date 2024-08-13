@@ -1,5 +1,4 @@
 ﻿using Alchemy.Inspector;
-using Better.Attributes.Runtime.Gizmo;
 using Cysharp.Threading.Tasks;
 using Pancake;
 using Pancake.Common;
@@ -45,7 +44,7 @@ namespace Soul.Controller.Runtime.Buildings.Productions
         public bool MultipleDropMode => false;
         public bool CanDropNow => !IsLocked;
 
-        public bool Drop(Item[] thingToDrop)
+        public bool HoverDrop(Item[] thingToDrop)
         {
             foreach (var item in thingToDrop)
             {
@@ -57,6 +56,17 @@ namespace Soul.Controller.Runtime.Buildings.Productions
 
             cropProductionManager.Add(thingToDrop);
             return true;
+        }
+        
+        public bool Drop(Item[] thingToDrop)
+        {
+            if (HoverDrop(thingToDrop))
+            {
+                cropProductionManager.StartProduction();
+                return true;
+            }
+
+            return false;
         }
 
         public ScriptableList<Item> AllowedThingsToDrop => allowedThingsToDrop;

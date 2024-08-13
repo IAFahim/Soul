@@ -14,9 +14,9 @@ namespace Soul.Controller.Runtime.DragAndDrop
         [SerializeField] public Transform containerTransform;
         [SerializeField] private CanvasGroup containerCanvasGroup;
         public ItemInventoryReference itemInventoryReference;
-        public ItemDragContainer itemDragContainerPrefab;
+        public ItemDragAndDropContainer itemDragAndDropContainerPrefab;
 
-        public List<ItemDragContainer> instantiateDragContainers;
+        public List<ItemDragAndDropContainer> instantiateDragContainers;
 
         public void OnSelect(Transform selectedTransform)
         {
@@ -37,7 +37,7 @@ namespace Soul.Controller.Runtime.DragAndDrop
             containerCanvasGroup.alpha = 1;
             foreach (var item in allowedThingsToDrop)
             {
-                var dragContainer = itemDragContainerPrefab.GameObject.Request<ItemDragContainer>(containerTransform);
+                var dragContainer = itemDragAndDropContainerPrefab.GameObject.Request<ItemDragAndDropContainer>(containerTransform);
                 if (dragContainer.Setup(itemInventoryReference, item, selectedTransform))
                 {
                     instantiateDragContainers.Add(dragContainer);
@@ -52,6 +52,7 @@ namespace Soul.Controller.Runtime.DragAndDrop
             {
                 dragContainer.GameObject.Return();
             }
+            instantiateDragContainers.Clear();
         }
 
         private (bool canDrop, ScriptableList<T> currentAllowedThingsToDrop) TryGetAllowedList<T>(

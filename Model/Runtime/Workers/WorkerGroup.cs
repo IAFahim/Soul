@@ -7,7 +7,7 @@ namespace Soul.Model.Runtime.Workers
     public struct WorkerGroup
     {
         public WorkerType workerType;
-        [SerializeField] private int count;
+        [SerializeField] public int count;
         public event Action<WorkerGroup, int> OnAdd;
         public event Action<WorkerGroup, int> OnRemove;
 

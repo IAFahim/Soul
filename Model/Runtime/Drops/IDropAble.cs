@@ -6,6 +6,7 @@ namespace Soul.Model.Runtime.Drops
     {
         public bool MultipleDropMode { get; }
         public bool CanDropNow { get; }
+        public bool HoverDrop(T[] thingToDrop);
         public bool Drop(T[] thingToDrop);
         public ScriptableList<T> AllowedThingsToDrop { get; }
     }
