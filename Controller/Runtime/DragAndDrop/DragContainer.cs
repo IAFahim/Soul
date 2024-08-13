@@ -15,6 +15,7 @@ namespace Soul.Controller.Runtime.DragAndDrop
         [DisableInEditMode] public bool isDragging;
         public Transform cardTransform;
         private Camera _mainCamera;
+        public Vector3 offset = new(0, 25, 0);
 
         private Vector3 _lastFingerPos;
 
@@ -42,7 +43,7 @@ namespace Soul.Controller.Runtime.DragAndDrop
         public void OnEndDrag(PointerEventData eventData)
         {
             isDragging = false;
-            LMotion.Create(cardTransform.localPosition, Vector3.zero, .3f).BindToLocalPosition(cardTransform);
+            LMotion.Create(cardTransform.localPosition, offset, .3f).BindToLocalPosition(cardTransform);
         }
 
         private void Update()

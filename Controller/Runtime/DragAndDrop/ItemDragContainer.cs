@@ -5,6 +5,7 @@ using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.DragAndDrop
 {
@@ -13,7 +14,9 @@ namespace Soul.Controller.Runtime.DragAndDrop
         [SerializeField] private TextMeshProUGUIFormat textMeshProUGUIFormat;
         [SerializeField] private Item currentItem;
         [SerializeField] private ItemInventoryReference itemInventoryReference;
-        [SerializeField] private Transform selectedTransform;
+
+        [SerializeField]
+        private Transform currentSelectedTransform;
 
         private void Awake()
         {
@@ -21,21 +24,34 @@ namespace Soul.Controller.Runtime.DragAndDrop
         }
 
 
-        public bool Setup(ItemInventoryReference inventoryReference, Item item, Transform container)
+        public bool Setup(ItemInventoryReference inventoryReference, Item item, Transform selectedTransform)
         {
             itemInventoryReference = inventoryReference;
             currentItem = item;
+            currentSelectedTransform = selectedTransform;
 
-            if (itemInventoryReference.inventory.TryGetItem(item, out var inventoryAmount))
+            float getAmount = GetAllowedItemCount();
+            if (getAmount > 0)
             {
-                float allowedWeight = AllowedWeight(container);
-                float minAmount = Mathf.Min(inventoryAmount, allowedWeight);
-                textMeshProUGUIFormat.SetTextFloat(minAmount / PointToWeight(item));
+                textMeshProUGUIFormat.SetTextFloat(getAmount);
                 return true;
             }
 
             GameObject.Return();
             return false;
+        }
+
+
+        private float GetAllowedItemCount()
+        {
+            if (itemInventoryReference.inventory.TryGetItem(currentItem, out var inventoryAmount))
+            {
+                float allowedWeight = AllowedWeight(currentSelectedTransform);
+                float minAmount = Mathf.Min(inventoryAmount, allowedWeight);
+                return Mathf.RoundToInt(minAmount / PointToWeight(currentItem));
+            }
+
+            return 0;
         }
 
         public float AllowedWeight(Transform otherTransform)
@@ -64,9 +80,9 @@ namespace Soul.Controller.Runtime.DragAndDrop
         {
             if (isHit)
             {
-                if (selectedTransform == rayCast.transform) return;
+                if (currentSelectedTransform == rayCast.transform) return;
                 itemInventoryReference.tempInventory.RemoveItem(currentItem);
-                selectedTransform = rayCast.transform;
+                currentSelectedTransform = rayCast.transform;
                 if (rayCast.transform.TryGetComponent<IDropAble<Item>>(out var dropAble))
                 {
                     if (dropAble.CanDropNow)

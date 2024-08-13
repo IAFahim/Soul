@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Soul.Controller.Runtime.Items
 {
-    [CreateAssetMenu(fileName = ".seed", menuName = "Soul/Item/Create Seed")]
+    [CreateAssetMenu(fileName = "seed", menuName = "Soul/Item/Create Seed")]
     public class Seed : Item, IPointToWeightReference
     {
         [SerializeField] private float pointToWeight = 20;

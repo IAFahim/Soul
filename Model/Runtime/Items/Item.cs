@@ -1,7 +1,6 @@
 ﻿using System;
 using Soul.Model.Runtime.Interfaces;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Model.Runtime.Items
 {

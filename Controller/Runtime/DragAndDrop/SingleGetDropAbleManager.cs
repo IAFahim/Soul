@@ -1,37 +1,68 @@
 ﻿using System.Collections.Generic;
+using Pancake;
 using Pancake.Pools;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Model.Runtime.CustomList;
+using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.DragAndDrop
 {
-    public class SingleGetDropAbleManager : GetDropAbleManager<Item>
+    public class SingleGetDropAbleManager : GameComponent
     {
+        [SerializeField] public Transform containerTransform;
+        [SerializeField] private CanvasGroup containerCanvasGroup;
         public ItemInventoryReference itemInventoryReference;
-        [FormerlySerializedAs("itemDragContainer")] public ItemDragContainer itemDragContainerPrefab;
+        public ItemDragContainer itemDragContainerPrefab;
+
         public List<ItemDragContainer> instantiateDragContainers;
 
-        public override void CanDrop(ScriptableList<Item> allowedThingsToDrop, Transform container)
+        public void OnSelect(Transform selectedTransform)
         {
+            var (canDrop, currentAllowedThingsToDrop) = TryGetAllowedList<Item>(selectedTransform);
+            if (canDrop)
+            {
+                CanDrop(currentAllowedThingsToDrop, selectedTransform);
+            }
+            else
+            {
+                CantDrop();
+            }
+        }
+
+
+        private void CanDrop(ScriptableList<Item> allowedThingsToDrop, Transform selectedTransform)
+        {
+            containerCanvasGroup.alpha = 1;
             foreach (var item in allowedThingsToDrop)
             {
-                var dragContainer = itemDragContainerPrefab.GameObject.Request<ItemDragContainer>(container);
-                if (dragContainer.Setup(itemInventoryReference, item, container))
+                var dragContainer = itemDragContainerPrefab.GameObject.Request<ItemDragContainer>(containerTransform);
+                if (dragContainer.Setup(itemInventoryReference, item, selectedTransform))
                 {
                     instantiateDragContainers.Add(dragContainer);
                 }
             }
         }
 
-        public override void CantDrop()
+        private void CantDrop()
         {
+            containerCanvasGroup.alpha = 0;
             foreach (var dragContainer in instantiateDragContainers)
             {
                 dragContainer.GameObject.Return();
             }
+        }
+
+        private (bool canDrop, ScriptableList<T> currentAllowedThingsToDrop) TryGetAllowedList<T>(
+            Transform selectedTransform)
+        {
+            if (selectedTransform.TryGetComponent<IDropAble<T>>(out var dropAble))
+            {
+                if (dropAble.CanDropNow) return (true, dropAble.AllowedThingsToDrop);
+            }
+
+            return (false, null);
         }
     }
 }
