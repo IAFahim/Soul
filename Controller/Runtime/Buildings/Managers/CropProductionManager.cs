@@ -1,15 +1,18 @@
 ﻿using Pancake;
 using Soul.Controller.Runtime.Inventories;
+using Soul.Controller.Runtime.Requirements;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Workers;
+using UnityEngine;
 
 namespace Soul.Controller.Runtime.Buildings.Managers
 {
     public class CropProductionManager : GameComponent, ISaveAble, ISingleDrop, IWeightCapacity
     {
         public const string KeyPrefix = "prod";
+        [SerializeField] private RequirementOfWorkerGroupTimeCurrencyForLevels requirementOfWorkerGroupTimeCurrencyForLevels; 
         public int capacity;
         public ItemInventoryReference inventoryReference;
         public float totalWorkerCount = 5;
@@ -22,6 +25,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         public WorkerGroup maxAllowedWorkersRequirement;
 
         public float WeightLimit => capacity;
+        
 
         public void Add(Item[] items)
         {
