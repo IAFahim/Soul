@@ -7,6 +7,7 @@ using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
 
+
 namespace Soul.Presenter.Runtime.DragAndDrops
 {
     public class ItemDragAndDropContainer : DragAndDropContainer
@@ -31,7 +32,13 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             itemInventoryReference = inventoryReference;
             currentItem = item;
             hitSelectedTransform = selectedTransform;
-            return TrySetText();
+            if (!TrySetText())
+            {
+                GameObject.Return();
+                return false;
+            }
+
+            return true;
         }
 
         private bool TrySetText()
@@ -44,7 +51,6 @@ namespace Soul.Presenter.Runtime.DragAndDrops
                 return true;
             }
 
-            GameObject.Return();
             return false;
         }
 
@@ -84,13 +90,12 @@ namespace Soul.Presenter.Runtime.DragAndDrops
                     if (dropAble.CanDropNow)
                     {
                         dropAble.HoverDrop(new[] { currentItem });
+                        return;
                     }
                 }
             }
-            else
-            {
-                itemInventoryReference.tempInventory.RemoveItem(currentItem);
-            }
+
+            itemInventoryReference.tempInventory.Clear(true);
         }
 
         protected override void OnDragRayCastEnd(bool isHit, RaycastHit rayCast)
@@ -104,13 +109,12 @@ namespace Soul.Presenter.Runtime.DragAndDrops
                     if (dropAble.CanDropNow)
                     {
                         dropAble.Drop(new[] { currentItem });
+                        TrySetText();
                     }
                 }
-
-                TrySetText();
             }
 
-            itemInventoryReference.tempInventory.RemoveItem(currentItem);
+            itemInventoryReference.tempInventory.Clear(true);
         }
     }
 }

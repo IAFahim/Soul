@@ -53,7 +53,7 @@ namespace Soul.Controller.Runtime.Buildings.Productions
                 }
             }
 
-            cropProductionManager.Add(thingToDrop);
+            cropProductionManager.TempAdd(thingToDrop);
             return true;
         }
 

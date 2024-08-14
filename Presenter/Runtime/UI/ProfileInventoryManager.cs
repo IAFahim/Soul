@@ -50,16 +50,18 @@ namespace Soul.Presenter.Runtime.UI
             itemInventoryReference.inventory.OnItemAddedOrIncreased += OnItemAddedOrIncreased;
             itemInventoryReference.tempInventory.OnItemAddedOrIncreased += OnTempItemAddedOrIncreased;
             itemInventoryReference.inventory.OnItemDecreased += OnItemDecreased;
-            itemInventoryReference.tempInventory.OnItemDecreased += OnTempItemDecreased;
+            itemInventoryReference.tempInventory.OnInventoryCleared += OnAllTempItemClear;
             SetAllAlpha(0);
         }
+
+        
 
         public void OnDisable()
         {
             itemInventoryReference.inventory.OnItemAddedOrIncreased -= OnItemAddedOrIncreased;
             itemInventoryReference.tempInventory.OnItemAddedOrIncreased -= OnTempItemAddedOrIncreased;
             itemInventoryReference.inventory.OnItemDecreased -= OnItemDecreased;
-            itemInventoryReference.tempInventory.OnItemDecreased -= OnTempItemDecreased;
+            itemInventoryReference.tempInventory.OnInventoryCleared += OnAllTempItemClear;
         }
 
         private void Start()
@@ -110,7 +112,6 @@ namespace Soul.Presenter.Runtime.UI
 
         private void OnTempItemAddedOrIncreased(Item item, int amount, int count, bool isAdded)
         {
-            if (Mathf.Approximately(0, amount)) return;
             if (item == coin)
             {
                 coinGoingToBeModifiedText.SetTextInt(-amount);
@@ -127,23 +128,13 @@ namespace Soul.Presenter.Runtime.UI
                 weightGoingToBeModifiedCanvasGroup.alpha = 1;
             }
         }
-
-        private void OnTempItemDecreased(Item item, int amount, int count)
+        
+        private void OnAllTempItemClear()
         {
-            if (item == coin)
-            {
-                coinGoingToBeModifiedCanvasGroup.alpha = 0;
-            }
-            else if (item == gem)
-            {
-                gemGoingToBeModifiedCanvasGroup.alpha = 0;
-            }
-            else if (item is IWeight weightedItem)
-            {
-                weightGoingToBeModifiedCanvasGroup.alpha = 0;
-            }
+            SetAllAlpha(0);
         }
 
+        
         private void SetAllAlpha(float alpha)
         {
             coinGoingToBeModifiedCanvasGroup.alpha = alpha;

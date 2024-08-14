@@ -27,10 +27,11 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         public float WeightLimit => capacity;
         
 
-        public void Add(Item[] items)
+        public void TempAdd(Item[] items)
         {
             queueItem = items[0];
             inventoryReference.tempInventory.AddOrIncreaseItem(queueItem, (int)WeightLimit);
+            inventoryReference.tempInventory.AddOrIncreaseItem(coinRequirement.Key, coinRequirement.Value);
             productionItem = new Pair<Item, int>(queueItem, (int)WeightLimit);
         }
 
