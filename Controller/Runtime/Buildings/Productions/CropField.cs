@@ -101,7 +101,7 @@ namespace Soul.Controller.Runtime.Buildings.Productions
         [Button]
         public void Load(string key)
         {
-            level = Data.Load<Level>(Guid);
+            level = Data.Load<Level>(Guid, level);
         }
 
         [Button]

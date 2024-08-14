@@ -1,23 +1,28 @@
-﻿using Pancake.Pools;
+﻿using Alchemy.Inspector;
+using Pancake.Pools;
+using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
 
-namespace Soul.Controller.Runtime.DragAndDrop
+namespace Soul.Presenter.Runtime.DragAndDrops
 {
     public class ItemDragAndDropContainer : DragAndDropContainer
     {
-        [SerializeField] private TextMeshProUGUIFormat textMeshProUGUIFormat;
-        [SerializeField] private Item currentItem;
-        [SerializeField] private ItemInventoryReference itemInventoryReference;
+        [SerializeField] private TextMeshProUGUIFormat dropCountText;
+        [SerializeField] private TextMeshProUGUIFormat itemTotalAmountText;
 
-        [SerializeField] private Transform currentSelectedTransform;
+        [DisableInEditMode, SerializeField] private Item currentItem;
+        [DisableInEditMode, SerializeField] private ItemInventoryReference itemInventoryReference;
+
+        [DisableInEditMode, ShowInInspector] private Transform hitSelectedTransform;
 
         private void Awake()
         {
-            textMeshProUGUIFormat.StoreFormat();
+            dropCountText.StoreFormat();
+            itemTotalAmountText.StoreFormat();
         }
 
 
@@ -25,12 +30,17 @@ namespace Soul.Controller.Runtime.DragAndDrop
         {
             itemInventoryReference = inventoryReference;
             currentItem = item;
-            currentSelectedTransform = selectedTransform;
+            hitSelectedTransform = selectedTransform;
+            return TrySetText();
+        }
 
-            int getAmount = GetAllowedItemCount();
-            if (getAmount > 0)
+        private bool TrySetText()
+        {
+            (int oneDropAmount, int inventoryAmount) = GetAllowedCounts();
+            if (oneDropAmount > 0)
             {
-                textMeshProUGUIFormat.SetTextInt(getAmount);
+                dropCountText.SetTextInt(oneDropAmount);
+                itemTotalAmountText.SetTextInt(inventoryAmount);
                 return true;
             }
 
@@ -39,19 +49,19 @@ namespace Soul.Controller.Runtime.DragAndDrop
         }
 
 
-        private int GetAllowedItemCount()
+        private (int oneDropAmount, int inventoryAmount) GetAllowedCounts()
         {
+            int oneDropAmount = 0;
             if (itemInventoryReference.inventory.TryGetItem(currentItem, out var inventoryAmount))
             {
-                int allowedWeight = AllowedWeight(currentSelectedTransform);
-                int minAmount = Mathf.Min(inventoryAmount, allowedWeight);
-                return minAmount;
+                int allowedWeight = AllowedWeight(hitSelectedTransform);
+                oneDropAmount = Mathf.Min(inventoryAmount, allowedWeight);
             }
 
-            return 0;
+            return (oneDropAmount, inventoryAmount);
         }
 
-        public int AllowedWeight(Transform otherTransform)
+        private int AllowedWeight(Transform otherTransform)
         {
             float allowedAmount = 0;
             if (otherTransform.TryGetComponent<IWeightCapacity>(out var weightCapacity))
@@ -66,9 +76,9 @@ namespace Soul.Controller.Runtime.DragAndDrop
         {
             if (isHit)
             {
-                if (currentSelectedTransform == rayCast.transform) return;
+                if (hitSelectedTransform == rayCast.transform) return;
                 itemInventoryReference.tempInventory.RemoveItem(currentItem);
-                currentSelectedTransform = rayCast.transform;
+                hitSelectedTransform = rayCast.transform;
                 if (rayCast.transform.TryGetComponent<IDropAble<Item>>(out var dropAble))
                 {
                     if (dropAble.CanDropNow)
@@ -88,7 +98,7 @@ namespace Soul.Controller.Runtime.DragAndDrop
             if (isHit)
             {
                 itemInventoryReference.tempInventory.RemoveItem(currentItem);
-                currentSelectedTransform = rayCast.transform;
+                hitSelectedTransform = rayCast.transform;
                 if (rayCast.transform.TryGetComponent<IDropAble<Item>>(out var dropAble))
                 {
                     if (dropAble.CanDropNow)
@@ -96,11 +106,11 @@ namespace Soul.Controller.Runtime.DragAndDrop
                         dropAble.Drop(new[] { currentItem });
                     }
                 }
+
+                TrySetText();
             }
-            else
-            {
-                itemInventoryReference.tempInventory.RemoveItem(currentItem);
-            }
+
+            itemInventoryReference.tempInventory.RemoveItem(currentItem);
         }
     }
 }

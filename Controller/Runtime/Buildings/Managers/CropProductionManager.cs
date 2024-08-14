@@ -12,9 +12,9 @@ namespace Soul.Controller.Runtime.Buildings.Managers
     public class CropProductionManager : GameComponent, ISaveAble, ISingleDrop, IWeightCapacity
     {
         public const string KeyPrefix = "prod";
+        public ItemInventoryReference inventoryReference;
         [SerializeField] private RequirementOfWorkerGroupTimeCurrencyForLevels requirementOfWorkerGroupTimeCurrencyForLevels; 
         public int capacity;
-        public ItemInventoryReference inventoryReference;
         public float totalWorkerCount = 5;
 
         public Pair<Item, int> productionItem;

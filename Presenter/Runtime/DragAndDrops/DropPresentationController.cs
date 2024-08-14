@@ -7,9 +7,9 @@ using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
 
-namespace Soul.Controller.Runtime.DragAndDrop
+namespace Soul.Presenter.Runtime.DragAndDrops
 {
-    public class SingleGetDropAbleManager : GameComponent
+    public class DropPresentationController : GameComponent
     {
         [SerializeField] public Transform containerTransform;
         [SerializeField] private CanvasGroup containerCanvasGroup;
@@ -53,6 +53,7 @@ namespace Soul.Controller.Runtime.DragAndDrop
                 dragContainer.GameObject.Return();
             }
             instantiateDragContainers.Clear();
+            itemInventoryReference.tempInventory.Clear(true);
         }
 
         private (bool canDrop, ScriptableList<T> currentAllowedThingsToDrop) TryGetAllowedList<T>(
