@@ -7,6 +7,5 @@ namespace Soul.Controller.Runtime.Inventories
     {
         public ItemInventory inventory;
         public static implicit operator ItemInventory(ItemInventoryReference reference) => reference.inventory;
-        public ItemInventory tempInventory;
     }
 }

@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using Pancake;
 using Pancake.Pools;
+using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Model.Runtime.CustomList;
 using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.DragAndDrops
 {
@@ -13,10 +15,19 @@ namespace Soul.Presenter.Runtime.DragAndDrops
     {
         [SerializeField] public Transform containerTransform;
         [SerializeField] private CanvasGroup containerCanvasGroup;
-        public ItemInventoryReference itemInventoryReference;
+
+        [FormerlySerializedAs("itemInventoryReference")]
+        public ItemInventoryReference ItemInventoryReference;
+
+        public TempHold tempHold;
         public ItemDragAndDropContainer itemDragAndDropContainerPrefab;
 
         public List<ItemDragAndDropContainer> instantiateDragContainers;
+
+        private void OnEnable()
+        {
+            containerCanvasGroup.alpha = 0;
+        }
 
         public void OnSelect(Transform selectedTransform)
         {
@@ -37,8 +48,9 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             containerCanvasGroup.alpha = 1;
             foreach (var item in allowedThingsToDrop)
             {
-                var dragContainer = itemDragAndDropContainerPrefab.GameObject.Request<ItemDragAndDropContainer>(containerTransform);
-                if (dragContainer.Setup(itemInventoryReference, item, selectedTransform))
+                var dragContainer =
+                    itemDragAndDropContainerPrefab.GameObject.Request<ItemDragAndDropContainer>(containerTransform);
+                if (dragContainer.Setup(ItemInventoryReference, tempHold, item, selectedTransform))
                 {
                     instantiateDragContainers.Add(dragContainer);
                 }
@@ -52,8 +64,9 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             {
                 dragContainer.GameObject.Return();
             }
+
             instantiateDragContainers.Clear();
-            itemInventoryReference.tempInventory.Clear(true);
+            tempHold.inventory.Clear(true);
         }
 
         private (bool canDrop, ScriptableList<T> currentAllowedThingsToDrop) TryGetAllowedList<T>(

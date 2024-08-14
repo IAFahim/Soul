@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace Soul.Presenter.Runtime.UI
 {
-    public class SelectedDataComponent : GameComponent
+    public class SelectedTransformInfoComponent : GameComponent
     {
         public CanvasGroup canvasGroup;
         public SelectData selectData;

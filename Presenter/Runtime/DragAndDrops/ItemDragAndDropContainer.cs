@@ -6,6 +6,7 @@ using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 
 namespace Soul.Presenter.Runtime.DragAndDrops
@@ -16,7 +17,12 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         [SerializeField] private TextMeshProUGUIFormat itemTotalAmountText;
 
         [DisableInEditMode, SerializeField] private Item currentItem;
-        [DisableInEditMode, SerializeField] private ItemInventoryReference itemInventoryReference;
+
+        [DisableInEditMode, SerializeField]
+        private ItemInventoryReference _itemInventoryReference;
+
+        [DisableInEditMode, SerializeField]
+        private TempHold _tempHold;
 
         [DisableInEditMode, ShowInInspector] private Transform hitSelectedTransform;
 
@@ -27,9 +33,11 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         }
 
 
-        public bool Setup(ItemInventoryReference inventoryReference, Item item, Transform selectedTransform)
+        public bool Setup(ItemInventoryReference inventoryReference, TempHold tempHold, Item item,
+            Transform selectedTransform)
         {
-            itemInventoryReference = inventoryReference;
+            _itemInventoryReference = inventoryReference;
+            _tempHold = tempHold;
             currentItem = item;
             hitSelectedTransform = selectedTransform;
             if (!TrySetText())
@@ -58,7 +66,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         private (int oneDropAmount, int inventoryAmount) GetAllowedCounts()
         {
             int oneDropAmount = 0;
-            if (itemInventoryReference.inventory.TryGetItem(currentItem, out var inventoryAmount))
+            if (_itemInventoryReference.inventory.TryGetItem(currentItem, out var inventoryAmount))
             {
                 int allowedWeight = AllowedWeight(hitSelectedTransform);
                 oneDropAmount = Mathf.Min(inventoryAmount, allowedWeight);
@@ -83,7 +91,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             if (isHit)
             {
                 if (hitSelectedTransform == rayCast.transform) return;
-                itemInventoryReference.tempInventory.RemoveItem(currentItem);
+                _tempHold.inventory.RemoveItem(currentItem);
                 hitSelectedTransform = rayCast.transform;
                 if (rayCast.transform.TryGetComponent<IDropAble<Item>>(out var dropAble))
                 {
@@ -95,14 +103,14 @@ namespace Soul.Presenter.Runtime.DragAndDrops
                 }
             }
 
-            itemInventoryReference.tempInventory.Clear(true);
+            _tempHold.inventory.Clear(true);
         }
 
         protected override void OnDragRayCastEnd(bool isHit, RaycastHit rayCast)
         {
             if (isHit)
             {
-                itemInventoryReference.tempInventory.RemoveItem(currentItem);
+                _tempHold.inventory.RemoveItem(currentItem);
                 hitSelectedTransform = rayCast.transform;
                 if (rayCast.transform.TryGetComponent<IDropAble<Item>>(out var dropAble))
                 {
@@ -114,7 +122,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
                 }
             }
 
-            itemInventoryReference.tempInventory.Clear(true);
+            _tempHold.inventory.Clear(true);
         }
     }
 }

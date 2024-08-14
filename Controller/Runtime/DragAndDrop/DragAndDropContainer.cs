@@ -42,7 +42,7 @@ namespace Soul.Controller.Runtime.DragAndDrop
         public void OnEndDrag(PointerEventData eventData)
         {
             isDragging = false;
-            OnDragRayCastEnd(CastRayFinger0PosWorld(out var rayCastHit), rayCastHit);
+            OnDragRayCastEnd(CastRayFinger0PosWorld(out var rayCastHit, true), rayCastHit);
             LMotion.Create(cardTransform.localPosition, offset, .3f).BindToLocalPosition(cardTransform);
         }
 

@@ -1,16 +1,19 @@
 ﻿using Pancake;
 using Pancake.Common;
+using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.UI
 {
     public class ProfileInventoryManager : GameComponent, ILoadComponent
     {
         public ItemInventoryReference itemInventoryReference;
+        public TempHold tempHold;
 
         [Header("Coin")] public Currency coin;
         public TextMeshProUGUIFormat coinText;
@@ -48,9 +51,9 @@ namespace Soul.Presenter.Runtime.UI
         public void OnEnable()
         {
             itemInventoryReference.inventory.OnItemAddedOrIncreased += OnItemAddedOrIncreased;
-            itemInventoryReference.tempInventory.OnItemAddedOrIncreased += OnTempItemAddedOrIncreased;
+            tempHold.inventory.OnItemAddedOrIncreased += OnTempItemAddedOrIncreased;
             itemInventoryReference.inventory.OnItemDecreased += OnItemDecreased;
-            itemInventoryReference.tempInventory.OnInventoryCleared += OnAllTempItemClear;
+            tempHold.inventory.OnInventoryCleared += OnAllTempItemClear;
             SetAllAlpha(0);
         }
 
@@ -59,9 +62,9 @@ namespace Soul.Presenter.Runtime.UI
         public void OnDisable()
         {
             itemInventoryReference.inventory.OnItemAddedOrIncreased -= OnItemAddedOrIncreased;
-            itemInventoryReference.tempInventory.OnItemAddedOrIncreased -= OnTempItemAddedOrIncreased;
+            tempHold.inventory.OnItemAddedOrIncreased -= OnTempItemAddedOrIncreased;
             itemInventoryReference.inventory.OnItemDecreased -= OnItemDecreased;
-            itemInventoryReference.tempInventory.OnInventoryCleared += OnAllTempItemClear;
+            tempHold.inventory.OnInventoryCleared += OnAllTempItemClear;
         }
 
         private void Start()

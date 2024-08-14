@@ -1,4 +1,6 @@
 ﻿using Pancake;
+using QuickEye.Utility;
+using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Requirements;
 using Soul.Model.Runtime.Containers;
@@ -13,12 +15,14 @@ namespace Soul.Controller.Runtime.Buildings.Managers
     {
         public const string KeyPrefix = "prod";
         public ItemInventoryReference inventoryReference;
+        public TempHold tempHold;
         [SerializeField] private RequirementOfWorkerGroupTimeCurrencyForLevels requirementOfWorkerGroupTimeCurrencyForLevels; 
         public int capacity;
         public float totalWorkerCount = 5;
 
         public Pair<Item, int> productionItem;
         public Pair<Item, int> coinRequirement;
+        public UnityTimeSpan productionTime;
         public WorkerGroup storedWorkers;
 
         public Item queueItem;
@@ -30,8 +34,8 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         public void TempAdd(Item[] items)
         {
             queueItem = items[0];
-            inventoryReference.tempInventory.AddOrIncreaseItem(queueItem, (int)WeightLimit);
-            inventoryReference.tempInventory.AddOrIncreaseItem(coinRequirement.Key, coinRequirement.Value);
+            tempHold.inventory.AddOrIncreaseItem(queueItem, (int)WeightLimit);
+            tempHold.inventory.AddOrIncreaseItem(coinRequirement.Key, coinRequirement.Value);
             productionItem = new Pair<Item, int>(queueItem, (int)WeightLimit);
         }
 
