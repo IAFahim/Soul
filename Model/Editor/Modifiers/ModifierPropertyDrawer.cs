@@ -1,56 +1,91 @@
-﻿using Soul.Model.Runtime.Modifiers;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
+using Soul.Model.Runtime.Modifiers;
 
 namespace Soul.Model.Editor.Modifiers
 {
     [CustomPropertyDrawer(typeof(Modifier))]
     public class ModifierDrawer : PropertyDrawer
     {
-        private const int LineCount = 4;
+        private const float PropertySpacing = 2f;
+        private const float HeaderHeight = 22f;
+        private const float PropertyHeight = 18f;
+        private static readonly Color HeaderColor = new Color(0.1f, 0.1f, 0.1f, 0.2f);
+        private static readonly Color ValueColor = new Color(0.2f, 0.8f, 0.2f);
+        private static readonly Color AlternateRowColor = new Color(0.5f, 0.5f, 0.5f, 0.1f);
+
+        private static readonly GUIContent[] PropertyLabels =
+        {
+            new GUIContent("Base", "The base value of the modifier"),
+            new GUIContent("Multiplier", "The multiplier applied to the base value"),
+            new GUIContent("Additive", "The value added after multiplication")
+        };
+
         private static readonly string[] PropertyNames = { "baseValue", "multiplier", "additive" };
-        private static readonly Color ValueColor = new(0.2f, 0.8f, 0.2f);
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
 
             var modifier = GetModifierFromProperty(property);
-            var foldoutRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+            var headerRect = new Rect(position.x, position.y, position.width, HeaderHeight);
 
-            // Custom foldout with colored value
-            property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, label, true);
-            var valueRect = new Rect(foldoutRect.xMax - 60, foldoutRect.y, 60, foldoutRect.height);
-            var style = new GUIStyle(EditorStyles.label)
-                { alignment = TextAnchor.MiddleRight, normal = { textColor = ValueColor } };
-            EditorGUI.LabelField(valueRect, $"{modifier.Value:F2}", style);
+            DrawHeader(headerRect, property, label, modifier);
 
             if (property.isExpanded)
             {
-                EditorGUI.indentLevel++;
                 DrawProperties(position, property);
-                EditorGUI.indentLevel--;
             }
 
             EditorGUI.EndProperty();
         }
 
+        private void DrawHeader(Rect rect, SerializedProperty property, GUIContent label, Modifier modifier)
+        {
+            EditorGUI.DrawRect(rect, HeaderColor);
+
+            // Foldout
+            bool isSmall = rect.width < 200;
+            float sideWidth = isSmall ? 40 : 200;
+            var foldoutRect = new Rect(rect.x, rect.y, rect.width - sideWidth, rect.height);
+            property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, label, true);
+
+            // Value display
+
+            var valueRect = new Rect(foldoutRect.xMax, foldoutRect.y, sideWidth, foldoutRect.height);
+
+            var style = new GUIStyle(EditorStyles.label)
+            {
+                alignment = TextAnchor.MiddleRight,
+                normal = { textColor = ValueColor },
+                fontStyle = FontStyle.Bold
+            };
+            EditorGUI.LabelField(valueRect, LabelString(modifier, isSmall), style);
+        }
+
+        private string LabelString(Modifier modifier, bool isSmall)
+        {
+            return isSmall
+                ? $"{modifier.Value:F2}"
+                : $"{modifier.BaseValue}x{modifier.Multiplier}+{modifier.Additive} = {modifier.Value:F2}";
+        }
+
         private void DrawProperties(Rect position, SerializedProperty property)
         {
+            var propertyRect = new Rect(position.x, position.y + HeaderHeight, position.width, PropertyHeight);
+
             for (int i = 0; i < PropertyNames.Length; i++)
             {
-                var propertyName = PropertyNames[i];
-                var rect = new Rect(position.x, position.y + (EditorGUIUtility.singleLineHeight + 2) * (i + 1),
-                    position.width, EditorGUIUtility.singleLineHeight);
-                var content = new GUIContent(ObjectNames.NicifyVariableName(propertyName));
+                propertyRect.y += PropertySpacing;
 
-                // Add subtle alternative row coloring
                 if (i % 2 == 1)
                 {
-                    EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 0.1f));
+                    EditorGUI.DrawRect(propertyRect, AlternateRowColor);
                 }
 
-                EditorGUI.PropertyField(rect, property.FindPropertyRelative(propertyName), content);
+                EditorGUI.PropertyField(propertyRect, property.FindPropertyRelative(PropertyNames[i]),
+                    PropertyLabels[i]);
+                propertyRect.y += PropertyHeight;
             }
         }
 
@@ -65,9 +100,13 @@ namespace Soul.Model.Editor.Modifiers
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            return property.isExpanded
-                ? EditorGUIUtility.singleLineHeight * LineCount + 6
-                : EditorGUIUtility.singleLineHeight;
+            float height = HeaderHeight;
+            if (property.isExpanded)
+            {
+                height += (PropertyHeight + PropertySpacing) * PropertyNames.Length;
+            }
+
+            return height;
         }
     }
 }

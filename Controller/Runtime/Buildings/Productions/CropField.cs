@@ -4,6 +4,7 @@ using Pancake;
 using Pancake.Common;
 using Soul.Controller.Runtime.Addressables;
 using Soul.Controller.Runtime.Buildings.Managers;
+using Soul.Controller.Runtime.Buildings.Records;
 using Soul.Controller.Runtime.Upgrades;
 using Soul.Model.Runtime.Buildings;
 using Soul.Model.Runtime.CustomList;
@@ -20,6 +21,7 @@ namespace Soul.Controller.Runtime.Buildings.Productions
         IDropAble<Item>, IUpgrade
     {
         public AddressablePoolLifetime addressablePoolLifetime;
+        [SerializeField] private CropFieldRecord cropFieldRecord;
         [SerializeField, Guid] private string guid;
         [SerializeField] private LockedInfrastructureInfo lockedInfrastructureInfo;
         [SerializeField] private Level level;
@@ -85,6 +87,7 @@ namespace Soul.Controller.Runtime.Buildings.Productions
         public async UniTask SetUp(int currentLevel)
         {
             await unlockAndUpgradeManager.Setup(addressablePoolLifetime, boxCollider, currentLevel);
+            var x = cropProductionManager.Setup(cropFieldRecord.productionRequirement);
         }
 
         [Button]
@@ -101,13 +104,15 @@ namespace Soul.Controller.Runtime.Buildings.Productions
         [Button]
         public void Load(string key)
         {
-            level = Data.Load<Level>(Guid, level);
+            cropFieldRecord = Data.Load(key, new CropFieldRecord());
+            level.level = new Vector2Int(cropFieldRecord.level, level.MaxLevel);
         }
 
         [Button]
         public void Save(string key)
         {
-            Data.Save(key, level);
+            cropFieldRecord.level = level.CurrentLevel;
+            Data.Save(key, cropFieldRecord);
         }
 
         public Level Level => level;

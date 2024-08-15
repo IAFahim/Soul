@@ -33,7 +33,7 @@ namespace Soul.Controller.Runtime.Upgrades
             await Setup(addressablePoolLifetime, boxCollider, level);
         }
 
-        public async UniTask Setup(AddressablePoolLifetime addressablePoolLifetime, BoxCollider boxCollider, int level)
+        public async UniTask<bool> Setup(AddressablePoolLifetime addressablePoolLifetime, BoxCollider boxCollider, int level)
         {
             unlockManager.Setup(addressablePoolLifetime);
             currentLevel = level;
@@ -47,6 +47,8 @@ namespace Soul.Controller.Runtime.Upgrades
                 upgradePartsManager = unLockedGameObject.GetComponent<PartsManager>();
                 if (upgradePartsManager) upgradePartsManager.Value.Spawn(currentLevel - 1, usePooling, boxCollider);
             }
+
+            return true;
         }
 
         public TimeRequirement UpgradeTimeRequirementFor(int level)

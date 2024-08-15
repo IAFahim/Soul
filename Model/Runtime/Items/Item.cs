@@ -14,5 +14,10 @@ namespace Soul.Model.Runtime.Items
         
 
         public string Title => title;
+
+        public override string ToString()
+        {
+            return title;
+        }
     }
 }
