@@ -8,8 +8,9 @@ namespace Soul.Controller.Runtime.Converters
 {
     [CreateAssetMenu(fileName = "ItemToItemConverterOverTime", menuName = "Soul/Converter/ItemToItemConverterOverTime")]
     [Serializable]
-    public class ItemToItemConverterOverTime : ScriptableObject
+    public class ItemToItemConverter : ScriptableObject
     {
         public ConvertTable<Item, Pair<Item, float>> convertTable;
+        public bool TryConvert(Item input, out Pair<Item, float> output) => convertTable.TryConvert(input, out output);
     }
 }

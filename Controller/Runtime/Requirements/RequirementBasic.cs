@@ -8,7 +8,6 @@ namespace Soul.Controller.Runtime.Requirements
     [Serializable]
     public class RequirementBasic
     {
-        public Pair<Currency, int> currencyRequirement;
         public Pair<WorkerType, int> workerCount;
     }
 }

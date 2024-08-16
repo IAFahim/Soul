@@ -6,6 +6,6 @@ namespace Soul.Model.Runtime.Requirements
     {
         [SerializeField] protected WorkerGroupTimeCurrencyRequirement<T, TV>[] requirements;
 
-        public WorkerGroupTimeCurrencyRequirement<T, TV> GetRequirement(int level) => requirements[level];
+        public WorkerGroupTimeCurrencyRequirement<T, TV> GetRequirement(int level) => requirements[level - 1];
     }
 }

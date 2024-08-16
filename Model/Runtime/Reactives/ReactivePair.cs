@@ -11,15 +11,13 @@ namespace Soul.Model.Runtime.Reactives
 
         public event Action<T, TV, TV> OnChange;
 
-        public Pair<T, TV> Pair
+        public TV Value => pair.Value;
+        
+        public void Set(TV value)
         {
-            get => pair;
-            set
-            {
-                TV oldValue = pair.Value;
-                pair = value;
-                OnChange?.Invoke(pair.Key, oldValue, pair.Value);
-            }
+            TV oldValue = pair.Value;
+            pair = new Pair<T, TV>(pair.Key, value);
+            OnChange?.Invoke(pair.Key, oldValue, pair.Value);
         }
 
         public static implicit operator T(ReactivePair<T, TV> pair) => pair.pair.Key;

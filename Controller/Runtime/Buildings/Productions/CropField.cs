@@ -28,6 +28,7 @@ namespace Soul.Controller.Runtime.Buildings.Productions
         [SerializeField] private BoxCollider boxCollider;
         [SerializeField] private CropProductionManager cropProductionManager;
         [SerializeField] private UnlockAndUpgradeManager unlockAndUpgradeManager;
+        
 
         private bool _loadDataOnEnable = true;
 
@@ -87,7 +88,7 @@ namespace Soul.Controller.Runtime.Buildings.Productions
         public async UniTask SetUp(int currentLevel)
         {
             await unlockAndUpgradeManager.Setup(addressablePoolLifetime, boxCollider, currentLevel);
-            var x = cropProductionManager.Setup(cropFieldRecord.productionRequirement);
+            var x = cropProductionManager.Setup(cropFieldRecord.productionRequirement, currentLevel);
         }
 
         [Button]
@@ -104,7 +105,7 @@ namespace Soul.Controller.Runtime.Buildings.Productions
         [Button]
         public void Load(string key)
         {
-            cropFieldRecord = Data.Load(key, new CropFieldRecord());
+            cropFieldRecord = Data.Load(key, cropFieldRecord);
             level.level = new Vector2Int(cropFieldRecord.level, level.MaxLevel);
         }
 
