@@ -6,13 +6,13 @@ using Soul.Controller.Runtime.Requirements;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings.Managers
 {
     public class CropProductionManager : GameComponent, ISingleDrop, IWeightCapacity
     {
-        public PlayerInventoryReference inventoryReference;
-        public TempHold tempHold;
+        [FormerlySerializedAs("inventoryReference")] public PlayerInventoryReference playerInventoryReference;
 
         [SerializeField]
         private RequirementOfWorkerGroupTimeCurrencyForLevels requirementOfWorkerGroupTimeCurrencyForLevels;
@@ -36,8 +36,8 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         public void TempAdd(Item[] items)
         {
             queueItem = items[0];
-            tempHold.inventory.AddOrIncrease(queueItem, (int)WeightLimit);
-            tempHold.inventory.AddOrIncrease(coinRequirement.Key, coinRequirement.Value);
+            playerInventoryReference.inventoryPreview.AddOrIncrease(queueItem, (int)WeightLimit);
+            playerInventoryReference.inventoryPreview.AddOrIncrease(coinRequirement.Key, coinRequirement.Value);
             productionItem = new Pair<Item, int>(queueItem, (int)WeightLimit);
         }
 
@@ -48,15 +48,15 @@ namespace Soul.Controller.Runtime.Buildings.Managers
 
         private void OnReward(bool isEnd)
         {
-            inventoryReference.inventory.Decrease(queueItem, (int)WeightLimit);
-            inventoryReference.inventory.Decrease(coinRequirement.Key, coinRequirement.Value);
+            playerInventoryReference.inventory.Decrease(queueItem, (int)WeightLimit);
+            playerInventoryReference.inventory.Decrease(coinRequirement.Key, coinRequirement.Value);
             if (!isEnd) storedWorkers = maxAllowedWorkersRequirement;
         }
 
         public bool HasEnoughToStart()
         {
-            return inventoryReference.inventory.HasEnough(coinRequirement) &&
-                   inventoryReference.inventory.HasEnough(productionItem) &&
+            return playerInventoryReference.inventory.HasEnough(coinRequirement) &&
+                   playerInventoryReference.inventory.HasEnough(productionItem) &&
                    totalWorkerCount >= maxAllowedWorkersRequirement;
         }
 

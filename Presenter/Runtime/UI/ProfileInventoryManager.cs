@@ -13,7 +13,6 @@ namespace Soul.Presenter.Runtime.UI
     public class ProfileInventoryManager : GameComponent, ILoadComponent
     {
         [FormerlySerializedAs("itemInventoryReference")] public PlayerInventoryReference playerInventoryReference;
-        public TempHold tempHold;
 
         [Header("Coin")] public Currency coin;
         public TextMeshProUGUIFormat coinText;
@@ -51,9 +50,9 @@ namespace Soul.Presenter.Runtime.UI
         public void OnEnable()
         {
             playerInventoryReference.inventory.OnAddedOrIncreased += OnAddedOrIncreased;
-            tempHold.inventory.OnAddedOrIncreased += OnTempAddedOrIncreased;
+            playerInventoryReference.inventoryPreview.OnAddedOrIncreased += OnTempAddedOrIncreased;
             playerInventoryReference.inventory.OnDecreased += OnDecreased;
-            tempHold.inventory.OnInventoryCleared += OnAllTempItemClear;
+            playerInventoryReference.inventoryPreview.OnInventoryCleared += OnAllTempItemClear;
             SetAllAlpha(0);
         }
 
@@ -62,9 +61,9 @@ namespace Soul.Presenter.Runtime.UI
         public void OnDisable()
         {
             playerInventoryReference.inventory.OnAddedOrIncreased -= OnAddedOrIncreased;
-            tempHold.inventory.OnAddedOrIncreased -= OnTempAddedOrIncreased;
+            playerInventoryReference.inventoryPreview.OnAddedOrIncreased -= OnTempAddedOrIncreased;
             playerInventoryReference.inventory.OnDecreased -= OnDecreased;
-            tempHold.inventory.OnInventoryCleared += OnAllTempItemClear;
+            playerInventoryReference.inventoryPreview.OnInventoryCleared += OnAllTempItemClear;
         }
 
         private void Start()

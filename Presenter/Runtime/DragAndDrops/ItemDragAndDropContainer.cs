@@ -21,8 +21,6 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         [FormerlySerializedAs("_itemInventoryReference")] [DisableInEditMode, SerializeField]
         private PlayerInventoryReference playerInventoryReference;
 
-        [DisableInEditMode, SerializeField]
-        private TempHold _tempHold;
 
         [DisableInEditMode, ShowInInspector] private Transform hitSelectedTransform;
 
@@ -33,11 +31,9 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         }
 
 
-        public bool Setup(PlayerInventoryReference inventoryReference, TempHold tempHold, Item item,
-            Transform selectedTransform)
+        public bool Setup(PlayerInventoryReference inventoryReference, Item item, Transform selectedTransform)
         {
             playerInventoryReference = inventoryReference;
-            _tempHold = tempHold;
             currentItem = item;
             hitSelectedTransform = selectedTransform;
             if (!TrySetText())
@@ -91,7 +87,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             if (isHit)
             {
                 if (hitSelectedTransform == rayCast.transform) return;
-                _tempHold.inventory.Remove(currentItem);
+                playerInventoryReference.inventoryPreview.Remove(currentItem);
                 hitSelectedTransform = rayCast.transform;
                 if (rayCast.transform.TryGetComponent<IDropAble<Item>>(out var dropAble))
                 {
@@ -103,14 +99,14 @@ namespace Soul.Presenter.Runtime.DragAndDrops
                 }
             }
 
-            _tempHold.inventory.Clear(true);
+            playerInventoryReference.inventoryPreview.Clear(true);
         }
 
         protected override void OnDragRayCastEnd(bool isHit, RaycastHit rayCast)
         {
             if (isHit)
             {
-                _tempHold.inventory.Remove(currentItem);
+                playerInventoryReference.inventoryPreview.Remove(currentItem);
                 hitSelectedTransform = rayCast.transform;
                 if (rayCast.transform.TryGetComponent<IDropAble<Item>>(out var dropAble))
                 {
@@ -122,7 +118,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
                 }
             }
 
-            _tempHold.inventory.Clear(true);
+            playerInventoryReference.inventoryPreview.Clear(true);
         }
     }
 }

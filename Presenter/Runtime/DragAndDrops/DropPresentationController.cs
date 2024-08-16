@@ -19,7 +19,6 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         [FormerlySerializedAs("ItemInventoryReference")] [FormerlySerializedAs("itemInventoryReference")]
         public PlayerInventoryReference playerInventoryReference;
 
-        public TempHold tempHold;
         public ItemDragAndDropContainer itemDragAndDropContainerPrefab;
 
         public List<ItemDragAndDropContainer> instantiateDragContainers;
@@ -50,7 +49,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             {
                 var dragContainer =
                     itemDragAndDropContainerPrefab.GameObject.Request<ItemDragAndDropContainer>(containerTransform);
-                if (dragContainer.Setup(playerInventoryReference, tempHold, item, selectedTransform))
+                if (dragContainer.Setup(playerInventoryReference, item, selectedTransform))
                 {
                     instantiateDragContainers.Add(dragContainer);
                 }
@@ -66,7 +65,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             }
 
             instantiateDragContainers.Clear();
-            tempHold.inventory.Clear(true);
+            playerInventoryReference.inventoryPreview.Clear(true);
         }
 
         private (bool canDrop, ScriptableList<T> currentAllowedThingsToDrop) TryGetAllowedList<T>(
