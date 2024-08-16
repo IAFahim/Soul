@@ -1,4 +1,4 @@
-﻿namespace Soul.Controller.Runtime.Inventories
+﻿namespace Soul.Controller.Runtime.DragAndDrop
 {
     public interface ISingleDrop
     {

@@ -1,7 +1,8 @@
 ﻿using System;
 using QuickEye.Utility;
 using Soul.Model.Runtime.Items;
-using Soul.Model.Runtime.Workers;
+using Soul.Model.Runtime.Peoples.Workers;
+using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Requirements
 {
@@ -10,7 +11,7 @@ namespace Soul.Controller.Runtime.Requirements
     {
         public bool isProducing;
         public Item productionItem;
-        public Worker productionWorker;
+        [FormerlySerializedAs("productionWorker")] public WorkerType productionWorkerType;
         public UnityTimeSpan productionTimeStartTimeSpan;
         public UnityTimeSpan productionTimeReduction;
     }

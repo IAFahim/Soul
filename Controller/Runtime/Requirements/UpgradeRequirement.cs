@@ -1,6 +1,7 @@
 ﻿using System;
 using QuickEye.Utility;
-using Soul.Model.Runtime.Workers;
+using Soul.Model.Runtime.Peoples.Workers;
+using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Requirements
 {
@@ -8,7 +9,7 @@ namespace Soul.Controller.Runtime.Requirements
     public struct UpgradeRequirement
     {
         public bool isUpgrading;
-        public Worker upgradeWorker;
+        [FormerlySerializedAs("upgradeWorker")] public WorkerType upgradeWorkerType;
         public UnityTimeSpan upgradeTimeStartTimeSpan;
         public UnityTimeSpan upgradeTimeReduction;
     }

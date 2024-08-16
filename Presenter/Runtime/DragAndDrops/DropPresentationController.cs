@@ -16,8 +16,8 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         [SerializeField] public Transform containerTransform;
         [SerializeField] private CanvasGroup containerCanvasGroup;
 
-        [FormerlySerializedAs("itemInventoryReference")]
-        public ItemInventoryReference ItemInventoryReference;
+        [FormerlySerializedAs("ItemInventoryReference")] [FormerlySerializedAs("itemInventoryReference")]
+        public PlayerInventoryReference playerInventoryReference;
 
         public TempHold tempHold;
         public ItemDragAndDropContainer itemDragAndDropContainerPrefab;
@@ -50,7 +50,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             {
                 var dragContainer =
                     itemDragAndDropContainerPrefab.GameObject.Request<ItemDragAndDropContainer>(containerTransform);
-                if (dragContainer.Setup(ItemInventoryReference, tempHold, item, selectedTransform))
+                if (dragContainer.Setup(playerInventoryReference, tempHold, item, selectedTransform))
                 {
                     instantiateDragContainers.Add(dragContainer);
                 }

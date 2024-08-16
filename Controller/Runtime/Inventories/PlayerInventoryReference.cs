@@ -1,17 +1,17 @@
-﻿using Soul.Model.Runtime.Items;
+﻿using Soul.Controller.Runtime.Inventories.Peoples;
+using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Reactives;
-using Soul.Model.Runtime.Workers;
 using UnityEngine;
 
 namespace Soul.Controller.Runtime.Inventories
 {
     [CreateAssetMenu(fileName = "itemInventory", menuName = "Soul/Inventory/Create Inventory")]
-    public class ItemInventoryReference : ScriptableObject
+    public class PlayerInventoryReference : ScriptableObject
     {
         public ReactivePair<Currency, int> coins;
         public ReactivePair<Item, int> gems;
-        public WorkerInventory workers;
         public ItemInventory inventory;
-        public static implicit operator ItemInventory(ItemInventoryReference reference) => reference.inventory;
+        public WorkerInventory workerInventory;
+        public static implicit operator ItemInventory(PlayerInventoryReference reference) => reference.inventory;
     }
 }

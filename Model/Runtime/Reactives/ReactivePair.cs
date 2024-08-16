@@ -8,10 +8,10 @@ namespace Soul.Model.Runtime.Reactives
     public struct ReactivePair<T, TV>
     {
         [SerializeField] private Pair<T, TV> pair;
-        
+
         public event Action<T, TV, TV> OnChange;
 
-        public Pair<T, TV> Pair1
+        public Pair<T, TV> Pair
         {
             get => pair;
             set
@@ -21,5 +21,8 @@ namespace Soul.Model.Runtime.Reactives
                 OnChange?.Invoke(pair.Key, oldValue, pair.Value);
             }
         }
+
+        public static implicit operator T(ReactivePair<T, TV> pair) => pair.pair.Key;
+        public static implicit operator TV(ReactivePair<T, TV> pair) => pair.pair.Value;
     }
 }

@@ -18,8 +18,8 @@ namespace Soul.Presenter.Runtime.DragAndDrops
 
         [DisableInEditMode, SerializeField] private Item currentItem;
 
-        [DisableInEditMode, SerializeField]
-        private ItemInventoryReference _itemInventoryReference;
+        [FormerlySerializedAs("_itemInventoryReference")] [DisableInEditMode, SerializeField]
+        private PlayerInventoryReference playerInventoryReference;
 
         [DisableInEditMode, SerializeField]
         private TempHold _tempHold;
@@ -33,10 +33,10 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         }
 
 
-        public bool Setup(ItemInventoryReference inventoryReference, TempHold tempHold, Item item,
+        public bool Setup(PlayerInventoryReference inventoryReference, TempHold tempHold, Item item,
             Transform selectedTransform)
         {
-            _itemInventoryReference = inventoryReference;
+            playerInventoryReference = inventoryReference;
             _tempHold = tempHold;
             currentItem = item;
             hitSelectedTransform = selectedTransform;
@@ -66,7 +66,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         private (int oneDropAmount, int inventoryAmount) GetAllowedCounts()
         {
             int oneDropAmount = 0;
-            if (_itemInventoryReference.inventory.TryGetItem(currentItem, out var inventoryAmount))
+            if (playerInventoryReference.inventory.TryGet(currentItem, out var inventoryAmount))
             {
                 int allowedWeight = AllowedWeight(hitSelectedTransform);
                 oneDropAmount = Mathf.Min(inventoryAmount, allowedWeight);
@@ -91,7 +91,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             if (isHit)
             {
                 if (hitSelectedTransform == rayCast.transform) return;
-                _tempHold.inventory.RemoveItem(currentItem);
+                _tempHold.inventory.Remove(currentItem);
                 hitSelectedTransform = rayCast.transform;
                 if (rayCast.transform.TryGetComponent<IDropAble<Item>>(out var dropAble))
                 {
@@ -110,7 +110,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         {
             if (isHit)
             {
-                _tempHold.inventory.RemoveItem(currentItem);
+                _tempHold.inventory.Remove(currentItem);
                 hitSelectedTransform = rayCast.transform;
                 if (rayCast.transform.TryGetComponent<IDropAble<Item>>(out var dropAble))
                 {

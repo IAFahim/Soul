@@ -11,7 +11,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
 {
     public class CropProductionManager : GameComponent, ISingleDrop, IWeightCapacity
     {
-        public ItemInventoryReference inventoryReference;
+        public PlayerInventoryReference inventoryReference;
         public TempHold tempHold;
 
         [SerializeField]
@@ -36,8 +36,8 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         public void TempAdd(Item[] items)
         {
             queueItem = items[0];
-            tempHold.inventory.AddOrIncreaseItem(queueItem, (int)WeightLimit);
-            tempHold.inventory.AddOrIncreaseItem(coinRequirement.Key, coinRequirement.Value);
+            tempHold.inventory.AddOrIncrease(queueItem, (int)WeightLimit);
+            tempHold.inventory.AddOrIncrease(coinRequirement.Key, coinRequirement.Value);
             productionItem = new Pair<Item, int>(queueItem, (int)WeightLimit);
         }
 
@@ -48,15 +48,15 @@ namespace Soul.Controller.Runtime.Buildings.Managers
 
         private void OnReward(bool isEnd)
         {
-            inventoryReference.inventory.DecreaseItem(queueItem, (int)WeightLimit);
-            inventoryReference.inventory.DecreaseItem(coinRequirement.Key, coinRequirement.Value);
+            inventoryReference.inventory.Decrease(queueItem, (int)WeightLimit);
+            inventoryReference.inventory.Decrease(coinRequirement.Key, coinRequirement.Value);
             if (!isEnd) storedWorkers = maxAllowedWorkersRequirement;
         }
 
         public bool HasEnoughToStart()
         {
-            return inventoryReference.inventory.HasEnoughItem(coinRequirement) &&
-                   inventoryReference.inventory.HasEnoughItem(productionItem) &&
+            return inventoryReference.inventory.HasEnough(coinRequirement) &&
+                   inventoryReference.inventory.HasEnough(productionItem) &&
                    totalWorkerCount >= maxAllowedWorkersRequirement;
         }
 

@@ -6,32 +6,32 @@ using Pancake.Common;
 using QuickEye.Utility;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Interfaces;
-using Soul.Model.Runtime.Items;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Model.Runtime.Inventories
 {
     [Serializable]
     public abstract class Inventory<T, TV> : ISaveAble where TV : IComparable<TV>, IEquatable<TV>
     {
-        [SerializeField] protected UnityDictionary<T, TV> items = new();
+        [FormerlySerializedAs("items")] [SerializeField] protected UnityDictionary<T, TV> dictionary = new();
 
-        public event Action<T, TV, TV, bool> OnItemAddedOrIncreased;
-        public event Action<T, TV, TV> OnItemDecreased;
-        public event Action<T, TV> OnItemRemoved;
+        public event Action<T, TV, TV, bool> OnAddedOrIncreased;
+        public event Action<T, TV, TV> OnDecreased;
+        public event Action<T, TV> OnRemoved;
         public event Action OnInventoryCleared;
 
-        public bool TryGetItem(T item, out TV amount)
+        public bool TryGet(T key, out TV amount)
         {
-            return items.TryGetValue(item, out amount);
+            return dictionary.TryGetValue(key, out amount);
         }
 
         [Button]
-        public void AddOrIncreaseItem(T item, TV amount)
+        public void AddOrIncrease(T key, TV amount)
         {
             TV count;
             bool isAdded = false;
-            if (items.TryGetValue(item, out TV currentAmount))
+            if (dictionary.TryGetValue(key, out TV currentAmount))
             {
                 count = AddValues(currentAmount, amount);
             }
@@ -41,72 +41,72 @@ namespace Soul.Model.Runtime.Inventories
                 isAdded = true;
             }
 
-            items[item] = count;
-            OnItemAddedOrIncreased?.Invoke(item, amount, count, isAdded);
+            dictionary[key] = count;
+            OnAddedOrIncreased?.Invoke(key, amount, count, isAdded);
         }
 
         [Button]
-        public bool DecreaseItem(T item, TV amount)
+        public bool Decrease(T key, TV amount)
         {
-            if (!items.TryGetValue(item, out TV currentAmount)) return false;
+            if (!dictionary.TryGetValue(key, out TV currentAmount)) return false;
             if (currentAmount.CompareTo(amount) < 0) return false;
             var count = SubtractValues(currentAmount, amount);
 
             if (count.Equals(default(TV)))
             {
-                RemoveItem(item);
+                Remove(key);
             }
             else
             {
-                items[item] = count;
-                OnItemDecreased?.Invoke(item, amount, count);
+                dictionary[key] = count;
+                OnDecreased?.Invoke(key, amount, count);
             }
 
             return true;
         }
 
-        public bool HasEnoughItem(T item, TV amount)
+        public bool HasEnough(T key, TV amount)
         {
-            return items.TryGetValue(item, out TV currentAmount) && currentAmount.CompareTo(amount) >= 0;
+            return dictionary.TryGetValue(key, out TV currentAmount) && currentAmount.CompareTo(amount) >= 0;
         }
 
-        public bool HasEnoughItem(Pair<T, TV> itemKeyValuePair)
+        public bool HasEnough(Pair<T, TV> keyValuePair)
         {
-            return items.TryGetValue(itemKeyValuePair.Key, out TV currentAmount) &&
-                   currentAmount.CompareTo(itemKeyValuePair.Value) >= 0;
+            return dictionary.TryGetValue(keyValuePair.Key, out TV currentAmount) &&
+                   currentAmount.CompareTo(keyValuePair.Value) >= 0;
         }
         
-        public bool HasEnoughItems(IEnumerable<Pair<T, TV>> itemKeyValues)
+        public bool HasEnough(IEnumerable<Pair<T, TV>> keyValues)
         {
-            return itemKeyValues.All(HasEnoughItem);
+            return keyValues.All(HasEnough);
         }
 
 
         [Button]
-        public bool RemoveItem(T item)
+        public bool Remove(T key)
         {
-            if (!items.Remove(item, out TV amount)) return false;
-            OnItemRemoved?.Invoke(item, amount);
+            if (!dictionary.Remove(key, out TV amount)) return false;
+            OnRemoved?.Invoke(key, amount);
             return true;
         }
 
         [Button]
-        public void RemoveAllItems()
+        public void RemoveAll()
         {
             Clear(true);
         }
 
-        public IEnumerable<KeyValuePair<T, TV>> GetAllItems()
+        public IEnumerable<KeyValuePair<T, TV>> GetAll()
         {
-            return items.ToList();
+            return dictionary.ToList();
         }
 
-        public bool HasItem(T item)
+        public bool Has(T key)
         {
-            return items.ContainsKey(item);
+            return dictionary.ContainsKey(key);
         }
 
-        public int ItemCount => items.Count;
+        public int Count => dictionary.Count;
 
         protected abstract TV AddValues(TV a, TV b);
         protected abstract TV SubtractValues(TV a, TV b);
@@ -125,28 +125,28 @@ namespace Soul.Model.Runtime.Inventories
             Clear(false);
             foreach (var pair in list.Where(pair => pair.Key != null))
             {
-                AddOrIncreaseItem(pair.Key, pair.Value);
+                AddOrIncrease(pair.Key, pair.Value);
             }
         }
 
         public List<Pair<T, TV>> ToList()
         {
-            return items.Select(item => new Pair<T, TV>(item.Key, item.Value)).ToList();
+            return dictionary.Select(keyValuePair => new Pair<T, TV>(keyValuePair.Key, keyValuePair.Value)).ToList();
         }
 
         public void Clear(bool invokeEvents)
         {
             if (invokeEvents)
             {
-                foreach (var item in items)
+                foreach (var keyValuePair in dictionary)
                 {
-                    OnItemRemoved?.Invoke(item.Key, item.Value);
+                    OnRemoved?.Invoke(keyValuePair.Key, keyValuePair.Value);
                 }
 
                 OnInventoryCleared?.Invoke();
             }
 
-            items.Clear();
+            dictionary.Clear();
         }
     }
 }

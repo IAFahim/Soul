@@ -12,7 +12,7 @@ namespace Soul.Presenter.Runtime.UI
 {
     public class ProfileInventoryManager : GameComponent, ILoadComponent
     {
-        public ItemInventoryReference itemInventoryReference;
+        [FormerlySerializedAs("itemInventoryReference")] public PlayerInventoryReference playerInventoryReference;
         public TempHold tempHold;
 
         [Header("Coin")] public Currency coin;
@@ -21,7 +21,7 @@ namespace Soul.Presenter.Runtime.UI
         public TextMeshProUGUIFormat coinGoingToBeModifiedText;
         public CanvasGroup coinGoingToBeModifiedCanvasGroup;
 
-        [Header("Gem")] public Currency gem;
+        [Header("Gem")]
         public TextMeshProUGUIFormat gemText;
         public TextMeshProUGUIFormat gemGoingToBeModifiedText;
         public CanvasGroup gemGoingToBeModifiedCanvasGroup;
@@ -50,9 +50,9 @@ namespace Soul.Presenter.Runtime.UI
 
         public void OnEnable()
         {
-            itemInventoryReference.inventory.OnItemAddedOrIncreased += OnItemAddedOrIncreased;
-            tempHold.inventory.OnItemAddedOrIncreased += OnTempItemAddedOrIncreased;
-            itemInventoryReference.inventory.OnItemDecreased += OnItemDecreased;
+            playerInventoryReference.inventory.OnAddedOrIncreased += OnAddedOrIncreased;
+            tempHold.inventory.OnAddedOrIncreased += OnTempAddedOrIncreased;
+            playerInventoryReference.inventory.OnDecreased += OnDecreased;
             tempHold.inventory.OnInventoryCleared += OnAllTempItemClear;
             SetAllAlpha(0);
         }
@@ -61,34 +61,25 @@ namespace Soul.Presenter.Runtime.UI
 
         public void OnDisable()
         {
-            itemInventoryReference.inventory.OnItemAddedOrIncreased -= OnItemAddedOrIncreased;
-            tempHold.inventory.OnItemAddedOrIncreased -= OnTempItemAddedOrIncreased;
-            itemInventoryReference.inventory.OnItemDecreased -= OnItemDecreased;
+            playerInventoryReference.inventory.OnAddedOrIncreased -= OnAddedOrIncreased;
+            tempHold.inventory.OnAddedOrIncreased -= OnTempAddedOrIncreased;
+            playerInventoryReference.inventory.OnDecreased -= OnDecreased;
             tempHold.inventory.OnInventoryCleared += OnAllTempItemClear;
         }
 
         private void Start()
         {
-            if (itemInventoryReference.inventory.TryGetItem(coin, out var coinCount)) coinText.SetTextInt(coinCount);
-            if (itemInventoryReference.inventory.TryGetItem(gem, out var gemCount)) gemText.SetTextInt(gemCount);
+            coinText.SetTextInt(playerInventoryReference.coins);
+            gemText.SetTextInt(playerInventoryReference.gems);
             workerText.SetTextInt(worker);
             weightText.SetTextFloat(weight.x);
             maxWeightText.SetTextFloat(weight.y);
             levelText.SetTextInt(level);
         }
 
-        private void OnItemAddedOrIncreased(Item item, int amount, int count, bool isAdded)
+        private void OnAddedOrIncreased(Item item, int amount, int count, bool isAdded)
         {
-            if (item == coin)
-            {
-                coinText.SetTextInt(count);
-                maxCoinText.SetTextInt(amount);
-            }
-            else if (item == gem)
-            {
-                gemText.SetTextInt(count);
-            }
-            else if (item is IWeight weightedItem)
+            if (item is IWeight weightedItem)
             {
                 weight.x += weightedItem.Weight * amount;
                 weightText.SetTextFloat(weight.x);
@@ -96,36 +87,18 @@ namespace Soul.Presenter.Runtime.UI
             }
         }
 
-        private void OnItemDecreased(Item item, int amount, int count)
+        private void OnDecreased(Item item, int amount, int count)
         {
-            if (item == coin)
-            {
-                coinText.SetTextInt(count);
-            }
-            else if (item == gem)
-            {
-                gemText.SetTextInt(count);
-            }
-            else if (item is IWeight weightedItem)
+            if (item is IWeight weightedItem)
             {
                 weight.x -= weightedItem.Weight * amount;
                 weightText.SetTextFloat(weight.x);
             }
         }
 
-        private void OnTempItemAddedOrIncreased(Item item, int amount, int count, bool isAdded)
+        private void OnTempAddedOrIncreased(Item item, int amount, int count, bool isAdded)
         {
-            if (item == coin)
-            {
-                coinGoingToBeModifiedText.SetTextInt(-amount);
-                coinGoingToBeModifiedCanvasGroup.alpha = 1;
-            }
-            else if (item == gem)
-            {
-                gemGoingToBeModifiedText.SetTextInt(-amount);
-                gemGoingToBeModifiedCanvasGroup.alpha = 1;
-            }
-            else if (item is IWeight weightedItem)
+            if (item is IWeight weightedItem)
             {
                 weightGoingToBeModifiedText.SetTextFloat(weightedItem.Weight * amount);
                 weightGoingToBeModifiedCanvasGroup.alpha = 1;
