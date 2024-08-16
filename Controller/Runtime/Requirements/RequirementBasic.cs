@@ -6,10 +6,9 @@ using Soul.Model.Runtime.Peoples.Workers;
 namespace Soul.Controller.Runtime.Requirements
 {
     [Serializable]
-    public class BasicRequirement
+    public class RequirementBasic
     {
-        public bool isActive;
-        public Item mainItem;
+        public Pair<Currency, int> currencyRequirement;
         public Pair<WorkerType, int> workerCount;
     }
 }

@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using Pancake;
 using Pancake.Pools;
-using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Model.Runtime.CustomList;
 using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.DragAndDrops
 {
@@ -16,7 +14,6 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         [SerializeField] public Transform containerTransform;
         [SerializeField] private CanvasGroup containerCanvasGroup;
 
-        [FormerlySerializedAs("ItemInventoryReference")] [FormerlySerializedAs("itemInventoryReference")]
         public PlayerInventoryReference playerInventoryReference;
 
         public ItemDragAndDropContainer itemDragAndDropContainerPrefab;

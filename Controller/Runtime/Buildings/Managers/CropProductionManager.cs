@@ -6,13 +6,12 @@ using Soul.Controller.Runtime.Requirements;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings.Managers
 {
     public class CropProductionManager : GameComponent, ISingleDrop, IWeightCapacity
     {
-        [FormerlySerializedAs("inventoryReference")] public PlayerInventoryReference playerInventoryReference;
+        public PlayerInventoryReference playerInventoryReference;
 
         [SerializeField]
         private RequirementOfWorkerGroupTimeCurrencyForLevels requirementOfWorkerGroupTimeCurrencyForLevels;

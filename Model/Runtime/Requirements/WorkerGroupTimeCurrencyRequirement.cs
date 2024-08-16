@@ -9,7 +9,7 @@ namespace Soul.Model.Runtime.Requirements
     {
         public int workerCount;
         public UnityTimeSpan time;
-        public Pair<T, TV>[] currencyRequirements;
+        public Pair<T, TV> currencyRequirement;
         public Pair<T, TV>[] items;
     }
 }

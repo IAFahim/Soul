@@ -1,18 +1,16 @@
 ﻿using Pancake;
 using Pancake.Common;
-using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.UI
 {
     public class ProfileInventoryManager : GameComponent, ILoadComponent
     {
-        [FormerlySerializedAs("itemInventoryReference")] public PlayerInventoryReference playerInventoryReference;
+        public PlayerInventoryReference playerInventoryReference;
 
         [Header("Coin")] public Currency coin;
         public TextMeshProUGUIFormat coinText;
