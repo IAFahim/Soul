@@ -93,7 +93,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
                 {
                     if (dropAble.CanDropNow)
                     {
-                        dropAble.HoverDrop(new[] { currentItem });
+                        dropAble.DropHovering(new[] { currentItem });
                         return;
                     }
                 }
@@ -112,7 +112,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
                 {
                     if (dropAble.CanDropNow)
                     {
-                        dropAble.Drop(new[] { currentItem });
+                        dropAble.TryDrop(new[] { currentItem });
                         TrySetText();
                     }
                 }

@@ -1,4 +1,4 @@
-﻿namespace Soul.Model.Runtime.Interfaces
+﻿namespace Soul.Model.Runtime.SaveAndLoad
 {
     public interface ISaveAble
     {

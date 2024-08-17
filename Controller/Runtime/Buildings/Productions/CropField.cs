@@ -12,23 +12,25 @@ using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.SaveAndLoad;
 using Soul.Model.Runtime.Selectors;
 using UnityEngine;
 
 namespace Soul.Controller.Runtime.Buildings.Productions
 {
     public class CropField : GameComponent, ISelectCallBack, IGuid, ITitle, ISaveAble, ILocked, ILoadComponent, ILevel,
-        IDropAble<Item>, IUpgrade
+        IDropAble<Item>, IUpgrade, ISaveAbleReference
     {
-        public AddressablePoolLifetime addressablePoolLifetime;
-        [SerializeField] private CropFieldRecord cropFieldRecord;
         [SerializeField, Guid] private string guid;
-        [SerializeField] private LockedInfrastructureInfo lockedInfrastructureInfo;
         [SerializeField] private Level level;
-        [SerializeField] private BoxCollider boxCollider;
+        [SerializeField] private CropFieldRecord cropFieldRecord;
         [SerializeField] private CropProductionManager cropProductionManager;
+
+        public AddressablePoolLifetime addressablePoolLifetime;
+        [SerializeField] private LockedInfrastructureInfo lockedInfrastructureInfo;
+        [SerializeField] private BoxCollider boxCollider;
         [SerializeField] private UnlockAndUpgradeManager unlockAndUpgradeManager;
-        
+
 
         private bool _loadDataOnEnable = true;
 
@@ -46,7 +48,7 @@ namespace Soul.Controller.Runtime.Buildings.Productions
         public bool MultipleDropMode => false;
         public bool CanDropNow => !IsLocked;
 
-        public bool HoverDrop(Item[] thingToDrop)
+        public bool DropHovering(Item[] thingToDrop)
         {
             foreach (var item in thingToDrop)
             {
@@ -60,11 +62,15 @@ namespace Soul.Controller.Runtime.Buildings.Productions
             return true;
         }
 
-        public bool Drop(Item[] thingToDrop)
+        public bool TryDrop(Item[] thingToDrop)
         {
-            if (HoverDrop(thingToDrop))
+            if (DropHovering(thingToDrop))
             {
-                cropProductionManager.StartProduction();
+                if (cropProductionManager.StartProduction())
+                {
+                    Save(Guid);
+                }
+
                 return true;
             }
 
@@ -73,10 +79,7 @@ namespace Soul.Controller.Runtime.Buildings.Productions
 
         public ScriptableList<Item> AllowedThingsToDrop => allowedThingsToDrop;
 
-        public void OnSelected(RaycastHit selfRaycastHit)
-        {
-            Debug.Log("Selected: " + this);
-        }
+        public void OnSelected(RaycastHit selfRaycastHit) => Debug.Log("Selected: " + this);
 
         private async void Start()
         {
@@ -88,19 +91,16 @@ namespace Soul.Controller.Runtime.Buildings.Productions
         public async UniTask SetUp(int currentLevel)
         {
             await unlockAndUpgradeManager.Setup(addressablePoolLifetime, boxCollider, currentLevel);
-            var x = cropProductionManager.Setup(cropFieldRecord.productionRequirement, currentLevel);
+            var x = cropProductionManager.Setup(cropFieldRecord.recordProduction, currentLevel, this);
         }
 
         [Button]
-        public void Upgrade()
-        {
-            unlockAndUpgradeManager.Upgrade(level + 1);
-        }
+        public void Upgrade() => unlockAndUpgradeManager.Upgrade(level + 1);
 
-        public override string ToString()
-        {
-            return Title;
-        }
+        public override string ToString() => Title;
+
+        [Button]
+        public void Save() => Save(Guid);
 
         [Button]
         public void Load(string key)
@@ -109,7 +109,6 @@ namespace Soul.Controller.Runtime.Buildings.Productions
             level.level = new Vector2Int(cropFieldRecord.level, level.MaxLevel);
         }
 
-        [Button]
         public void Save(string key)
         {
             cropFieldRecord.level = level.CurrentLevel;

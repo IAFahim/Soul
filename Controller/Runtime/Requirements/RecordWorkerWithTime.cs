@@ -4,7 +4,7 @@ using QuickEye.Utility;
 namespace Soul.Controller.Runtime.Requirements
 {
     [Serializable]
-    public class RequirementBasicWithTime: RequirementBasic
+    public class RecordWorkerWithTime: RecordWorker
     {
         public UnityDateTime startTime;
         public UnityTimeSpan reductionTime;
