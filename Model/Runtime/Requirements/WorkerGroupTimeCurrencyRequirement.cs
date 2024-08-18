@@ -1,6 +1,7 @@
 ﻿using System;
 using QuickEye.Utility;
 using Soul.Model.Runtime.Containers;
+using UnityEngine.Serialization;
 
 namespace Soul.Model.Runtime.Requirements
 {
@@ -8,8 +9,8 @@ namespace Soul.Model.Runtime.Requirements
     public struct WorkerGroupTimeCurrencyRequirement<T, TV>
     {
         public int workerCount;
-        public UnityTimeSpan time;
-        public Pair<T, TV> currencyRequirement;
+        [FormerlySerializedAs("time")] public UnityTimeSpan fullTime;
+        [FormerlySerializedAs("currencyRequirement")] public Pair<T, TV> currency;
         public Pair<T, TV>[] items;
     }
 }

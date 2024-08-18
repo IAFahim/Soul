@@ -26,13 +26,7 @@ namespace Soul.Controller.Runtime.Upgrades
             instantiatedParts = new(parts.SpawnParts(Transform, usePooling));
             SetBounds(boxCollider);
         }
-
-        [Button]
-        public void SpawnExtra(int next, bool usePooling)
-        {
-            var extraParts = upgradeParts[next - 1].SpawnExtraParts(Transform, upgradeParts[next], usePooling);
-            instantiatedParts.AddRange(extraParts);
-        }
+        
 
         [Button]
         public void CaptureChildrenFor(int index)
@@ -45,6 +39,16 @@ namespace Soul.Controller.Runtime.Upgrades
         {
             boxCollider.center = bounds.center;
             boxCollider.size = bounds.size;
+        }
+        
+        [Button]
+        public void ClearInstantiatedParts()
+        {
+            foreach (var part in instantiatedParts)
+            {
+                Destroy(part);
+            }
+            instantiatedParts.Clear();
         }
 
         private void OnDrawGizmosSelected()

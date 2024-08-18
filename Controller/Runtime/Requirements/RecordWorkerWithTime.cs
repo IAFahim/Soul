@@ -9,12 +9,12 @@ namespace Soul.Controller.Runtime.Requirements
         public UnityDateTime startTime;
         public UnityTimeSpan reductionTime;
 
-        public UnityTimeSpan RequiredTime(UnityTimeSpan requiredTime) => requiredTime - reductionTime;
-        public UnityDateTime EndTime(UnityTimeSpan requiredTime) => startTime + RequiredTime(requiredTime);
-        public UnityTimeSpan TimeRemaining(UnityTimeSpan requiredTime) => EndTime(requiredTime) - DateTime.UtcNow;
+        public UnityTimeSpan DiscountedTime(UnityTimeSpan fullTime) => fullTime - reductionTime;
+        public UnityDateTime EndTime(UnityTimeSpan fullTime) => startTime + DiscountedTime(fullTime);
+        public UnityTimeSpan TimeRemaining(UnityTimeSpan fullTime) => EndTime(fullTime) - DateTime.UtcNow;
 
-        public float Progress(UnityTimeSpan requiredTime) => 1 - (float)TimeRemaining(requiredTime).TotalSeconds /
-            (float)RequiredTime(requiredTime).TotalSeconds;
-        public bool IsCompleted(UnityTimeSpan requiredTime) => TimeRemaining(requiredTime) <= TimeSpan.Zero;
+        public float Progress(UnityTimeSpan fullTime) => 1 - (float)TimeRemaining(fullTime).TotalSeconds /
+            (float)DiscountedTime(fullTime).TotalSeconds;
+        public bool IsCompleted(UnityTimeSpan fullTime) => TimeRemaining(fullTime) <= TimeSpan.Zero;
     }
 }

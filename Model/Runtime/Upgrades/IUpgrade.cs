@@ -1,6 +1,6 @@
 ﻿using Soul.Model.Runtime.Levels;
 
-namespace Soul.Controller.Runtime.Upgrades
+namespace Soul.Model.Runtime.Upgrades
 {
     public interface IUpgrade : ILevel
     {

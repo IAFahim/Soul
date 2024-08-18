@@ -25,7 +25,6 @@ namespace Soul.Controller.Runtime.Buildings.Managers
     public class CropProductionManager : GameComponent, ISingleDrop, IWeightCapacity, IRewardClaim,
         IReward<Pair<Item, int>>
     {
-        
         [SerializeField] private PlayerInventoryReference playerInventoryReference;
 
         [SerializeField]
@@ -35,40 +34,43 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         [SerializeField] private Level currentLevel;
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
-        
-        [SerializeField] private RecordProduction currentRecordProduction;
+
+        [FormerlySerializedAs("currentRecordProduction")] [SerializeField]
+        private RecordProduction productionRecord;
+
         private ISaveAbleReference _saveAbleReference;
         [SerializeField] private Item queueItem;
         [SerializeField] private bool isClaimable;
         private DelayHandle _delayHandle;
-        
-        [FormerlySerializedAs("reward")] [SerializeField] private RewardPopup rewardPopup;
+
+        [FormerlySerializedAs("reward")] [SerializeField]
+        private RewardPopup rewardPopup;
 
         // Properties
-        public Item ProductionItem => currentRecordProduction.productionItem ??= queueItem;
+        public Item ProductionItem => productionRecord.productionItem ??= queueItem;
 
         public float WeightLimit => capacity;
 
         public bool IsProducing
         {
-            get => currentRecordProduction.isProducing;
-            set => currentRecordProduction.isProducing = value;
+            get => productionRecord.isProducing;
+            set => productionRecord.isProducing = value;
         }
 
         public int CurrencyRequirement => 0;
-        public int WorkerCount => currentRecordProduction.workerCount;
-        public UnityDateTime StartTime => currentRecordProduction.startTime;
-        public UnityTimeSpan ReductionTime => currentRecordProduction.reductionTime;
+        public int WorkerCount => productionRecord.workerCount;
+        public UnityDateTime StartTime => productionRecord.startTime;
+        public UnityTimeSpan ReductionTime => productionRecord.reductionTime;
 
         public WorkerGroupTimeCurrencyRequirement<Item, int> Required =>
-            requirementOfWorkerGroupTimeCurrencyForLevels.GetRequirement(currentLevel);
+            requirementOfWorkerGroupTimeCurrencyForLevels.GetRequirement(currentLevel - 1);
 
-        public TimeSpan TimeRequired => Required.time;
-        public UnityTimeSpan RequiredTimeSpan => currentRecordProduction.RequiredTime(TimeRequired);
-        public UnityDateTime EndTime => currentRecordProduction.EndTime(TimeRequired);
-        public UnityTimeSpan TimeRemaining => currentRecordProduction.TimeRemaining(TimeRequired);
-        public float Progress => currentRecordProduction.Progress(TimeRequired);
-        public bool IsCompleted => IsProducing && currentRecordProduction.IsCompleted(TimeRequired);
+        public TimeSpan RequiredFullTime => Required.fullTime;
+        public UnityTimeSpan DiscountedTime => productionRecord.DiscountedTime(Required.fullTime);
+        public UnityDateTime EndTime => productionRecord.EndTime(RequiredFullTime);
+        public UnityTimeSpan TimeRemaining => productionRecord.TimeRemaining(RequiredFullTime);
+        public float Progress => productionRecord.Progress(RequiredFullTime);
+        public bool IsCompleted => IsProducing && productionRecord.IsCompleted(RequiredFullTime);
 
 
         public int CurrentCurrency => playerInventoryReference.coins.Value;
@@ -92,19 +94,17 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         /// <summary>
         /// Initializes the CropProductionManager with the provided data.
         /// </summary>
-        public bool Setup(RecordProduction recordProduction, Level level, ISaveAbleReference saveAbleReference)
+        public bool Setup(PlayerInventoryReference inventoryReference, RecordProduction recordProduction, Level level,
+            ISaveAbleReference saveAbleReference)
         {
-            currentRecordProduction = recordProduction;
+            playerInventoryReference = inventoryReference;
+            productionRecord = recordProduction;
             currentLevel = level;
             _saveAbleReference = saveAbleReference;
-            if (currentRecordProduction.isProducing)
-            {
-                StartTimer(false);
-            }
-
-            return true;
+            if (IsProducing) StartTimer(false);
+            return IsProducing;
         }
-        
+
 
         /// <summary>
         /// Temporarily adds items for preview purposes.
@@ -122,9 +122,9 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         public bool StartProduction()
         {
             if (IsProducing) return false;
-            if (HasEnoughToStart())
+            if (HasEnough())
             {
-                SetProductionRecord();
+                ProductionRecordModify();
                 TakeRequirement();
                 StartTimer(true);
                 _saveAbleReference.Save();
@@ -137,7 +137,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         /// <summary>
         /// Checks if there are enough resources to start production.
         /// </summary>
-        public bool HasEnoughToStart()
+        public bool HasEnough()
         {
             return playerInventoryReference.inventory.HasEnough(ProductionItem, capacity);
         }
@@ -172,7 +172,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
                 return;
             }
 
-            float delay = startNow ? (float)RequiredTimeSpan.TotalSeconds : (float)TimeRemaining.TotalSeconds;
+            float delay = startNow ? (float)DiscountedTime.TotalSeconds : (float)TimeRemaining.TotalSeconds;
             _delayHandle = App.Delay(delay, OnComplete);
             Track.Start(name, delay);
         }
@@ -180,13 +180,13 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         /// <summary>
         /// Sets the production record data.
         /// </summary>
-        private void SetProductionRecord()
+        private void ProductionRecordModify()
         {
             IsProducing = true;
-            currentRecordProduction.workerCount.Value = WorkerCount;
-            currentRecordProduction.productionItem = ProductionItem;
-            currentRecordProduction.startTime = new UnityDateTime(DateTime.UtcNow);
-            currentRecordProduction.reductionTime = new UnityTimeSpan();
+            productionRecord.workerCount.Value = WorkerCount;
+            productionRecord.productionItem = ProductionItem;
+            productionRecord.startTime = new UnityDateTime(DateTime.UtcNow);
+            productionRecord.reductionTime = new UnityTimeSpan();
         }
 
         /// <summary>

@@ -44,7 +44,7 @@ namespace Soul.Controller.Runtime.Upgrades
         }
 
         [Button]
-        private void ReleaseInstance()
+        public void ReleaseInstance()
         {
             if (_instantiatedAssetPairReference.Value)
                 addressablePoolLifetime.ReturnToPool(_instantiatedAssetPairReference);

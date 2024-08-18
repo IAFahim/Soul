@@ -5,6 +5,7 @@ using Pancake.Common;
 using Soul.Controller.Runtime.Addressables;
 using Soul.Controller.Runtime.Buildings.Managers;
 using Soul.Controller.Runtime.Buildings.Records;
+using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Upgrades;
 using Soul.Model.Runtime.Buildings;
 using Soul.Model.Runtime.CustomList;
@@ -14,14 +15,17 @@ using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.SaveAndLoad;
 using Soul.Model.Runtime.Selectors;
+using Soul.Model.Runtime.Unlocks;
+using Soul.Model.Runtime.Upgrades;
 using UnityEngine;
 
-namespace Soul.Controller.Runtime.Buildings.Productions
+namespace Soul.Controller.Runtime.Buildings
 {
-    public class CropField : GameComponent, ISelectCallBack, IGuid, ITitle, ISaveAble, ILocked, ILoadComponent, ILevel,
-        IDropAble<Item>, IUpgrade, ISaveAbleReference
+    public class CropField : GameComponent, ISelectCallBack, IGuid, ITitle, ISaveAble, ILocked, ILoadComponent,
+        IDropAble<Item>, IUpgrade, IUnlock, ISaveAbleReference
     {
         [SerializeField, Guid] private string guid;
+        [SerializeField] private PlayerInventoryReference playerInventoryReference;
         [SerializeField] private Level level;
         [SerializeField] private CropFieldRecord cropFieldRecord;
         [SerializeField] private CropProductionManager cropProductionManager;
@@ -90,9 +94,10 @@ namespace Soul.Controller.Runtime.Buildings.Productions
 
         public async UniTask SetUp(int currentLevel)
         {
-            await unlockAndUpgradeManager.Setup(addressablePoolLifetime, cropFieldRecord.recordUpgrade
-                , this, boxCollider, level);
-            var x = cropProductionManager.Setup(cropFieldRecord.recordProduction, level, this);
+            await unlockAndUpgradeManager.Setup(addressablePoolLifetime, playerInventoryReference,
+                cropFieldRecord.recordUpgrade, this, boxCollider, level);
+            var x = cropProductionManager.Setup(playerInventoryReference, cropFieldRecord.recordProduction, level,
+                this);
         }
 
         public bool CanUpgrade => !level.IsMaxLevel;
@@ -132,6 +137,14 @@ namespace Soul.Controller.Runtime.Buildings.Productions
         void ILoadComponent.OnLoadComponents()
         {
             Reset();
+        }
+
+        public bool IsUnlocking => unlockAndUpgradeManager.IsUnlocking;
+        public bool CanUnlock => unlockAndUpgradeManager.HasEnough();
+
+        public void Unlock()
+        {
+            unlockAndUpgradeManager.Unlock();
         }
     }
 }
