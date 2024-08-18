@@ -49,5 +49,8 @@ namespace Soul.Model.Runtime.Containers
         {
             return key.GetHashCode() ^ value.GetHashCode();
         }
+        
+        public static implicit operator T (Pair<T, TV> pair) => pair.key;
+        public static implicit operator TV (Pair<T, TV> pair) => pair.value;
     }
 }

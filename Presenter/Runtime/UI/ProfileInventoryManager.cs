@@ -13,31 +13,31 @@ namespace Soul.Presenter.Runtime.UI
         public PlayerInventoryReference playerInventoryReference;
 
         [Header("Coin")] public Currency coin;
-        public TextMeshProUGUIFormat coinText;
-        public TextMeshProUGUIFormat maxCoinText;
-        public TextMeshProUGUIFormat coinGoingToBeModifiedText;
+        public TMPFormat coinText;
+        public TMPFormat maxCoinText;
+        public TMPFormat coinGoingToBeModifiedText;
         public CanvasGroup coinGoingToBeModifiedCanvasGroup;
 
         [Header("Gem")]
-        public TextMeshProUGUIFormat gemText;
-        public TextMeshProUGUIFormat gemGoingToBeModifiedText;
+        public TMPFormat gemText;
+        public TMPFormat gemGoingToBeModifiedText;
         public CanvasGroup gemGoingToBeModifiedCanvasGroup;
 
         [Header("Worker")] public int worker;
-        public TextMeshProUGUIFormat workerText;
-        public TextMeshProUGUIFormat maxWorkerText;
-        public TextMeshProUGUIFormat workerGoingToBeModifiedText;
+        public TMPFormat workerText;
+        public TMPFormat maxWorkerText;
+        public TMPFormat workerGoingToBeModifiedText;
         public CanvasGroup workerGoingToBeModifiedCanvasGroup;
 
         [Header("Weight")] [BarAttribute.Bar] public Vector2 weight;
-        public TextMeshProUGUIFormat weightText;
-        public TextMeshProUGUIFormat maxWeightText;
-        public TextMeshProUGUIFormat weightGoingToBeModifiedText;
+        public TMPFormat weightText;
+        public TMPFormat maxWeightText;
+        public TMPFormat weightGoingToBeModifiedText;
         public CanvasGroup weightGoingToBeModifiedCanvasGroup;
 
         [Header("Level And XP")] public Level level;
-        public TextMeshProUGUIFormat levelText;
-        public TextMeshProUGUIFormat xpGoingToBeAddedText;
+        public TMPFormat levelText;
+        public TMPFormat xpGoingToBeAddedText;
         public CanvasGroup xpGoingToBeAddedCanvasGroup;
 
         private void Awake()

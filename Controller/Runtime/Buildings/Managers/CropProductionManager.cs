@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography.X509Certificates;
 using Alchemy.Inspector;
 using Pancake;
 using Pancake.Common;
@@ -8,6 +7,7 @@ using Soul.Controller.Runtime.Converters;
 using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Requirements;
+using Soul.Controller.Runtime.Rewards;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Peoples.Workers;
@@ -21,39 +21,29 @@ using UnityEngine.Serialization;
 namespace Soul.Controller.Runtime.Buildings.Managers
 {
     public class CropProductionManager : GameComponent, ISingleDrop, IWeightCapacity, IRewardClaim,
-        IRewardSingle<Item, int>
+        IReward<Pair<Item, int>>
     {
-        public PlayerInventoryReference playerInventoryReference;
-
-        [FormerlySerializedAs("currentProductionRequirement")]
-        public RecordProduction currentRecordProduction;
+        
+        [SerializeField] private PlayerInventoryReference playerInventoryReference;
 
         [SerializeField]
         private RequirementOfWorkerGroupTimeCurrencyForLevels requirementOfWorkerGroupTimeCurrencyForLevels;
 
-        public int capacity;
-        public int currentLevel;
-        public WorkerType basicWorkerType;
-        public ItemToItemConverter itemToItemConverter;
-        public Item queueItem;
-
-        public bool isClaimable;
-        public DelayHandle delayHandle;
+        [SerializeField] private int capacity;
+        [SerializeField] private int currentLevel;
+        [SerializeField] private WorkerType basicWorkerType;
+        [SerializeField] private ItemToItemConverter itemToItemConverter;
+        
+        [SerializeField] private RecordProduction currentRecordProduction;
         private ISaveAbleReference _saveAbleReference;
+        [SerializeField] private Item queueItem;
+        [SerializeField] private bool isClaimable;
+        private DelayHandle _delayHandle;
+        
+        [FormerlySerializedAs("reward")] [SerializeField] private RewardPopup rewardPopup;
 
-
-        public Item ProductionItem
-        {
-            get
-            {
-                if (currentRecordProduction.productionItem == null)
-                {
-                    currentRecordProduction.productionItem = queueItem;
-                }
-
-                return currentRecordProduction.productionItem;
-            }
-        }
+        // Properties
+        public Item ProductionItem => currentRecordProduction.productionItem ??= queueItem;
 
         public float WeightLimit => capacity;
 
@@ -64,22 +54,42 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         }
 
         public int CurrencyRequirement => 0;
-        public int WorkerCount => currentRecordProduction.workerCount.Value;
+        public int WorkerCount => currentRecordProduction.workerCount;
         public UnityDateTime StartTime => currentRecordProduction.startTime;
         public UnityTimeSpan ReductionTime => currentRecordProduction.reductionTime;
-        public UnityTimeSpan RequiredTimeSpan => Required.time - ReductionTime;
-        public UnityDateTime EndTime => StartTime + RequiredTimeSpan;
-        public UnityTimeSpan TimeLeft => EndTime - DateTime.UtcNow;
-
-        public float Progress => 1 - (float)TimeLeft.TotalSeconds / (float)RequiredTimeSpan.TotalSeconds;
-        public bool IsCompleted => IsProducing && TimeLeft <= TimeSpan.Zero;
 
         public WorkerGroupTimeCurrencyRequirement<Item, int> Required =>
             requirementOfWorkerGroupTimeCurrencyForLevels.GetRequirement(currentLevel);
 
         public TimeSpan TimeRequired => Required.time;
+        public UnityTimeSpan RequiredTimeSpan => currentRecordProduction.RequiredTime(TimeRequired);
+        public UnityDateTime EndTime => currentRecordProduction.EndTime(TimeRequired);
+        public UnityTimeSpan TimeRemaining => currentRecordProduction.TimeRemaining(TimeRequired);
+        public float Progress => currentRecordProduction.Progress(TimeRequired);
+        public bool IsCompleted => IsProducing && currentRecordProduction.IsCompleted(TimeRequired);
+
+
         public int CurrentCurrency => playerInventoryReference.coins.Value;
 
+        public Pair<Item, int> Reward
+        {
+            get
+            {
+                if (itemToItemConverter.TryConvert(ProductionItem, out var convertedItem))
+                {
+                    int productionAmount = (int)(convertedItem.Value * capacity);
+                    return new Pair<Item, int>(convertedItem.Key, productionAmount);
+                }
+
+                return new Pair<Item, int>();
+            }
+        }
+
+        // Public Methods
+
+        /// <summary>
+        /// Initializes the CropProductionManager with the provided data.
+        /// </summary>
         public bool Setup(RecordProduction recordProduction, int level, ISaveAbleReference saveAbleReference)
         {
             currentRecordProduction = recordProduction;
@@ -93,6 +103,9 @@ namespace Soul.Controller.Runtime.Buildings.Managers
             return true;
         }
 
+        /// <summary>
+        /// Temporarily adds items for preview purposes.
+        /// </summary>
         public void TempAdd(Item[] items)
         {
             queueItem = items[0];
@@ -100,6 +113,9 @@ namespace Soul.Controller.Runtime.Buildings.Managers
             playerInventoryReference.workerInventoryPreview.Decrease(basicWorkerType, Required.workerCount);
         }
 
+        /// <summary>
+        /// Starts the production process.
+        /// </summary>
         public bool StartProduction()
         {
             if (IsProducing) return false;
@@ -115,7 +131,37 @@ namespace Soul.Controller.Runtime.Buildings.Managers
             return false;
         }
 
-        public void StartTimer(bool startNow)
+        /// <summary>
+        /// Checks if there are enough resources to start production.
+        /// </summary>
+        public bool HasEnoughToStart()
+        {
+            return playerInventoryReference.inventory.HasEnough(ProductionItem, capacity);
+        }
+
+        /// <summary>
+        /// Checks if the reward can be claimed.
+        /// </summary>
+        public bool CanClaim => isClaimable;
+
+        /// <summary>
+        /// Claims the reward.
+        /// </summary>
+        [Button]
+        public void RewardClaim()
+        {
+            if (!isClaimable) return;
+            AddReward();
+            isClaimable = false;
+        }
+
+
+        // Private Methods
+
+        /// <summary>
+        /// Starts the production timer.
+        /// </summary>
+        private void StartTimer(bool startNow)
         {
             if (IsCompleted)
             {
@@ -123,18 +169,14 @@ namespace Soul.Controller.Runtime.Buildings.Managers
                 return;
             }
 
-            if (startNow)
-            {
-                delayHandle = App.Delay((float)RequiredTimeSpan.TotalSeconds, OnComplete);
-            }
-            else
-            {
-                delayHandle = App.Delay((float)TimeLeft.TotalSeconds, OnComplete);
-            }
-
-            Track.Start(name, (float)RequiredTimeSpan.TotalSeconds);
+            float delay = startNow ? (float)RequiredTimeSpan.TotalSeconds : (float)TimeRemaining.TotalSeconds;
+            _delayHandle = App.Delay(delay, OnComplete);
+            Track.Start(name, delay);
         }
 
+        /// <summary>
+        /// Sets the production record data.
+        /// </summary>
         private void SetProductionRecord()
         {
             IsProducing = true;
@@ -144,52 +186,33 @@ namespace Soul.Controller.Runtime.Buildings.Managers
             currentRecordProduction.reductionTime = new UnityTimeSpan();
         }
 
-        public void OnComplete()
+        /// <summary>
+        /// Called when the production timer completes.
+        /// </summary>
+        private void OnComplete()
         {
             isClaimable = true;
+            rewardPopup.Setup(this, this, true);
         }
 
-        public void TakeRequirement()
+        /// <summary>
+        /// Takes the required resources for production.
+        /// </summary>
+        private void TakeRequirement()
         {
             playerInventoryReference.inventory.Decrease(ProductionItem, capacity);
         }
 
+        /// <summary>
+        /// Adds the reward to the player's inventory.
+        /// </summary>
         private void AddReward()
         {
-            var singleReward = RewardSingleItem;
+            var singleReward = Reward;
             playerInventoryReference.inventory.AddOrIncrease(singleReward.Key, singleReward.Value);
             playerInventoryReference.coins.Set(CurrentCurrency + 10);
             IsProducing = false;
             _saveAbleReference.Save();
-        }
-
-        public bool HasEnoughToStart()
-        {
-            return playerInventoryReference.inventory.HasEnough(ProductionItem, capacity);
-        }
-
-        public bool CanClaim() => isClaimable;
-
-        [Button]
-        public void RewardClaim()
-        {
-            if (!isClaimable) return;
-            AddReward();
-            isClaimable = false;
-        }
-
-        public Pair<Item, int> RewardSingleItem
-        {
-            get
-            {
-                if (itemToItemConverter.TryConvert(ProductionItem, out var convertedItem))
-                {
-                    int productionAmount = (int)(convertedItem.Value * capacity);
-                    return new Pair<Item, int>(convertedItem.Key, productionAmount);
-                }
-
-                return new Pair<Item, int>();
-            }
         }
     }
 }

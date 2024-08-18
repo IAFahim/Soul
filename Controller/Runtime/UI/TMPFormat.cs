@@ -6,12 +6,12 @@ using UnityEngine;
 namespace Soul.Controller.Runtime.UI
 {
     [Serializable]
-    public partial struct TextMeshProUGUIFormat
+    public struct TMPFormat
     {
         [SerializeField] private string format;
-        [SerializeField] private TextMeshProUGUI tmp;
+        [SerializeField] private TMP_Text tmp;
 
-        public TextMeshProUGUI TMP
+        public TMP_Text TMP
         {
             get => tmp;
             set
@@ -25,10 +25,10 @@ namespace Soul.Controller.Runtime.UI
 
         public void SetTextFloat(float value) => TMP.text = string.Format(format, value.ToString(CultureInfo.InvariantCulture));
         public void SetTextInt(int value) => TMP.text = string.Format(format, value.ToString(CultureInfo.InvariantCulture));
-        public static implicit operator string(TextMeshProUGUIFormat textMeshProUGUIFormat) =>
-            textMeshProUGUIFormat.format;
+        public static implicit operator string(TMPFormat tmpFormat) =>
+            tmpFormat.format;
 
-        public static implicit operator TextMeshProUGUI(TextMeshProUGUIFormat textMeshProUGUIFormat) => 
-            textMeshProUGUIFormat.TMP;
+        public static implicit operator TMP_Text(TMPFormat tmpFormat) => 
+            tmpFormat.TMP;
     }
 }

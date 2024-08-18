@@ -5,22 +5,22 @@ using UnityEngine;
 
 namespace Soul.Model.Editor.Items
 {
-    [CustomEditor(typeof(GameItems))]
+    [CustomEditor(typeof(ItemCatalog))]
     public class ItemReferenceEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
 
-            GameItems gameItems = (GameItems)target;
+            ItemCatalog itemCatalog = (ItemCatalog)target;
 
             if (GUILayout.Button("Populate Items"))
             {
-                PopulateItems(gameItems);
+                PopulateItems(itemCatalog);
             }
         }
 
-        private void PopulateItems(GameItems gameItems)
+        private void PopulateItems(ItemCatalog itemCatalog)
         {
             string[] guids = AssetDatabase.FindAssets("t:Item");
             var items = new List<Item>();
@@ -35,8 +35,8 @@ namespace Soul.Model.Editor.Items
                 }
             }
 
-            gameItems.allItems = items.ToArray();
-            EditorUtility.SetDirty(gameItems);
+            itemCatalog.allItems = items.ToArray();
+            EditorUtility.SetDirty(itemCatalog);
             AssetDatabase.SaveAssets();
         }
     }

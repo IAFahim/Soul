@@ -1,8 +1,10 @@
-﻿namespace Soul.Model.Runtime.Rewards
+﻿using System;
+using Soul.Model.Runtime.Claims;
+
+namespace Soul.Model.Runtime.Rewards
 {
-    public interface IRewardClaim
+    public interface IRewardClaim : IClaimAble
     {
-        public bool CanClaim();
         public void RewardClaim();
     }
 }

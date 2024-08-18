@@ -31,7 +31,7 @@ namespace Soul.Presenter.Runtime.UI
 
         public GameObject levelContainer;
         public string levelLockedText = "Lock";
-        public TextMeshProUGUIFormat levelTMP;
+        public TMPFormat levelTMP;
         
         
 

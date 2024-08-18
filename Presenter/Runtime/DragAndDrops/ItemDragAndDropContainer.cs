@@ -13,8 +13,8 @@ namespace Soul.Presenter.Runtime.DragAndDrops
 {
     public class ItemDragAndDropContainer : DragAndDropContainer
     {
-        [SerializeField] private TextMeshProUGUIFormat dropCountText;
-        [SerializeField] private TextMeshProUGUIFormat itemTotalAmountText;
+        [SerializeField] private TMPFormat dropCountText;
+        [SerializeField] private TMPFormat itemTotalAmountText;
 
         [DisableInEditMode, SerializeField] private Item currentItem;
 

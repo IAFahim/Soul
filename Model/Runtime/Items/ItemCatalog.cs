@@ -2,7 +2,7 @@
 
 namespace Soul.Model.Runtime.Items
 {
-    public class GameItems : ScriptableObject
+    public class ItemCatalog : ScriptableObject
     {
         public Item[] allItems;
     }
