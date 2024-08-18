@@ -3,6 +3,9 @@ using Cysharp.Threading.Tasks;
 using Pancake;
 using Pancake.Common;
 using Soul.Controller.Runtime.Addressables;
+using Soul.Controller.Runtime.Requirements;
+using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.SaveAndLoad;
 using Soul.Model.Runtime.Times;
 using UnityEngine;
 
@@ -10,31 +13,23 @@ namespace Soul.Controller.Runtime.Upgrades
 {
     public class UnlockAndUpgradeManager : GameComponent, ILoadComponent
     {
+        [SerializeField] private RecordUpgrade recordUpgrade;
         [SerializeField] private Transform parent;
-        [SerializeField] private int currentLevel;
+        [SerializeField] private Level currentLevel;
         [SerializeField] private bool usePooling;
         [SerializeField] private UnlockManager unlockManager;
         [SerializeField] private Optional<PartsManager> upgradePartsManager;
 
         private DelayHandle _delayHandle;
-        public bool IsUpgrading => _delayHandle != null && !_delayHandle.IsDone;
+        private ISaveAbleReference _saveAbleReference;
+        public bool IsUpgrading => _delayHandle is { IsDone: false };
 
-        public async UniTask Setup(AddressablePoolLifetime addressablePoolLifetime,
-            BoxCollider boxCollider, int level, bool usePoolingForLevels, Transform parentOverride)
+
+        public async UniTask Setup(AddressablePoolLifetime addressablePoolLifetime, RecordUpgrade upgradeRecord,
+            ISaveAbleReference saveAbleReference, BoxCollider boxCollider, Level level)
         {
-            parent = parentOverride;
-            await Setup(addressablePoolLifetime, boxCollider, level, usePoolingForLevels);
-        }
-
-        public async UniTask Setup(AddressablePoolLifetime addressablePoolLifetime, BoxCollider boxCollider, int level, bool usePoolingForLevels)
-
-        {
-            usePooling = usePoolingForLevels;
-            await Setup(addressablePoolLifetime, boxCollider, level);
-        }
-
-        public async UniTask<bool> Setup(AddressablePoolLifetime addressablePoolLifetime, BoxCollider boxCollider, int level)
-        {
+            recordUpgrade = upgradeRecord;
+            _saveAbleReference = saveAbleReference;
             unlockManager.Setup(addressablePoolLifetime);
             currentLevel = level;
             if (currentLevel == 0)
@@ -47,8 +42,6 @@ namespace Soul.Controller.Runtime.Upgrades
                 upgradePartsManager = unLockedGameObject.GetComponent<PartsManager>();
                 if (upgradePartsManager) upgradePartsManager.Value.Spawn(currentLevel - 1, usePooling, boxCollider);
             }
-
-            return true;
         }
 
         public TimeRequirement UpgradeTimeRequirementFor(int level)
@@ -59,13 +52,18 @@ namespace Soul.Controller.Runtime.Upgrades
         [Button]
         public void Upgrade(int level)
         {
+            recordUpgrade.toLevel = level;
+            recordUpgrade.isUpgrading = true;
             _delayHandle = UpgradeTimeRequirementFor(level).Start(OnComplete, true);
+            _saveAbleReference.Save();
         }
 
         private void OnComplete()
         {
-            currentLevel++;
-            upgradePartsManager.Value.Spawn(currentLevel, usePooling);
+            currentLevel.CurrentLevel = recordUpgrade.toLevel;
+            upgradePartsManager.Value.Spawn(currentLevel - 1, usePooling);
+            recordUpgrade.isUpgrading = false;
+            _saveAbleReference.Save();
         }
 
 

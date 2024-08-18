@@ -9,6 +9,6 @@ namespace Soul.Controller.Runtime.Buildings.Records
     {
         public int level;
         [FormerlySerializedAs("productionRequirement")] public RecordProduction recordProduction;
-        public UpgradeRequirement upgradeRequirement;
+        [FormerlySerializedAs("requirementUpgrade")] [FormerlySerializedAs("upgradeRequirement")] public RecordUpgrade recordUpgrade;
     }
 }

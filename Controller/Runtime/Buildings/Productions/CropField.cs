@@ -90,9 +90,12 @@ namespace Soul.Controller.Runtime.Buildings.Productions
 
         public async UniTask SetUp(int currentLevel)
         {
-            await unlockAndUpgradeManager.Setup(addressablePoolLifetime, boxCollider, currentLevel);
-            var x = cropProductionManager.Setup(cropFieldRecord.recordProduction, currentLevel, this);
+            await unlockAndUpgradeManager.Setup(addressablePoolLifetime, cropFieldRecord.recordUpgrade
+                , this, boxCollider, level);
+            var x = cropProductionManager.Setup(cropFieldRecord.recordProduction, level, this);
         }
+
+        public bool CanUpgrade => !level.IsMaxLevel;
 
         [Button]
         public void Upgrade() => unlockAndUpgradeManager.Upgrade(level + 1);

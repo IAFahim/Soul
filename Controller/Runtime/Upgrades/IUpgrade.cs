@@ -2,9 +2,10 @@
 
 namespace Soul.Controller.Runtime.Upgrades
 {
-    public interface IUpgrade
+    public interface IUpgrade : ILevel
     {
-        public Level Level { get; }
         public bool IsUpgrading { get; }
+        public bool CanUpgrade { get; }
+        public void Upgrade();
     }
 }

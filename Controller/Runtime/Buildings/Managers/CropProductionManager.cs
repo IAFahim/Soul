@@ -2,6 +2,7 @@
 using Alchemy.Inspector;
 using Pancake;
 using Pancake.Common;
+using Pancake.Pools;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Converters;
 using Soul.Controller.Runtime.DragAndDrop;
@@ -10,6 +11,7 @@ using Soul.Controller.Runtime.Requirements;
 using Soul.Controller.Runtime.Rewards;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
+using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Peoples.Workers;
 using Soul.Model.Runtime.Requirements;
 using Soul.Model.Runtime.Rewards;
@@ -30,7 +32,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         private RequirementOfWorkerGroupTimeCurrencyForLevels requirementOfWorkerGroupTimeCurrencyForLevels;
 
         [SerializeField] private int capacity;
-        [SerializeField] private int currentLevel;
+        [SerializeField] private Level currentLevel;
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
         
@@ -90,7 +92,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         /// <summary>
         /// Initializes the CropProductionManager with the provided data.
         /// </summary>
-        public bool Setup(RecordProduction recordProduction, int level, ISaveAbleReference saveAbleReference)
+        public bool Setup(RecordProduction recordProduction, Level level, ISaveAbleReference saveAbleReference)
         {
             currentRecordProduction = recordProduction;
             currentLevel = level;
@@ -102,6 +104,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
 
             return true;
         }
+        
 
         /// <summary>
         /// Temporarily adds items for preview purposes.
@@ -192,7 +195,8 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         private void OnComplete()
         {
             isClaimable = true;
-            rewardPopup.Setup(this, this, true);
+            var instantiatedRewardPopup = rewardPopup.gameObject.Request(Transform).GetComponent<RewardPopup>();
+            instantiatedRewardPopup.Setup(this, this, true);
         }
 
         /// <summary>
