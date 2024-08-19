@@ -47,7 +47,7 @@ namespace Soul.Controller.Runtime.Buildings
         }
 
         public string Title => lockedInfrastructureInfo.Title;
-        public bool IsLocked => level.CurrentLevel == 0;
+        public bool IsLocked => level.Current == 0;
 
         public bool MultipleDropMode => false;
         public bool CanDropNow => !IsLocked;
@@ -100,7 +100,7 @@ namespace Soul.Controller.Runtime.Buildings
                 this);
         }
 
-        public bool CanUpgrade => !level.IsMaxLevel;
+        public bool CanUpgrade => !level.IsMax;
 
         [Button]
         public void Upgrade() => unlockAndUpgradeManager.Upgrade(level + 1);
@@ -114,12 +114,12 @@ namespace Soul.Controller.Runtime.Buildings
         public void Load(string key)
         {
             cropFieldRecord = Data.Load(key, cropFieldRecord);
-            level.level = new Vector2Int(cropFieldRecord.level, level.MaxLevel);
+            level.vector2Int = new Vector2Int(cropFieldRecord.level, level.Max);
         }
 
         public void Save(string key)
         {
-            cropFieldRecord.level = level.CurrentLevel;
+            cropFieldRecord.level = level.Current;
             Data.Save(key, cropFieldRecord);
         }
 

@@ -94,7 +94,7 @@ namespace Soul.Presenter.Runtime.UI
                 {
                     MarkedLock();
                 }
-                else if (levelValue.IsMaxLevel)
+                else if (levelValue.IsMax)
                 {
                     MarkMaxLevel(levelValue);
                 }
@@ -130,7 +130,7 @@ namespace Soul.Presenter.Runtime.UI
             unLockUpgradeButton.onClick.AddListener(Upgrade);
             unLockUpgradeImage.sprite = upgradeButtonSprite;
             unLockUpgradeButtonTMP.text = upgradeButtonText;
-            levelTMP.SetTextInt(levelValue.CurrentLevel);
+            levelTMP.SetTextInt(levelValue.Current);
         }
 
         private void MarkMaxLevel(Level levelValue)
@@ -138,7 +138,7 @@ namespace Soul.Presenter.Runtime.UI
             unLockUpgradeButton.interactable = false;
             unLockUpgradeImage.sprite = upgradeButtonSprite;
             unLockUpgradeButtonTMP.text = maxLevelText;
-            levelTMP.SetTextInt(levelValue.CurrentLevel);
+            levelTMP.SetTextInt(levelValue.Current);
         }
         
         private void MarkedLock()

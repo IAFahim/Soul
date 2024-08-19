@@ -122,7 +122,7 @@ namespace Soul.Controller.Runtime.Upgrades
         private void OnCompleteUpgrading()
         {
             IsUpgrading = false;
-            currentLevel.CurrentLevel = upgradeRecord.toLevel;
+            currentLevel.Current = upgradeRecord.toLevel;
             upgradePartsManager.Value.ClearInstantiatedParts();
             upgradePartsManager.Value.Spawn(currentLevel - 1, currentBoxCollider);
             _saveAbleReference.Save();
@@ -155,7 +155,7 @@ namespace Soul.Controller.Runtime.Upgrades
         {
             IsUpgrading = false;
             await ShowUnlocked(currentBoxCollider);
-            currentLevel.CurrentLevel = 1;
+            currentLevel.Current = 1;
             upgradePartsManager.Value.Spawn(currentLevel - 1, currentBoxCollider);
             _saveAbleReference.Save();
         }
