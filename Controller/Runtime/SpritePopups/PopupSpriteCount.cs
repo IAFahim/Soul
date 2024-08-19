@@ -36,7 +36,7 @@ namespace Soul.Controller.Runtime.SpritePopups
 
         public void SetCount(int count) => countText.SetTextInt(count);
 
-        public abstract void OnSelected(RaycastHit selfRaycastHit);
+        public abstract void OnSelected(RaycastHit selfRayCastHit);
 
         public void OnRequest()
         {

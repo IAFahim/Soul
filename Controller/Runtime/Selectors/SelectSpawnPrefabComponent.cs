@@ -12,12 +12,12 @@ namespace Soul.Controller.Runtime.Selectors
 
         private GameObject _instantiated;
 
-        public void OnSelected(RaycastHit selfRaycastHit)
+        public void OnSelected(RaycastHit selfRayCastHit)
         {
-            _instantiated = preserveGameObject.Request(Transform);
+            preserveGameObject.PoolOrInstantiate(Transform, out _instantiated);
         }
 
-        public void OnDeSelected(RaycastHit otherRaycastHit)
+        public void OnDeSelected(RaycastHit otherRayCastHit)
         {
             _instantiated.Return();
         }

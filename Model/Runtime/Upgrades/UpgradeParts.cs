@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Preserves;
 using UnityEngine;
 
@@ -13,25 +14,26 @@ namespace Soul.Model.Runtime.Upgrades
 
         public PreservePrefabAndTransform[] Parts => parts;
 
-        public GameObject[] SpawnParts(Transform parent, bool usePooling)
+        public Pair<GameObject, bool>[] SpawnParts(Transform parent)
         {
-            return PopulateArrayBySpawn(parent, usePooling, parts);
+            return PopulateArrayBySpawn(parent, parts);
         }
 
-        private GameObject[] PopulateArrayBySpawn(Transform parent, bool usePooling,
+        private Pair<GameObject, bool>[] PopulateArrayBySpawn(Transform parent,
             PreservePrefabAndTransform[] preservePrefabAndTransforms)
         {
-            GameObject[] instantiatedParts = new GameObject[preservePrefabAndTransforms.Length];
+            var instantiatedParts = new Pair<GameObject, bool>[preservePrefabAndTransforms.Length];
             for (int i = 0; i < preservePrefabAndTransforms.Length; i++)
             {
                 var part = preservePrefabAndTransforms[i];
-                instantiatedParts[i] = usePooling ? part.Request(parent) : part.Instantiate(parent);
+                bool usePool = part.PoolOrInstantiate(parent, out GameObject partGameObject);
+                instantiatedParts[i] = new Pair<GameObject, bool>(partGameObject, usePool);
             }
 
             return instantiatedParts;
         }
 
-        public GameObject[] SpawnExtraParts(Transform parent, UpgradeParts nextLevelParts, bool usePooling)
+        public Pair<GameObject, bool>[] SpawnExtraParts(Transform parent, UpgradeParts nextLevelParts, bool usePooling)
         {
             List<PreservePrefabAndTransform> extraPreservePrefabAndTransforms = new();
             foreach (var next in nextLevelParts.Parts)
@@ -43,7 +45,7 @@ namespace Soul.Model.Runtime.Upgrades
                 }
             }
 
-            return PopulateArrayBySpawn(parent, usePooling, extraPreservePrefabAndTransforms.ToArray());
+            return PopulateArrayBySpawn(parent, extraPreservePrefabAndTransforms.ToArray());
         }
 
         public void StoreAllChildren(Transform parent)
@@ -57,6 +59,5 @@ namespace Soul.Model.Runtime.Upgrades
                 parts[i] = preservePrefabAndTransform;
             }
         }
-        
     }
 }

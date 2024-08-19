@@ -4,6 +4,6 @@ namespace Soul.Model.Runtime.Selectors
 {
     public interface IDeSelectedCallBack
     {
-        public void OnDeSelected(RaycastHit otherRaycastHit);
+        public void OnDeSelected(RaycastHit otherRayCastHit);
     }
 }

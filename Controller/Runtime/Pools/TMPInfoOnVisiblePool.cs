@@ -14,9 +14,11 @@ namespace Soul.Controller.Runtime.Pools
         public Component textProvidingComponent;
 
         private TextMeshPro _instantiatedTMP;
+
         private void OnBecameVisible()
         {
-            _instantiatedTMP = preserveGameObject.Request(parent).GetComponent<TextMeshPro>();
+            preserveGameObject.PoolOrInstantiate(parent, out var tmpGameObject);
+            tmpGameObject.GetComponent<TextMeshPro>();
             _instantiatedTMP.fontSize = fontSize;
             _instantiatedTMP.text = textProvidingComponent.ToString();
         }

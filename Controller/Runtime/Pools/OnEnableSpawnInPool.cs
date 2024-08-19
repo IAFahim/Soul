@@ -1,23 +1,24 @@
 ﻿using Pancake;
-using Pancake.Pools;
 using Soul.Model.Runtime.Preserves;
 using UnityEngine;
 
 namespace Soul.Controller.Runtime.Pools
 {
-    public class OnEnableSpawnInPool : GameComponent
+    public class EnableSpawnInPool : GameComponent
     {
         [SerializeField] private PreservePrefabAndTransform preserveGameObject;
         [SerializeField] private GameObject spawnedGameObject;
 
+        [SerializeField] private bool usedPool;
+
         private void OnEnable()
         {
-            spawnedGameObject = preserveGameObject.Request(Transform);
+            preserveGameObject.PoolOrInstantiate(Transform, out spawnedGameObject);
         }
 
         private void OnDisable()
         {
-            if (spawnedGameObject) spawnedGameObject.Return();
+            if (spawnedGameObject) preserveGameObject.ReturnOrDestroy(spawnedGameObject);
         }
 
         private void OnDrawGizmosSelected()

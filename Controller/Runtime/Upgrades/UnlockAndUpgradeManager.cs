@@ -14,7 +14,6 @@ using Soul.Model.Runtime.Requirements;
 using Soul.Model.Runtime.SaveAndLoad;
 using TrackTime;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Upgrades
 {
@@ -25,14 +24,12 @@ namespace Soul.Controller.Runtime.Upgrades
         [SerializeField]
         private RequirementOfWorkerGroupTimeCurrencyForLevels requirementOfWorkerGroupTimeCurrencyForLevels;
 
-        [FormerlySerializedAs("recordUpgrade")] [SerializeField]
-        private RecordUpgrade upgradeRecord;
+        [SerializeField] private RecordUpgrade upgradeRecord;
 
         public BoxCollider currentBoxCollider;
 
         [SerializeField] private Transform parent;
         [SerializeField] private Level currentLevel;
-        [SerializeField] private bool usePooling;
         [SerializeField] private UnlockManager unlockManager;
         [SerializeField] private Optional<PartsManager> upgradePartsManager;
 
@@ -73,11 +70,10 @@ namespace Soul.Controller.Runtime.Upgrades
             else
             {
                 await ShowUnlocked(boxCollider);
-                if (upgradePartsManager) upgradePartsManager.Value.Spawn(currentLevel - 1, usePooling, boxCollider);
+                if (upgradePartsManager) upgradePartsManager.Value.Spawn(currentLevel - 1, boxCollider);
             }
 
             if (IsUnlocking) StartTimer(false);
-            else if (IsUpgrading) StartTimer(false);
             return IsUpgrading;
         }
 
@@ -91,19 +87,20 @@ namespace Soul.Controller.Runtime.Upgrades
         {
             if (IsComplete)
             {
-                OnCompleteUpgrading();
+                if (currentLevel.IsLocked) OnCompleteUnlocking();
+                else OnCompleteUpgrading();
                 return;
             }
 
             float delay = startNow ? (float)DiscountedTime.TotalSeconds : (float)TimeRemaining.TotalSeconds;
-            _delayHandle = App.Delay(delay, OnCompleteUpgrading);
+            _delayHandle = App.Delay(delay, currentLevel.IsLocked ? OnCompleteUnlocking : OnCompleteUpgrading);
             Track.Start(name, delay);
         }
 
         [Button]
         public void Upgrade(int level)
         {
-            UpgradeRecordModify();
+            RecordModify();
             StartTimer(true);
             _saveAbleReference.Save();
         }
@@ -113,7 +110,7 @@ namespace Soul.Controller.Runtime.Upgrades
             return playerInventoryReference.inventory.HasEnough(Required.currency.Key, Required.currency.Value);
         }
 
-        public void UpgradeRecordModify()
+        private void RecordModify()
         {
             IsUpgrading = true;
             upgradeRecord.workerCount.Value = Required.workerCount;
@@ -126,9 +123,8 @@ namespace Soul.Controller.Runtime.Upgrades
         {
             IsUpgrading = false;
             currentLevel.CurrentLevel = upgradeRecord.toLevel;
-            upgradeRecord.isUpgrading = false;
             upgradePartsManager.Value.ClearInstantiatedParts();
-            upgradePartsManager.Value.Spawn(currentLevel-1, usePooling);
+            upgradePartsManager.Value.Spawn(currentLevel - 1, currentBoxCollider);
             _saveAbleReference.Save();
         }
 
@@ -145,18 +141,23 @@ namespace Soul.Controller.Runtime.Upgrades
 
         public void Unlock()
         {
-            unlockManager.ReleaseInstance();
-            upgradeRecord.toLevel = 1;
-            IsUpgrading = true;
-            currentLevel.CurrentLevel = 1;
+            RecordModify();
+            StartTimer(true);
             _saveAbleReference.Save();
         }
 
-        public async UniTask OnCompleteUnlocking()
+        private void OnCompleteUnlocking()
         {
+            OnCompleteUnlockingAsync().Forget();
+        }
+
+        private async UniTask OnCompleteUnlockingAsync()
+        {
+            IsUpgrading = false;
             await ShowUnlocked(currentBoxCollider);
-            OnCompleteUpgrading();
-            upgradePartsManager.Value.Spawn(currentLevel - 1, usePooling);
+            currentLevel.CurrentLevel = 1;
+            upgradePartsManager.Value.Spawn(currentLevel - 1, currentBoxCollider);
+            _saveAbleReference.Save();
         }
     }
 }

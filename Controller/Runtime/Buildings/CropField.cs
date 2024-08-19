@@ -83,7 +83,7 @@ namespace Soul.Controller.Runtime.Buildings
 
         public ScriptableList<Item> AllowedThingsToDrop => allowedThingsToDrop;
 
-        public void OnSelected(RaycastHit selfRaycastHit) => Debug.Log("Selected: " + this);
+        public void OnSelected(RaycastHit selfRayCastHit) => Debug.Log("Selected: " + this);
 
         private async void Start()
         {

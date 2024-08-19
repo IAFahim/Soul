@@ -23,7 +23,7 @@ namespace Soul.Controller.Runtime.Rewards
             base.Setup(Reward.Key, Reward.Value);
         }
 
-        public override void OnSelected(RaycastHit selfRaycastHit)
+        public override void OnSelected(RaycastHit selfRayCastHit)
         {
             if (_rewardClaimReference.CanClaim) _rewardClaimReference.RewardClaim();
             if(onCollectReturnToPool) ReturnToPool();

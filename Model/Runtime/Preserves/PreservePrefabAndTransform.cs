@@ -11,35 +11,50 @@ namespace Soul.Model.Runtime.Preserves
     public class PreservePrefabAndTransform : PreserveTransformInfo
     {
         [Preview] public GameObject prefab;
+        public bool usePool = true;
+
         public PreservePrefabAndTransform(GameObject gameObject, bool destroyObject = true)
         {
             Preserve(gameObject, destroyObject);
         }
-        
+
         public PreservePrefabAndTransform(Transform transform, bool destroyObject = true)
         {
             Preserve(transform.gameObject, destroyObject);
         }
 
+        public bool PoolOrInstantiate(Transform parent, out GameObject gameObject)
+        {
+            gameObject = usePool ? Request(parent) : Instantiate(parent);
+            return usePool;
+        }
 
-        public GameObject Instantiate(Transform parent)
+        public bool ReturnOrDestroy(GameObject gameObject)
+        {
+            if (usePool) gameObject.Return();
+            else gameObject.SafeDestroy();
+            return usePool;
+        }
+
+
+        private GameObject Instantiate(Transform parent)
         {
             var gameObject = Object.Instantiate(prefab, parent);
             return SetTransformInfo(gameObject);
         }
 
-        public GameObject Request(Transform parent)
+        private GameObject Request(Transform parent)
         {
             var gameObject = prefab.Request(parent);
             return SetTransformInfo(gameObject);
         }
-        
+
         [Button]
         protected void PreservePrefabAsEntry()
         {
             Preserve(prefab, true);
         }
-        
+
         private void Preserve(GameObject gameObject, bool destroyObject)
         {
             var foundPrefab = FindAndLoadPrefab(gameObject);
@@ -72,7 +87,7 @@ namespace Soul.Model.Runtime.Preserves
             else
                 path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
 
-            
+
             prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
             return true;
 #else
