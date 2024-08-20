@@ -62,7 +62,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             }
 
             instantiateDragContainers.Clear();
-            playerInventoryReference.inventoryPreview.Clear(true);
+            playerInventoryReference.inventoryPreview.Clear();
         }
 
         private (bool canDrop, ScriptableList<T> currentAllowedThingsToDrop) TryGetAllowedList<T>(

@@ -47,9 +47,9 @@ namespace Soul.Presenter.Runtime.UI
 
         public void OnEnable()
         {
-            playerInventoryReference.inventory.OnAddedOrIncreased += OnAddedOrIncreased;
-            playerInventoryReference.inventoryPreview.OnAddedOrIncreased += OnTempAddedOrIncreased;
-            playerInventoryReference.inventory.OnDecreased += OnDecreased;
+            // playerInventoryReference.inventory.OnAddedOrIncreased += OnAddedOrIncreased;
+            // playerInventoryReference.inventoryPreview.OnAddedOrIncreased += OnTempAddedOrIncreased;
+            // playerInventoryReference.inventory.OnDecreased += OnDecreased;
             playerInventoryReference.inventoryPreview.OnInventoryCleared += OnAllTempItemClear;
             SetAllAlpha(0);
         }
@@ -58,9 +58,9 @@ namespace Soul.Presenter.Runtime.UI
 
         public void OnDisable()
         {
-            playerInventoryReference.inventory.OnAddedOrIncreased -= OnAddedOrIncreased;
-            playerInventoryReference.inventoryPreview.OnAddedOrIncreased -= OnTempAddedOrIncreased;
-            playerInventoryReference.inventory.OnDecreased -= OnDecreased;
+            // playerInventoryReference.inventory.OnAddedOrIncreased -= OnAddedOrIncreased;
+            // playerInventoryReference.inventoryPreview.OnAddedOrIncreased -= OnTempAddedOrIncreased;
+            // playerInventoryReference.inventory.OnDecreased -= OnDecreased;
             playerInventoryReference.inventoryPreview.OnInventoryCleared += OnAllTempItemClear;
         }
 

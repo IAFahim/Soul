@@ -5,112 +5,98 @@ using Alchemy.Inspector;
 using Pancake.Common;
 using QuickEye.Utility;
 using Soul.Model.Runtime.Containers;
-using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.SaveAndLoad;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Model.Runtime.Inventories
 {
     [Serializable]
-    public abstract class Inventory<T, TV> : ISaveAble where TV : IComparable<TV>, IEquatable<TV>
+    public abstract class Inventory<TKey, TValue> : ISaveAble where TValue : IComparable<TValue>, IEquatable<TValue>
     {
-        [FormerlySerializedAs("items")] [SerializeField] protected UnityDictionary<T, TV> dictionary = new();
+        [SerializeField]
+        protected UnityDictionary<TKey, TValue> items = new();
 
-        public event Action<T, TV, TV, bool> OnAddedOrIncreased;
-        public event Action<T, TV, TV> OnDecreased;
-        public event Action<T, TV> OnRemoved;
+        public bool RemoveIfZero { get; set; } = true;
+
+        public event Action<InventoryChangeEventArgs<TKey, TValue>> OnItemChanged;
         public event Action OnInventoryCleared;
 
-        public bool TryGet(T key, out TV amount)
+        public bool TryGet(TKey key, out TValue amount) => items.TryGetValue(key, out amount);
+
+        [Button]
+        public void AddOrIncrease(TKey key, TValue addAmount)
         {
-            return dictionary.TryGetValue(key, out amount);
+            var currentAmount = items.GetValueOrDefault(key);
+            var newAmount = AddValues(currentAmount, addAmount);
+            items[key] = newAmount;
+
+            OnItemChanged?.Invoke(new InventoryChangeEventArgs<TKey, TValue>(
+                key, newAmount, addAmount, InventoryChangeType.Added));
         }
 
         [Button]
-        public void AddOrIncrease(T key, TV amount)
+        public bool TryDecrease(TKey key, TValue subtractAmount)
         {
-            TV count;
-            bool isAdded = false;
-            if (dictionary.TryGetValue(key, out TV currentAmount))
+            if (!items.TryGetValue(key, out var currentAmount))
             {
-                count = AddValues(currentAmount, amount);
+                return false;
+            }
+
+            var newAmount = SubtractValues(currentAmount, subtractAmount);
+            if (newAmount.CompareTo(default) <= 0 && RemoveIfZero)
+            {
+                items.Remove(key);
+                OnItemChanged?.Invoke(new InventoryChangeEventArgs<TKey, TValue>(
+                    key, default, subtractAmount, InventoryChangeType.Removed));
             }
             else
             {
-                count = amount;
-                isAdded = true;
-            }
-
-            dictionary[key] = count;
-            OnAddedOrIncreased?.Invoke(key, amount, count, isAdded);
-        }
-
-        [Button]
-        public bool Decrease(T key, TV amount)
-        {
-            if (!dictionary.TryGetValue(key, out TV currentAmount)) return false;
-            if (currentAmount.CompareTo(amount) < 0) return false;
-            var count = SubtractValues(currentAmount, amount);
-
-            if (count.Equals(default(TV)))
-            {
-                Remove(key);
-            }
-            else
-            {
-                dictionary[key] = count;
-                OnDecreased?.Invoke(key, amount, count);
+                items[key] = newAmount;
+                OnItemChanged?.Invoke(new InventoryChangeEventArgs<TKey, TValue>(
+                    key, newAmount, subtractAmount, InventoryChangeType.Decreased));
             }
 
             return true;
         }
 
-        public bool HasEnough(T key, TV amount)
+        public bool HasEnough(TKey key, TValue amount)
+            => items.TryGetValue(key, out var currentAmount) && currentAmount.CompareTo(amount) >= 0;
+
+        public bool HasEnough(IEnumerable<Pair<TKey, TValue>> requiredItems)
+            => requiredItems.All(kvp => HasEnough(kvp.Key, kvp.Value));
+
+        [Button]
+        public bool Remove(TKey key)
         {
-            return dictionary.TryGetValue(key, out TV currentAmount) && currentAmount.CompareTo(amount) >= 0;
+            if (!items.Remove(key, out var amount)) return false;
+            OnItemChanged?.Invoke(new InventoryChangeEventArgs<TKey, TValue>(
+                key, default, amount, InventoryChangeType.Removed));
+            return true;
         }
 
-        public bool HasEnough(Pair<T, TV> keyValuePair)
+        [Button]
+        public void Clear()
         {
-            return dictionary.TryGetValue(keyValuePair.Key, out TV currentAmount) &&
-                   currentAmount.CompareTo(keyValuePair.Value) >= 0;
+            items.Clear();
+            OnInventoryCleared?.Invoke();
+        }
+
+        public IEnumerable<KeyValuePair<TKey, TValue>> GetAll()
+        {
+            return items.ToList();
         }
         
-        public bool HasEnough(IEnumerable<Pair<T, TV>> keyValues)
+        public List<Pair<TKey, TValue>> ToList()
         {
-            return keyValues.All(HasEnough);
+            return items.Select(pair => new Pair<TKey, TValue>(pair.Key, pair.Value)).ToList();
         }
 
+        public bool Has(TKey key) => items.ContainsKey(key);
 
-        [Button]
-        public bool Remove(T key)
-        {
-            if (!dictionary.Remove(key, out TV amount)) return false;
-            OnRemoved?.Invoke(key, amount);
-            return true;
-        }
+        public int Count => items.Count;
 
-        [Button]
-        public void RemoveAll()
-        {
-            Clear(true);
-        }
-
-        public IEnumerable<KeyValuePair<T, TV>> GetAll()
-        {
-            return dictionary.ToList();
-        }
-
-        public bool Has(T key)
-        {
-            return dictionary.ContainsKey(key);
-        }
-
-        public int Count => dictionary.Count;
-
-        protected abstract TV AddValues(TV a, TV b);
-        protected abstract TV SubtractValues(TV a, TV b);
+        protected abstract TValue AddValues(TValue a, TValue b);
+        protected abstract TValue SubtractValues(TValue a, TValue b);
 
         [Button]
         public void Save(string key)
@@ -119,35 +105,41 @@ namespace Soul.Model.Runtime.Inventories
         }
 
         [Button]
-        public void Load(string key)
+        public bool Load(string key)
         {
-            var list = Data.Load<List<Pair<T, TV>>>(key);
-            if (list == null) return;
-            Clear(false);
-            foreach (var pair in list.Where(pair => pair.Key != null))
+            var loadedItems = Data.Load<List<Pair<TKey, TValue>>>(key);
+            if (loadedItems == null) return false;
+            
+            items.Clear();
+            foreach (var item in loadedItems.Where(item => item.Key != null))
             {
-                AddOrIncrease(pair.Key, pair.Value);
-            }
-        }
-
-        public List<Pair<T, TV>> ToList()
-        {
-            return dictionary.Select(keyValuePair => new Pair<T, TV>(keyValuePair.Key, keyValuePair.Value)).ToList();
-        }
-
-        public void Clear(bool invokeEvents)
-        {
-            if (invokeEvents)
-            {
-                foreach (var keyValuePair in dictionary)
-                {
-                    OnRemoved?.Invoke(keyValuePair.Key, keyValuePair.Value);
-                }
-
-                OnInventoryCleared?.Invoke();
+                items[item.Key] = item.Value;
             }
 
-            dictionary.Clear();
+            return true;
+        }
+    }
+
+    public enum InventoryChangeType
+    {
+        Added,
+        Removed,
+        Decreased
+    }
+
+    public struct InventoryChangeEventArgs<TKey, TValue>
+    {
+        public TKey Key { get; }
+        public TValue NewAmount { get; }
+        public TValue ChangeAmount { get; }
+        public InventoryChangeType ChangeType { get; }
+
+        public InventoryChangeEventArgs(TKey key, TValue newAmount, TValue changeAmount, InventoryChangeType changeType)
+        {
+            Key = key;
+            NewAmount = newAmount;
+            ChangeAmount = changeAmount;
+            ChangeType = changeType;
         }
     }
 }

@@ -113,7 +113,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         {
             queueItem = items[0];
             playerInventoryReference.inventoryPreview.AddOrIncrease(queueItem, (int)WeightLimit);
-            playerInventoryReference.workerInventoryPreview.Decrease(basicWorkerType, Required.workerCount);
+            playerInventoryReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         /// </summary>
         private void TakeRequirement()
         {
-            playerInventoryReference.inventory.Decrease(ProductionItem, capacity);
+            playerInventoryReference.inventory.TryDecrease(ProductionItem, capacity);
         }
 
         /// <summary>

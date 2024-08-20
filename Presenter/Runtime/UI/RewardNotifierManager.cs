@@ -3,6 +3,7 @@ using Pancake;
 using Pancake.Pools;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Inventories;
+using Soul.Model.Runtime.Inventories;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
 
@@ -17,16 +18,26 @@ namespace Soul.Presenter.Runtime.UI
 
         private void OnEnable()
         {
-            playerInventoryReference.inventory.OnAddedOrIncreased += OnAddedOrIncreased;
+            playerInventoryReference.inventory.OnItemChanged += OnAddedOrIncreased;
         }
 
-        private void OnAddedOrIncreased(Item item, int amount, int _, bool __)
+        private void OnAddedOrIncreased(InventoryChangeEventArgs<Item, int> inventoryChangeEventArgs)
         {
-            OnAddedOrIncreasedAsync(item, amount, _, __).Forget();
+            OnAdded(inventoryChangeEventArgs.Key, inventoryChangeEventArgs.NewAmount,
+                inventoryChangeEventArgs.ChangeAmount, inventoryChangeEventArgs.ChangeType);
+        }
+
+        private void OnAdded(Item key, int newAmount, int changeAmount, InventoryChangeType changeType)
+        {
+            if (changeType == InventoryChangeType.Added)
+            {
+                OnAddedOrIncreasedAsync(key, newAmount, changeAmount, changeType).Forget();
+            }
         }
 
 
-        private async UniTask OnAddedOrIncreasedAsync(Item item, int amount, int _, bool __)
+        private async UniTask OnAddedOrIncreasedAsync(Item item, int newAmount, int changeAmount,
+            InventoryChangeType changeType)
         {
             if (!instantiatedRewardNotifiers.TryGetValue(item, out var rewardNotifier))
             {
@@ -35,9 +46,9 @@ namespace Soul.Presenter.Runtime.UI
             }
 
             await UniTask.WaitForEndOfFrame(this);
-            rewardNotifier.Setup(amount, playerInventoryReference.weight, item, this);
+            rewardNotifier.Setup(changeAmount, playerInventoryReference.weight, item, this);
         }
-        
+
         public void RemoveSelf(Item self)
         {
             instantiatedRewardNotifiers.Remove(self);
@@ -45,7 +56,7 @@ namespace Soul.Presenter.Runtime.UI
 
         private void OnDisable()
         {
-            playerInventoryReference.inventory.OnAddedOrIncreased -= OnAddedOrIncreased;
+            playerInventoryReference.inventory.OnItemChanged -= OnAddedOrIncreased;
         }
     }
 }

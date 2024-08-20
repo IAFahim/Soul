@@ -1,13 +1,12 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Model.Runtime.Limits
 {
     [Serializable]
     public class Limit
     {
-        [FormerlySerializedAs("level")] [BarAttribute.Bar] public Vector2Int vector2Int;
+        [BarAttribute.Bar] public Vector2Int vector2Int;
 
         public int Current
         {

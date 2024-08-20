@@ -99,7 +99,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
                 }
             }
 
-            playerInventoryReference.inventoryPreview.Clear(true);
+            playerInventoryReference.inventoryPreview.Clear();
         }
 
         protected override void OnDragRayCastEnd(bool isHit, RaycastHit rayCast)
@@ -118,7 +118,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
                 }
             }
 
-            playerInventoryReference.inventoryPreview.Clear(true);
+            playerInventoryReference.inventoryPreview.Clear();
         }
     }
 }

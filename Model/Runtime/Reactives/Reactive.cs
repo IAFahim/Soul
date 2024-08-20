@@ -1,11 +1,12 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Soul.Model.Runtime.Reactives
 {
     [Serializable]
     public struct Reactive<T>
     {
-        public T value;
+        [SerializeField] private T value;
         public event Action<T, T> OnChange;
 
         public T Value
@@ -18,5 +19,7 @@ namespace Soul.Model.Runtime.Reactives
                 OnChange?.Invoke(oldValue, value);
             }
         }
+        
+        public static implicit operator T(Reactive<T> reactive) => reactive.Value;
     }
 }
