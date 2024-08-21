@@ -5,6 +5,7 @@ using Pancake.Common;
 using Soul.Controller.Runtime.Addressables;
 using Soul.Controller.Runtime.Buildings.Managers;
 using Soul.Controller.Runtime.Buildings.Records;
+using Soul.Controller.Runtime.InfoPanels;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Upgrades;
 using Soul.Model.Runtime.Buildings;
@@ -18,24 +19,27 @@ using Soul.Model.Runtime.Selectors;
 using Soul.Model.Runtime.Unlocks;
 using Soul.Model.Runtime.Upgrades;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings
 {
     public class CropField : GameComponent, ISelectCallBack, IGuid, ITitle, ISaveAble, ILocked, ILoadComponent,
-        IDropAble<Item>, IUpgrade, IUnlock, ISaveAbleReference
+        IDropAble<Item>, IUpgrade, IUnlock, ISaveAbleReference, IInfoPanelReference
     {
         [SerializeField, Guid] private string guid;
         [SerializeField] private PlayerInventoryReference playerInventoryReference;
         [SerializeField] private Level level;
         [SerializeField] private CropFieldRecord cropFieldRecord;
         [SerializeField] private CropProductionManager cropProductionManager;
-
         public AddressablePoolLifetime addressablePoolLifetime;
-        [SerializeField] private LockedInfrastructureInfo lockedInfrastructureInfo;
+
+        [FormerlySerializedAs("lockedInfrastructureInfo")] [SerializeField]
+        private LevelInfrastructureInfo levelInfrastructureInfo;
+
         [SerializeField] private BoxCollider boxCollider;
         [SerializeField] private UnlockAndUpgradeManager unlockAndUpgradeManager;
 
-
+        [SerializeField] private InfoPanel infoPanelPrefab;
         private bool _loadDataOnEnable = true;
 
         [SerializeField] private ScriptableList<Item> allowedThingsToDrop;
@@ -46,8 +50,9 @@ namespace Soul.Controller.Runtime.Buildings
             set => guid = value;
         }
 
-        public string Title => lockedInfrastructureInfo.Title;
-        public bool IsLocked => level.Current == 0;
+
+        public string Title => levelInfrastructureInfo.Title;
+        public bool IsLocked => level.IsLocked;
 
         public bool MultipleDropMode => false;
         public bool CanDropNow => !IsLocked;
@@ -146,5 +151,14 @@ namespace Soul.Controller.Runtime.Buildings
         {
             unlockAndUpgradeManager.Unlock();
         }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.white;
+            Gizmos.DrawWireSphere(InfoPanelWorldPosition, 1f);
+        }
+
+        public IInfoPanel InfoPanelPrefab => infoPanelPrefab;
+        public Vector3 InfoPanelWorldPosition => transform.TransformPoint(levelInfrastructureInfo.GetInfoPanelPositionOffset(level));
     }
 }
