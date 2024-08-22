@@ -6,7 +6,6 @@ using Soul.Model.Runtime;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Tweens;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 // ReSharper disable UnusedMember.Local
 
@@ -16,7 +15,7 @@ namespace Soul.Controller.Runtime.Movements
     {
         public Transform transformToMove;
         public UnityDictionary<PlaceEnum, List<MoveWithRotateVariableTween>> locationDictionary;
-        [FormerlySerializedAs("currentLocation")] public PlaceEnum currentPlace;
+        public PlaceEnum currentPlace;
         public int currentLocationSubIndex;
         
 

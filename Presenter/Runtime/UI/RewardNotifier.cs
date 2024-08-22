@@ -28,7 +28,7 @@ namespace Soul.Presenter.Runtime.UI
         public void Setup(int count, LimitStruct limit, Item item, IRemoveReference<Item> removeReference)
         {
             countLimitText.TMP.SetText("+" + countLimitText, count);
-            icon.sprite = item.Sprite;
+            icon.sprite = item.Icon;
             progressBar.Value = count / (float)limit.Max;
             itemReference = item;
             _removeReference = removeReference;

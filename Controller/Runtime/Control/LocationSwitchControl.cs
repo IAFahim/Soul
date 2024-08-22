@@ -1,7 +1,6 @@
 ﻿using Alchemy.Inspector;
 using Pancake;
 using Soul.Model.Runtime;
-using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Control
 {

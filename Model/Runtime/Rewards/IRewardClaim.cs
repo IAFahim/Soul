@@ -1,5 +1,4 @@
-﻿using System;
-using Soul.Model.Runtime.Claims;
+﻿using Soul.Model.Runtime.Claims;
 
 namespace Soul.Model.Runtime.Rewards
 {

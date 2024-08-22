@@ -19,7 +19,6 @@ using Soul.Model.Runtime.Selectors;
 using Soul.Model.Runtime.Unlocks;
 using Soul.Model.Runtime.Upgrades;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings
 {
@@ -33,8 +32,7 @@ namespace Soul.Controller.Runtime.Buildings
         [SerializeField] private CropProductionManager cropProductionManager;
         public AddressablePoolLifetime addressablePoolLifetime;
 
-        [FormerlySerializedAs("lockedInfrastructureInfo")] [SerializeField]
-        private LevelInfrastructureInfo levelInfrastructureInfo;
+        [SerializeField] private LevelInfrastructureInfo levelInfrastructureInfo;
 
         [SerializeField] private BoxCollider boxCollider;
         [SerializeField] private UnlockAndUpgradeManager unlockAndUpgradeManager;
@@ -129,7 +127,7 @@ namespace Soul.Controller.Runtime.Buildings
         }
 
         public Level Level => level;
-        public bool IsUpgrading => unlockAndUpgradeManager.IsUpgrading;
+        public bool IsUpgrading => cropFieldRecord.recordUpgrade.InProgression;
 
 
         private void Reset()

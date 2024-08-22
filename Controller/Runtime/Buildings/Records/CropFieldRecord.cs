@@ -1,6 +1,5 @@
 ﻿using System;
-using Soul.Controller.Runtime.Requirements;
-using UnityEngine.Serialization;
+using Soul.Controller.Runtime.Records;
 
 namespace Soul.Controller.Runtime.Buildings.Records
 {
@@ -8,7 +7,7 @@ namespace Soul.Controller.Runtime.Buildings.Records
     public class CropFieldRecord
     {
         public int level;
-        [FormerlySerializedAs("productionRequirement")] public RecordProduction recordProduction;
-        [FormerlySerializedAs("requirementUpgrade")] [FormerlySerializedAs("upgradeRequirement")] public RecordUpgrade recordUpgrade;
+        public RecordProduction recordProduction;
+        public RecordUpgrade recordUpgrade;
     }
 }

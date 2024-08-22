@@ -7,6 +7,7 @@ using Pancake.Common;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Addressables;
 using Soul.Controller.Runtime.Inventories;
+using Soul.Controller.Runtime.Records;
 using Soul.Controller.Runtime.Requirements;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
@@ -21,8 +22,7 @@ namespace Soul.Controller.Runtime.Upgrades
     {
         public PlayerInventoryReference playerInventoryReference;
 
-        [SerializeField]
-        private RequirementOfWorkerGroupTimeCurrencyForLevels requirementOfWorkerGroupTimeCurrencyForLevels;
+        [SerializeField] private BasicRequirementScriptableObject basicRequirementScriptableObject;
 
         [SerializeField] private RecordUpgrade upgradeRecord;
 
@@ -36,21 +36,16 @@ namespace Soul.Controller.Runtime.Upgrades
         private DelayHandle _delayHandle;
         private ISaveAbleReference _saveAbleReference;
 
-        public WorkerGroupTimeCurrencyRequirement<Item, int> Required =>
-            requirementOfWorkerGroupTimeCurrencyForLevels.GetRequirement(currentLevel);
+        public RequirementBasic<Item, int> Required =>
+            basicRequirementScriptableObject.GetRequirement(currentLevel);
 
         public UnityTimeSpan RequiredFullTime => Required.fullTime;
-        public UnityTimeSpan DiscountedTime => upgradeRecord.DiscountedTime(Required.fullTime);
-        public UnityTimeSpan TimeRemaining => upgradeRecord.TimeRemaining(Required.fullTime);
+        public UnityTimeSpan GetTimeAfterDiscount => upgradeRecord.Time.GetTimeAfterDiscount(Required.fullTime);
+        public UnityTimeSpan TimeRemaining => upgradeRecord.Time.Remaining(Required.fullTime);
 
-        public bool IsUpgrading
-        {
-            get => upgradeRecord.isUpgrading;
-            private set => upgradeRecord.isUpgrading = value;
-        }
 
-        public bool IsComplete => IsUpgrading && upgradeRecord.IsCompleted(RequiredFullTime);
-        public bool IsUnlocking => currentLevel == 0 && IsUpgrading;
+        public bool IsComplete => upgradeRecord.InProgression && upgradeRecord.Time.IsOver(RequiredFullTime);
+        public bool IsUnlocking => currentLevel == 0 && upgradeRecord.InProgression;
 
 
         public async UniTask<bool> Setup(AddressablePoolLifetime addressablePoolLifetime,
@@ -74,7 +69,7 @@ namespace Soul.Controller.Runtime.Upgrades
             }
 
             if (IsUnlocking) StartTimer(false);
-            return IsUpgrading;
+            return upgradeRecord.InProgression;
         }
 
         private async Task ShowUnlocked(BoxCollider boxCollider)
@@ -92,7 +87,7 @@ namespace Soul.Controller.Runtime.Upgrades
                 return;
             }
 
-            float delay = startNow ? (float)DiscountedTime.TotalSeconds : (float)TimeRemaining.TotalSeconds;
+            float delay = startNow ? (float)GetTimeAfterDiscount.TotalSeconds : (float)TimeRemaining.TotalSeconds;
             _delayHandle = App.Delay(delay, currentLevel.IsLocked ? OnCompleteUnlocking : OnCompleteUpgrading);
             Track.Start(name, delay);
         }
@@ -112,16 +107,16 @@ namespace Soul.Controller.Runtime.Upgrades
 
         private void RecordModify()
         {
-            IsUpgrading = true;
-            upgradeRecord.workerCount.Value = Required.workerCount;
+            upgradeRecord.InProgression = true;
+            upgradeRecord.SetWorker(Required.workerCount);
             upgradeRecord.toLevel = currentLevel + 1;
-            upgradeRecord.startTime = new UnityDateTime(DateTime.UtcNow);
-            upgradeRecord.reductionTime = new UnityTimeSpan();
+            upgradeRecord.Time.StartedAt = new UnityDateTime(DateTime.UtcNow);
+            upgradeRecord.Time.Discount = new UnityTimeSpan();
         }
 
         private void OnCompleteUpgrading()
         {
-            IsUpgrading = false;
+            upgradeRecord.InProgression = false;
             currentLevel.Current = upgradeRecord.toLevel;
             upgradePartsManager.Value.ClearInstantiatedParts();
             upgradePartsManager.Value.Spawn(currentLevel - 1, currentBoxCollider);
@@ -153,7 +148,7 @@ namespace Soul.Controller.Runtime.Upgrades
 
         private async UniTask OnCompleteUnlockingAsync()
         {
-            IsUpgrading = false;
+            upgradeRecord.InProgression = false;
             await ShowUnlocked(currentBoxCollider);
             currentLevel.Current = 1;
             upgradePartsManager.Value.Spawn(currentLevel - 1, currentBoxCollider);

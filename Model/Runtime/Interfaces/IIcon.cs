@@ -2,8 +2,8 @@
 
 namespace Soul.Model.Runtime.Interfaces
 {
-    public interface ISprite
+    public interface IIcon
     {
-        public Sprite Sprite { get; }
+        public Sprite Icon { get; }
     }
 }

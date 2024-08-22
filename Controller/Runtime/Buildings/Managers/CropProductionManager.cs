@@ -7,6 +7,7 @@ using QuickEye.Utility;
 using Soul.Controller.Runtime.Converters;
 using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Inventories;
+using Soul.Controller.Runtime.Records;
 using Soul.Controller.Runtime.Requirements;
 using Soul.Controller.Runtime.Rewards;
 using Soul.Model.Runtime.Containers;
@@ -18,7 +19,6 @@ using Soul.Model.Runtime.Rewards;
 using Soul.Model.Runtime.SaveAndLoad;
 using TrackTime;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings.Managers
 {
@@ -26,25 +26,22 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         IReward<Pair<Item, int>>
     {
         [SerializeField] private PlayerInventoryReference playerInventoryReference;
-
-        [SerializeField]
-        private RequirementOfWorkerGroupTimeCurrencyForLevels requirementOfWorkerGroupTimeCurrencyForLevels;
+        [SerializeField] private BasicRequirementScriptableObject basicRequirementScriptableObject;
 
         [SerializeField] private int capacity;
         [SerializeField] private Level currentLevel;
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
 
-        [FormerlySerializedAs("currentRecordProduction")] [SerializeField]
-        private RecordProduction productionRecord;
+        [SerializeField] private RecordProduction productionRecord;
 
         private ISaveAbleReference _saveAbleReference;
         [SerializeField] private Item queueItem;
         [SerializeField] private bool isClaimable;
         private DelayHandle _delayHandle;
 
-        [FormerlySerializedAs("reward")] [SerializeField]
-        private RewardPopup rewardPopup;
+        [SerializeField] private RewardPopup rewardPopup;
+
 
         // Properties
         public Item ProductionItem => productionRecord.productionItem ??= queueItem;
@@ -58,19 +55,19 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         }
 
         public int CurrencyRequirement => 0;
-        public int WorkerCount => productionRecord.workerCount;
-        public UnityDateTime StartTime => productionRecord.startTime;
-        public UnityTimeSpan ReductionTime => productionRecord.reductionTime;
+        public int WorkerCount => productionRecord.worker.typeAndCount;
+        public UnityDateTime StartedAt => productionRecord.Time.StartedAt;
+        public UnityTimeSpan TimeDiscount => productionRecord.Time.Discount;
 
-        public WorkerGroupTimeCurrencyRequirement<Item, int> Required =>
-            requirementOfWorkerGroupTimeCurrencyForLevels.GetRequirement(currentLevel - 1);
+        public RequirementBasic<Item, int> Required =>
+            basicRequirementScriptableObject.GetRequirement(currentLevel - 1);
 
-        public TimeSpan RequiredFullTime => Required.fullTime;
-        public UnityTimeSpan DiscountedTime => productionRecord.DiscountedTime(Required.fullTime);
-        public UnityDateTime EndTime => productionRecord.EndTime(RequiredFullTime);
-        public UnityTimeSpan TimeRemaining => productionRecord.TimeRemaining(RequiredFullTime);
-        public float Progress => productionRecord.Progress(RequiredFullTime);
-        public bool IsCompleted => IsProducing && productionRecord.IsCompleted(RequiredFullTime);
+        public UnityTimeSpan RequiredFullTime => Required.fullTime;
+        public UnityTimeSpan DiscountedTime => productionRecord.Time.GetTimeAfterDiscount(Required.fullTime);
+        public UnityDateTime EndsAt => productionRecord.Time.EndsAt(RequiredFullTime);
+        public UnityTimeSpan TimeRemaining => productionRecord.Time.Remaining(RequiredFullTime);
+        public float Progress => productionRecord.Time.Progress(RequiredFullTime);
+        public bool IsComplete => IsProducing && productionRecord.Time.IsOver(RequiredFullTime);
 
 
         public int CurrentCurrency => playerInventoryReference.coins.Value;
@@ -166,7 +163,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         /// </summary>
         private void StartTimer(bool startNow)
         {
-            if (IsCompleted)
+            if (IsComplete)
             {
                 OnComplete();
                 return;
@@ -183,10 +180,10 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         private void ProductionRecordModify()
         {
             IsProducing = true;
-            productionRecord.workerCount.Value = WorkerCount;
+            productionRecord.worker.typeAndCount.Value = WorkerCount;
             productionRecord.productionItem = ProductionItem;
-            productionRecord.startTime = new UnityDateTime(DateTime.UtcNow);
-            productionRecord.reductionTime = new UnityTimeSpan();
+            productionRecord.Time.StartedAt = new UnityDateTime(DateTime.UtcNow);
+            productionRecord.Time.Discount = new UnityTimeSpan();
         }
 
         /// <summary>

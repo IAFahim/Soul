@@ -7,19 +7,10 @@ namespace Soul.Controller.Runtime.FloatingUI
     {
         [SerializeField] protected Transform cameraTransform;
 
-        private void Start()
+        private void OnEnable()
         {
             if(cameraTransform == null) cameraTransform = Camera.main.transform;
-        }
-
-        private void Update()
-        {
-            AlignCameraToTransform();
-        }
-
-        private void AlignCameraToTransform()
-        {
-            Transform.rotation = cameraTransform.rotation;
+            transform.rotation = cameraTransform.rotation;
         }
     }
 }
