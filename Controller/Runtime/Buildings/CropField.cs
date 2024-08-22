@@ -51,38 +51,12 @@ namespace Soul.Controller.Runtime.Buildings
 
         public string Title => levelInfrastructureInfo.Title;
         public bool IsLocked => level.IsLocked;
-
         public bool MultipleDropMode => false;
         public bool CanDropNow => !IsLocked;
+        public IInfoPanel InfoPanelPrefab => infoPanelPrefab;
 
-        public bool DropHovering(Item[] thingToDrop)
-        {
-            foreach (var item in thingToDrop)
-            {
-                if (!allowedThingsToDrop.Contains(item))
-                {
-                    return false;
-                }
-            }
-
-            cropProductionManager.TempAdd(thingToDrop);
-            return true;
-        }
-
-        public bool TryDrop(Item[] thingToDrop)
-        {
-            if (DropHovering(thingToDrop))
-            {
-                if (cropProductionManager.StartProduction())
-                {
-                    Save(Guid);
-                }
-
-                return true;
-            }
-
-            return false;
-        }
+        public Vector3 InfoPanelWorldPosition =>
+            transform.TransformPoint(levelInfrastructureInfo.GetInfoPanelPositionOffset(level));
 
         public ScriptableList<Item> AllowedThingsToDrop => allowedThingsToDrop;
 
@@ -156,7 +130,34 @@ namespace Soul.Controller.Runtime.Buildings
             Gizmos.DrawWireSphere(InfoPanelWorldPosition, 1f);
         }
 
-        public IInfoPanel InfoPanelPrefab => infoPanelPrefab;
-        public Vector3 InfoPanelWorldPosition => transform.TransformPoint(levelInfrastructureInfo.GetInfoPanelPositionOffset(level));
+
+        public bool DropHovering(Item[] thingToDrop)
+        {
+            foreach (var item in thingToDrop)
+            {
+                if (!allowedThingsToDrop.Contains(item))
+                {
+                    return false;
+                }
+            }
+
+            cropProductionManager.TempAdd(thingToDrop);
+            return true;
+        }
+
+        public bool TryDrop(Item[] thingToDrop)
+        {
+            if (DropHovering(thingToDrop))
+            {
+                if (cropProductionManager.TryStartProgression())
+                {
+                    Save(Guid);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
     }
 }

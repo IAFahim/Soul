@@ -11,6 +11,7 @@ namespace Soul.Model.Runtime.Reactives
 
         public event Action<T, TV, TV> OnChange;
 
+        public T Key => pair.Key;
         public TV Value => pair.Value;
         
         public void Set(TV value)

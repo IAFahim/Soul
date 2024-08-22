@@ -9,17 +9,7 @@ namespace Soul.Controller.Runtime.Records
     public class RecordUpgrade : ITimeBasedReference, IInProgression
     {
         public RecordWorker worker;
-
-        public void SetWorker(int amount)
-        {
-            worker.typeAndCount.Value = amount;
-        }
-
-        public int GetWorker()
-        {
-            return worker.typeAndCount.Value;
-        }
-
+        
         [SerializeField] private RecordTime time;
         [SerializeField] private bool isUpgrading;
         public int toLevel = 1;

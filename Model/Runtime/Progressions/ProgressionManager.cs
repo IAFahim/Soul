@@ -8,7 +8,8 @@ using TrackTime;
 
 namespace Soul.Model.Runtime.Progressions
 {
-    public abstract class ProgressionManager<TRecord> : GameComponent where TRecord : ITimeBased, IInProgression
+    public abstract class ProgressionManager<TRecord> : GameComponent
+        where TRecord : ITimeBasedReference, IInProgression
     {
         public TRecord recordReference;
         public Level levelReference;
@@ -18,50 +19,58 @@ namespace Soul.Model.Runtime.Progressions
         protected DelayHandle DelayHandle;
 
 
-        public UnityDateTime StartedAt => recordReference.StartedAt;
-        public UnityTimeSpan TimeDiscount => recordReference.Discount;
-        public UnityTimeSpan DiscountedTime => recordReference.GetTimeAfterDiscount(FullTimeRequirement);
-        public UnityDateTime EndsAt => recordReference.EndsAt(FullTimeRequirement);
-        public UnityTimeSpan TimeRemaining => recordReference.Remaining(FullTimeRequirement);
-        public float Progress => recordReference.Progress(FullTimeRequirement);
-        public bool IsComplete => recordReference.InProgression && recordReference.IsOver(FullTimeRequirement);
+        public UnityDateTime StartedAt => recordReference.Time.StartedAt;
+        public UnityTimeSpan TimeDiscount => recordReference.Time.Discount;
+        public UnityTimeSpan DiscountedTime => recordReference.Time.GetTimeAfterDiscount(FullTimeRequirement);
+        public UnityDateTime EndsAt => recordReference.Time.EndsAt(FullTimeRequirement);
+        public UnityTimeSpan TimeRemaining => recordReference.Time.Remaining(FullTimeRequirement);
+        public float Progress => recordReference.Time.Progress(FullTimeRequirement);
+        public bool IsComplete => recordReference.InProgression && recordReference.Time.IsOver(FullTimeRequirement);
 
 
+        /// <summary>
+        /// Initializes the Progression with the provided data for first time
+        /// </summary>
         protected virtual bool Setup(TRecord record, Level level, ISaveAbleReference saveAbleReference)
         {
             recordReference = record;
             levelReference = level;
             SaveAbleReference = saveAbleReference;
-            TimerStart(false);
-            return true;
+            bool isUnlocked = !levelReference.IsLocked;
+            if (isUnlocked) TimerStart(false);
+            return isUnlocked;
         }
 
+        /// <summary>
+        /// Starts the production process.
+        /// </summary>
         public virtual bool TryStartProgression()
         {
             bool hasEnough = HasEnough();
             if (hasEnough)
             {
                 ModifyRecordBeforeProgression();
+                TakeRequirement();
                 TimerStart(true);
             }
 
             return hasEnough;
         }
 
+        protected abstract void TakeRequirement();
+
+        /// <summary>
+        /// Checks if there are enough resources to start production.
+        /// </summary>
         public abstract bool HasEnough();
 
         protected virtual void ModifyRecordBeforeProgression()
         {
             recordReference.InProgression = true;
-            recordReference.StartedAt = new UnityDateTime(DateTime.UtcNow);
+            recordReference.Time.StartedAt = new UnityDateTime(DateTime.UtcNow);
             SaveAbleReference.Save();
         }
-        
-        protected virtual void ModifyRecordAfterProgression()
-        {
-            recordReference.InProgression = false;
-            SaveAbleReference.Save();
-        }
+
 
         private void TimerStart(bool starsNow)
         {

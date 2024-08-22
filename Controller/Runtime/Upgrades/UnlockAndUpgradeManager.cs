@@ -102,13 +102,15 @@ namespace Soul.Controller.Runtime.Upgrades
 
         public bool HasEnough()
         {
-            return playerInventoryReference.inventory.HasEnough(Required.currency.Key, Required.currency.Value);
+            var currentCoin = playerInventoryReference.coins;
+            if (currentCoin.Key != Required.currency.Key) return false;
+            return currentCoin >= Required.currency.Value;
         }
 
         private void RecordModify()
         {
             upgradeRecord.InProgression = true;
-            upgradeRecord.SetWorker(Required.workerCount);
+            upgradeRecord.worker.Set(Required.workerCount);
             upgradeRecord.toLevel = currentLevel + 1;
             upgradeRecord.Time.StartedAt = new UnityDateTime(DateTime.UtcNow);
             upgradeRecord.Time.Discount = new UnityTimeSpan();
