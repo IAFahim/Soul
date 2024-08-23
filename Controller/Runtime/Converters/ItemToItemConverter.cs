@@ -10,7 +10,15 @@ namespace Soul.Controller.Runtime.Converters
     [Serializable]
     public class ItemToItemConverter : ScriptableObject
     {
-        public ConvertTable<Item, Pair<Item, float>> convertTable;
-        public bool TryConvert(Item input, out Pair<Item, float> output) => convertTable.TryConvert(input, out output);
+        public ConvertTable<Item, Pair<Item, float>>[] convertTables;
+        public int currentIndex;
+
+        public ConvertTable<Item, Pair<Item, float>> CurrentTable => convertTables[currentIndex];
+
+        public void Set(int index)
+        {
+            currentIndex = index;
+        }
+        public bool TryConvert(Item input, out Pair<Item, float> output) => CurrentTable.TryConvert(input, out output);
     }
 }

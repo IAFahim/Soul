@@ -6,7 +6,7 @@ using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Records;
 using Soul.Controller.Runtime.Requirements;
-using Soul.Controller.Runtime.Rewards;
+using Soul.Controller.Runtime.SpritePopups;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
@@ -16,6 +16,7 @@ using Soul.Model.Runtime.Requirements;
 using Soul.Model.Runtime.Rewards;
 using Soul.Model.Runtime.SaveAndLoad;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings.Managers
 {
@@ -32,11 +33,17 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         [SerializeField] private Item queueItem;
         [SerializeField] private bool isClaimable;
 
-        [SerializeField] private RewardPopup rewardPopup;
+        [FormerlySerializedAs("rewardPopup")] [SerializeField]
+        private PopupIndicatorIconCount popupIndicator;
 
 
         // Properties
-        public Item ProductionItem => recordReference.productionItem ??= queueItem;
+        public Item ProductionItem
+        {
+            get => recordReference.productionItem ??= queueItem;
+            set => recordReference.productionItem = value;
+        }
+
         public float WeightLimit => capacity;
         public int CurrencyRequirement => 0;
         public int WorkerCount => recordReference.worker.typeAndCount;
@@ -85,7 +92,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
 
 
         public override bool HasEnough() => playerInventoryReference.inventory.HasEnough(ProductionItem, capacity);
-        
+
 
         /// <summary>
         /// Checks if the reward can be claimed.
@@ -117,14 +124,6 @@ namespace Soul.Controller.Runtime.Buildings.Managers
             base.ModifyRecordBeforeProgression();
         }
 
-        private void ModifyRecordAfterProgression()
-        {
-            var singleReward = Reward;
-            playerInventoryReference.inventory.AddOrIncrease(singleReward.Key, singleReward.Value);
-            playerInventoryReference.coins.Set(CurrentCurrency + 10);
-            recordReference.InProgression = false;
-            SaveAbleReference.Save();
-        }
 
         /// <summary>
         /// Called when the production timer completes.
@@ -132,7 +131,8 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         public override void OnComplete()
         {
             isClaimable = true;
-            var instantiatedRewardPopup = rewardPopup.gameObject.Request(Transform).GetComponent<RewardPopup>();
+            var instantiatedRewardPopup =
+                popupIndicator.gameObject.Request(Transform).GetComponent<PopupIndicatorIconCount>();
             instantiatedRewardPopup.Setup(this, this, true);
         }
 
@@ -150,6 +150,16 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         private void AddReward()
         {
             ModifyRecordAfterProgression();
+        }
+
+        private void ModifyRecordAfterProgression()
+        {
+            var singleReward = Reward;
+            playerInventoryReference.inventory.AddOrIncrease(singleReward.Key, singleReward.Value);
+            playerInventoryReference.coins.Set(CurrentCurrency + 10);
+            recordReference.InProgression = false;
+            ProductionItem = null;
+            SaveAbleReference.Save();
         }
     }
 }
