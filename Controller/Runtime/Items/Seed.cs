@@ -1,4 +1,5 @@
-﻿using Soul.Model.Runtime.Items;
+﻿using QuickEye.Utility;
+using Soul.Model.Runtime.Items;
 using UnityEngine;
 
 namespace Soul.Controller.Runtime.Items
@@ -7,6 +8,7 @@ namespace Soul.Controller.Runtime.Items
     public class Seed : Item, IPointToWeightReference
     {
         [SerializeField] private float pointToWeight = 20;
+        public UnityTimeSpan growTime;
 
         public float PointToWeight
         {

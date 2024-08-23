@@ -5,10 +5,9 @@ using Soul.Model.Runtime.Progressions;
 namespace Soul.Model.Runtime.Records
 {
     [Serializable]
-    public struct RecordTime : ITimeBased
+    public class RecordTime : ITimeBased
     {
         public UnityDateTime startedAt;
-
         public UnityTimeSpan discount;
 
         public UnityDateTime StartedAt

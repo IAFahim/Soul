@@ -14,7 +14,7 @@ namespace Soul.Controller.Runtime.Movements
         public MoveVariableTween travelMoveVariableTween;
 
         [Button]
-        public async UniTaskVoid Play()
+        public async UniTask Play()
         {
             rotateVariableTween.Play(Transform);
             await liftMoveVariableTween.Play(Transform).GetAwaiter();

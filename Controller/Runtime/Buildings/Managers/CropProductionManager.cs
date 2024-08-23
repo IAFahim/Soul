@@ -1,11 +1,11 @@
-﻿using System;
-using Alchemy.Inspector;
+﻿using Alchemy.Inspector;
 using Pancake.Pools;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Converters;
 using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Grids;
 using Soul.Controller.Runtime.Inventories;
+using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.Records;
 using Soul.Controller.Runtime.Requirements;
 using Soul.Controller.Runtime.SpritePopups;
@@ -14,7 +14,6 @@ using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Peoples.Workers;
 using Soul.Model.Runtime.Progressions;
-using Soul.Model.Runtime.Requirements;
 using Soul.Model.Runtime.Rewards;
 using Soul.Model.Runtime.SaveAndLoad;
 using UnityEngine;
@@ -27,12 +26,12 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         IReward<Pair<Item, int>>
     {
         [SerializeField] private PlayerInventoryReference playerInventoryReference;
-        [SerializeField] private BasicRequirementScriptableObject basicRequirementScriptableObject;
+        [FormerlySerializedAs("requirementScriptableObject")] [FormerlySerializedAs("basicRequirementScriptableObject")] [SerializeField] private RequirementForUpgrades requirementForUpgrades;
         [SerializeField] private int capacity;
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
 
-        [SerializeField] private Item queueItem;
+        [SerializeField] private Seed queueItem;
         [SerializeField] private bool isClaimable;
 
         [FormerlySerializedAs("rewardPopup")] [SerializeField]
@@ -42,9 +41,13 @@ namespace Soul.Controller.Runtime.Buildings.Managers
 
 
         // Properties
-        public Item ProductionItem
+        public Seed ProductionItem
         {
-            get => recordReference.productionItem ??= queueItem;
+            get
+            {
+                var seed = recordReference.productionItem as Seed;
+                return seed ?? queueItem;
+            }
             set => recordReference.productionItem = value;
         }
 
@@ -52,10 +55,9 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         public int CurrencyRequirement => 0;
         public int WorkerCount => recordReference.worker.typeAndCount;
 
-        public RequirementBasic<Item, int> Required =>
-            basicRequirementScriptableObject.GetRequirement(levelReference - 1);
+        public RequirementForUpgrade Required => requirementForUpgrades.GetRequirement(levelReference - 1);
 
-        public override UnityTimeSpan FullTimeRequirement => Required.fullTime;
+        public override UnityTimeSpan FullTimeRequirement => ProductionItem.growTime;
 
         public int CurrentCurrency => playerInventoryReference.coins.Value;
 
@@ -89,7 +91,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         /// </summary>
         public void TempAdd(Item[] items)
         {
-            queueItem = items[0];
+            queueItem = items[0] as Seed;
             playerInventoryReference.inventoryPreview.AddOrIncrease(queueItem, (int)WeightLimit);
             playerInventoryReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
         }

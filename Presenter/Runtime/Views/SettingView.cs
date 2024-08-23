@@ -37,7 +37,7 @@ namespace Soul.Presenter.Runtime.Views
         private async UniTask BugAndFeedbackButtonPressed()
         {
             await PopupHelper.Close(Transform);
-            MainUIContainer.In.GetMain<PopupContainer>().Push(bugAndFeedbackPopupKey, true);
+            await MainUIContainer.In.GetMain<PopupContainer>().Push(bugAndFeedbackPopupKey, true);
         }
 
         public void OnDisable()

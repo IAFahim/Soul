@@ -9,7 +9,6 @@ namespace Soul.Controller.Runtime.Items
     public class Crop : Item, IWeight
     {
         [Range(0, 100)] [SerializeReference] public int weight = 1;
-        public UnityTimeSpan growTime;
         public int Weight => weight;
     }
 }

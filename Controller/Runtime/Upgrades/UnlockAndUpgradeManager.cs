@@ -15,6 +15,7 @@ using Soul.Model.Runtime.Requirements;
 using Soul.Model.Runtime.SaveAndLoad;
 using TrackTime;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Upgrades
 {
@@ -22,7 +23,10 @@ namespace Soul.Controller.Runtime.Upgrades
     {
         public PlayerInventoryReference playerInventoryReference;
 
-        [SerializeField] private BasicRequirementScriptableObject basicRequirementScriptableObject;
+        [FormerlySerializedAs("requirementScriptableObject")]
+        [FormerlySerializedAs("basicRequirementScriptableObject")]
+        [SerializeField]
+        private RequirementForUpgrades requirementForUpgrades;
 
         [SerializeField] private RecordUpgrade upgradeRecord;
 
@@ -36,8 +40,7 @@ namespace Soul.Controller.Runtime.Upgrades
         private DelayHandle _delayHandle;
         private ISaveAbleReference _saveAbleReference;
 
-        public RequirementBasic<Item, int> Required =>
-            basicRequirementScriptableObject.GetRequirement(currentLevel);
+        public RequirementForUpgrade Required => requirementForUpgrades.GetRequirement(currentLevel);
 
         public UnityTimeSpan RequiredFullTime => Required.fullTime;
         public UnityTimeSpan GetTimeAfterDiscount => upgradeRecord.Time.GetTimeAfterDiscount(Required.fullTime);
