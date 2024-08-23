@@ -5,7 +5,9 @@ using Pancake.Pools;
 using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Limits;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using UnityProgressBar;
 
@@ -13,38 +15,45 @@ namespace Soul.Presenter.Runtime.UI
 {
     public class RewardNotifier : GameComponent, ILoadComponent
     {
-        [SerializeField] TMPFormat countLimitText;
+        [FormerlySerializedAs("countLimitText")] [SerializeField] TMPFormat addedText;
+        [SerializeField] TMPFormat totalText;
         [SerializeField] Image icon;
         [SerializeField] ProgressBar progressBar;
         [SerializeField, DisableInEditMode] Item itemReference;
 
-        private IRemoveReference<Item> _removeReference;
+        private IRemoveSelfCallBack<Item> _removeSelfCallBack;
 
         private void Awake()
         {
-            countLimitText.StoreFormat();
+            addedText.StoreFormat();
+            totalText.StoreFormat();
         }
 
-        public void Setup(int count, LimitStruct limit, Item item, IRemoveReference<Item> removeReference)
+        public void Setup(Item item, int newAmount, int added, LimitIntStruct limitInt,
+            IRemoveSelfCallBack<Item> removeSelfCallBack)
         {
-            countLimitText.TMP.SetText("+" + countLimitText, count);
+            totalText.TMP.SetText(totalText, newAmount);
+            addedText.TMP.SetText("+" + addedText, added);
             icon.sprite = item.Icon;
-            progressBar.Value = count / (float)limit.Max;
+            progressBar.Value = limitInt;
             itemReference = item;
-            _removeReference = removeReference;
+            _removeSelfCallBack = removeSelfCallBack;
             App.Delay(3f, OnComplete);
         }
 
         private void OnComplete()
         {
-            _removeReference.RemoveSelf(itemReference);
+            _removeSelfCallBack.RemoveSelf(itemReference);
             GameObject.Return();
         }
 
         void ILoadComponent.OnLoadComponents()
         {
-            countLimitText = GetComponentInChildren<TMPFormat>();
+            addedText.TMP = GetComponentInChildren<TMP_Text>();
+            totalText.TMP = GetComponentsInChildren<TMP_Text>()[^1];
             icon = GetComponents<Image>()[^1];
+            addedText.StoreFormat();
+            totalText.StoreFormat();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Soul.Controller.Runtime.Inventories.Peoples;
-using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Limits;
 using Soul.Model.Runtime.Reactives;
@@ -19,10 +18,12 @@ namespace Soul.Controller.Runtime.Inventories
 
         public WorkerInventory workerInventory;
         public WorkerInventory workerInventoryPreview;
-        
-        public Reactive<LimitStruct> weight;
-        public Reactive<LimitStruct> weightPreview;
+
+        public Reactive<LimitIntStruct> weight;
+        public Reactive<int> weightPreview;
         public static implicit operator ItemInventory(PlayerInventoryReference reference) => reference.inventory;
-        public static implicit operator WorkerInventory(PlayerInventoryReference reference) => reference.workerInventory;
+
+        public static implicit operator WorkerInventory(PlayerInventoryReference reference) =>
+            reference.workerInventory;
     }
 }

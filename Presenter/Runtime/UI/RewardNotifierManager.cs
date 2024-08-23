@@ -5,11 +5,12 @@ using QuickEye.Utility;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Model.Runtime.Inventories;
 using Soul.Model.Runtime.Items;
+using Soul.Model.Runtime.Limits;
 using UnityEngine;
 
 namespace Soul.Presenter.Runtime.UI
 {
-    public class RewardNotifierManager : GameComponent, IRemoveReference<Item>
+    public class RewardNotifierManager : GameComponent, IRemoveSelfCallBack<Item>
     {
         public PlayerInventoryReference playerInventoryReference;
         public Transform spawnPoint;
@@ -29,15 +30,14 @@ namespace Soul.Presenter.Runtime.UI
 
         private void OnAdded(Item key, int newAmount, int changeAmount, InventoryChangeType changeType)
         {
-            if (changeType == InventoryChangeType.Added)
+            if (changeType == InventoryChangeType.Added || changeType == InventoryChangeType.Increased)
             {
                 OnAddedOrIncreasedAsync(key, newAmount, changeAmount, changeType).Forget();
             }
         }
 
 
-        private async UniTask OnAddedOrIncreasedAsync(Item item, int newAmount, int changeAmount,
-            InventoryChangeType changeType)
+        private async UniTask OnAddedOrIncreasedAsync(Item item, int newAmount, int changeAmount, InventoryChangeType changeType)
         {
             if (!instantiatedRewardNotifiers.TryGetValue(item, out var rewardNotifier))
             {
@@ -46,7 +46,8 @@ namespace Soul.Presenter.Runtime.UI
             }
 
             await UniTask.WaitForEndOfFrame(this);
-            rewardNotifier.Setup(changeAmount, playerInventoryReference.weight, item, this);
+            LimitIntStruct weightLimitInt = playerInventoryReference.weight;
+            rewardNotifier.Setup(item, newAmount, changeAmount, weightLimitInt, this);
         }
 
         public void RemoveSelf(Item self)

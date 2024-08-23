@@ -13,8 +13,7 @@ namespace Soul.Model.Runtime.Inventories
     [Serializable]
     public abstract class Inventory<TKey, TValue> : ISaveAble where TValue : IComparable<TValue>, IEquatable<TValue>
     {
-        [SerializeField]
-        protected UnityDictionary<TKey, TValue> items = new();
+        [SerializeField] protected UnityDictionary<TKey, TValue> items = new();
 
         public bool RemoveIfZero { get; set; } = true;
 
@@ -24,14 +23,23 @@ namespace Soul.Model.Runtime.Inventories
         public bool TryGet(TKey key, out TValue amount) => items.TryGetValue(key, out amount);
 
         [Button]
-        public void AddOrIncrease(TKey key, TValue addAmount)
+        public bool AddOrIncrease(TKey key, TValue addAmount)
         {
-            var currentAmount = items.GetValueOrDefault(key);
-            var newAmount = AddValues(currentAmount, addAmount);
-            items[key] = newAmount;
+            if (items.TryGetValue(key, out var currentAmount))
+            {
+                var newAmount = AddValues(currentAmount, addAmount);
+                items[key] = newAmount;
+                OnItemChanged?.Invoke(new InventoryChangeEventArgs<TKey, TValue>(
+                    key, newAmount, addAmount, InventoryChangeType.Increased));
+            }
+            else
+            {
+                items[key] = addAmount;
+                OnItemChanged?.Invoke(new InventoryChangeEventArgs<TKey, TValue>(
+                    key, addAmount, addAmount, InventoryChangeType.Added));
+            }
 
-            OnItemChanged?.Invoke(new InventoryChangeEventArgs<TKey, TValue>(
-                key, newAmount, addAmount, InventoryChangeType.Added));
+            return true;
         }
 
         [Button]
@@ -85,7 +93,7 @@ namespace Soul.Model.Runtime.Inventories
         {
             return items.ToList();
         }
-        
+
         public List<Pair<TKey, TValue>> ToList()
         {
             return items.Select(pair => new Pair<TKey, TValue>(pair.Key, pair.Value)).ToList();
@@ -109,7 +117,7 @@ namespace Soul.Model.Runtime.Inventories
         {
             var loadedItems = Data.Load<List<Pair<TKey, TValue>>>(key);
             if (loadedItems == null) return false;
-            
+
             items.Clear();
             foreach (var item in loadedItems.Where(item => item.Key != null))
             {
@@ -123,8 +131,9 @@ namespace Soul.Model.Runtime.Inventories
     public enum InventoryChangeType
     {
         Added,
+        Increased,
         Removed,
-        Decreased
+        Decreased,
     }
 
     public struct InventoryChangeEventArgs<TKey, TValue>

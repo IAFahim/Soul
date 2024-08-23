@@ -1,8 +1,10 @@
-﻿using Alchemy.Inspector;
+﻿using System;
+using Alchemy.Inspector;
 using Pancake.Pools;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Converters;
 using Soul.Controller.Runtime.DragAndDrop;
+using Soul.Controller.Runtime.Grids;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Records;
 using Soul.Controller.Runtime.Requirements;
@@ -35,6 +37,8 @@ namespace Soul.Controller.Runtime.Buildings.Managers
 
         [FormerlySerializedAs("rewardPopup")] [SerializeField]
         private PopupIndicatorIconCount popupIndicator;
+        
+        public GridWayPointLimiter wayPointLimiter;
 
 
         // Properties
@@ -160,6 +164,12 @@ namespace Soul.Controller.Runtime.Buildings.Managers
             recordReference.InProgression = false;
             ProductionItem = null;
             SaveAbleReference.Save();
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            if (wayPointLimiter == null) return;
+            wayPointLimiter.OnDrawGizmosSelected();
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Soul.Model.Runtime.Reactives
             get => value;
             set
             {
-                T oldValue = value;
+                T oldValue = this.value;
                 this.value = value;
                 OnChange?.Invoke(oldValue, value);
             }

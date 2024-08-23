@@ -2,6 +2,6 @@
 {
     public interface IWeight
     {
-        public float Weight { get; }
+        public int Weight { get; }
     }
 }

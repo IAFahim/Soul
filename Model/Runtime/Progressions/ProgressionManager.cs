@@ -36,9 +36,9 @@ namespace Soul.Model.Runtime.Progressions
             recordReference = record;
             levelReference = level;
             SaveAbleReference = saveAbleReference;
-            bool isUnlocked = !levelReference.IsLocked;
-            if (isUnlocked) TimerStart(false);
-            return isUnlocked;
+            bool canStart = recordReference.InProgression;
+            if (canStart) TimerStart(false);
+            return canStart;
         }
 
         /// <summary>
