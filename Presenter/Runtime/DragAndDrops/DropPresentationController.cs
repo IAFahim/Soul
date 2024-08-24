@@ -2,7 +2,7 @@
 using Pancake;
 using Pancake.Pools;
 using Soul.Controller.Runtime.Inventories;
-using Soul.Model.Runtime.CustomList;
+using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
@@ -27,10 +27,10 @@ namespace Soul.Presenter.Runtime.DragAndDrops
 
         public void OnSelect(Transform selectedTransform)
         {
-            var (canDrop, currentAllowedThingsToDrop) = TryGetAllowedList<Item>(selectedTransform);
-            if (canDrop)
+            var hasDropable = selectedTransform.TryGetComponent(out IDropAble<Pair<Item, int>> dropable);
+            if (hasDropable && dropable.CanDropNow)
             {
-                CanDrop(currentAllowedThingsToDrop, selectedTransform);
+                CanDrop(selectedTransform);
             }
             else
             {
@@ -39,13 +39,13 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         }
 
 
-        private void CanDrop(ScriptableList<Item> allowedThingsToDrop, Transform selectedTransform)
+        private void CanDrop(Transform selectedTransform)
         {
             containerCanvasGroup.alpha = 1;
-            foreach (var item in allowedThingsToDrop)
+            var allowedThingsToDropReference = selectedTransform.GetComponent<IAllowedToDropReference<Item>>();
+            foreach (var item in allowedThingsToDropReference.ListOfAllowedToDrop)
             {
-                var dragContainer =
-                    itemDragAndDropContainerPrefab.GameObject.Request<ItemDragAndDropContainer>(containerTransform);
+                var dragContainer = itemDragAndDropContainerPrefab.GameObject.Request<ItemDragAndDropContainer>(containerTransform);
                 if (dragContainer.Setup(playerInventoryReference, item, selectedTransform))
                 {
                     instantiateDragContainers.Add(dragContainer);
@@ -63,17 +63,6 @@ namespace Soul.Presenter.Runtime.DragAndDrops
 
             instantiateDragContainers.Clear();
             playerInventoryReference.inventoryPreview.Clear();
-        }
-
-        private (bool canDrop, ScriptableList<T> currentAllowedThingsToDrop) TryGetAllowedList<T>(
-            Transform selectedTransform)
-        {
-            if (selectedTransform.TryGetComponent<IDropAble<T>>(out var dropAble))
-            {
-                if (dropAble.CanDropNow) return (true, dropAble.AllowedThingsToDrop);
-            }
-
-            return (false, null);
         }
     }
 }

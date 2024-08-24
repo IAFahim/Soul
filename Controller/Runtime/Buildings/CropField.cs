@@ -1,4 +1,5 @@
-﻿using Alchemy.Inspector;
+﻿using System.Collections.Generic;
+using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using Pancake;
 using Pancake.Common;
@@ -9,6 +10,7 @@ using Soul.Controller.Runtime.InfoPanels;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Upgrades;
 using Soul.Model.Runtime.Buildings;
+using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.CustomList;
 using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Interfaces;
@@ -23,7 +25,7 @@ using UnityEngine;
 namespace Soul.Controller.Runtime.Buildings
 {
     public class CropField : GameComponent, ISelectCallBack, IGuid, ITitle, ISaveAble, ILocked, ILoadComponent,
-        IDropAble<Item>, IUpgrade, IUnlock, ISaveAbleReference, IInfoPanelReference
+        IDropAble<Pair<Item, int>>, IAllowedToDropReference<Item>, IUpgrade, IUnlock, ISaveAbleReference, IInfoPanelReference
     {
         [SerializeField, Guid] private string guid;
         [SerializeField] private PlayerInventoryReference playerInventoryReference;
@@ -58,7 +60,7 @@ namespace Soul.Controller.Runtime.Buildings
         public Vector3 InfoPanelWorldPosition =>
             transform.TransformPoint(levelInfrastructureInfo.GetInfoPanelPositionOffset(level));
 
-        public ScriptableList<Item> AllowedThingsToDrop => allowedThingsToDrop;
+        public IList<Item> ListOfAllowedToDrop => allowedThingsToDrop;
 
         public void OnSelected(RaycastHit selfRayCastHit) => Debug.Log("Selected: " + this);
 
@@ -131,23 +133,20 @@ namespace Soul.Controller.Runtime.Buildings
         }
 
 
-        public bool DropHovering(Item[] thingToDrop)
+        public bool DropHovering(Pair<Item, int> thingToDrop)
         {
-            foreach (var item in thingToDrop)
+            var hasEnough = ListOfAllowedToDrop.Contains(thingToDrop.Key);
+            if (hasEnough)
             {
-                if (!allowedThingsToDrop.Contains(item))
-                {
-                    return false;
-                }
+                cropProductionManager.TempAdd(thingToDrop);
             }
 
-            cropProductionManager.TempAdd(thingToDrop);
-            return true;
+            return hasEnough;
         }
 
-        public bool TryDrop(Item[] thingToDrop)
+        public bool TryDrop(Pair<Item, int> dropPackage)
         {
-            if (DropHovering(thingToDrop))
+            if (DropHovering(dropPackage))
             {
                 if (cropProductionManager.TryStartProgression())
                 {

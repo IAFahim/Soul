@@ -12,6 +12,7 @@ using Soul.Controller.Runtime.RequiresAndRewards;
 using Soul.Controller.Runtime.Rewards;
 using Soul.Controller.Runtime.SpritePopups;
 using Soul.Model.Runtime.Containers;
+using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Peoples.Workers;
@@ -32,7 +33,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
 
-        [SerializeField] private Seed queueItem;
+        [SerializeField] private Pair<Item, int> queueItemValuePair;
         [SerializeField] private bool isClaimable;
 
         [SerializeField] private int capacity = 3;
@@ -43,14 +44,15 @@ namespace Soul.Controller.Runtime.Buildings.Managers
 
 
         // Properties
-        public Seed ProductionItem
+        public Pair<Item, int> ProductionItem
         {
             get
             {
-                var seed = recordReference.productionItem as Seed;
-                return seed ?? queueItem;
+                var itemKeyValuePair = recordReference.productionItemValuePair;
+                if (!itemKeyValuePair.Key) return queueItemValuePair;
+                return itemKeyValuePair;
             }
-            set => recordReference.productionItem = value;
+            set => recordReference.productionItemValuePair = value;
         }
 
         public float WeightLimit => capacity;
@@ -60,9 +62,9 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         public RequirementForProduction Required => requiredAndRewardForProductions.GetRequirement(levelReference - 1);
         public RewardForProduction RewardForProduction => requiredAndRewardForProductions.GetReward(levelReference - 1);
 
-        public int PlantCount => capacity * ProductionItem.KgToPoint;
+        public int PlantCount => capacity * ((IKgToCount)ProductionItem.Key).KgToPoint;
 
-        public override UnityTimeSpan FullTimeRequirement => ProductionItem.growTime;
+        public override UnityTimeSpan FullTimeRequirement => ((ITimeRequirement)ProductionItem.Key).RequiredTime;
 
         public int CurrentCurrency => playerInventoryReference.coins.Value;
 
@@ -97,11 +99,18 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         /// <summary>
         /// Temporarily adds items for preview purposes.
         /// </summary>
-        public void TempAdd(Item[] items)
+        public void TempAdd(Pair<Item, int> itemKeyValuePair)
         {
-            queueItem = items[0] as Seed;
-            playerInventoryReference.inventoryPreview.AddOrIncrease(queueItem, (int)WeightLimit);
+            queueItemValuePair = itemKeyValuePair; 
+            playerInventoryReference.inventoryPreview.AddOrIncrease(queueItemValuePair, (int)WeightLimit);
             playerInventoryReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
+        }
+
+        
+
+        public override bool TryStartProgression()
+        {
+            return !isClaimable && base.TryStartProgression();
         }
 
 
@@ -133,7 +142,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         protected override void ModifyRecordBeforeProgression()
         {
             recordReference.worker.Set(WorkerCount);
-            recordReference.productionItem = ProductionItem;
+            recordReference.productionItemValuePair = ProductionItem;
             recordReference.Time.Discount = new UnityTimeSpan();
             base.ModifyRecordBeforeProgression();
         }
@@ -181,7 +190,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
             playerInventoryReference.inventory.AddOrIncrease(singleReward.Key, singleReward.Value);
             playerInventoryReference.coins.Set(CurrentCurrency + 10);
             recordReference.InProgression = false;
-            ProductionItem = null;
+            ProductionItem = new Pair<Item, int>();
             SaveAbleReference.Save();
         }
     }

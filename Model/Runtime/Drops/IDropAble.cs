@@ -1,13 +1,10 @@
-﻿using Soul.Model.Runtime.CustomList;
-
-namespace Soul.Model.Runtime.Drops
+﻿namespace Soul.Model.Runtime.Drops
 {
-    public interface IDropAble<T>
+    public interface IDropAble<in TDrop>
     {
         public bool MultipleDropMode { get; }
-        public ScriptableList<T> AllowedThingsToDrop { get; }
         public bool CanDropNow { get; }
-        public bool DropHovering(T[] thingToDrop);
-        public bool TryDrop(T[] thingToDrop);
+        public bool DropHovering(TDrop thingToDrop);
+        public bool TryDrop(TDrop dropPackage);
     }
 }
