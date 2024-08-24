@@ -11,6 +11,7 @@ using Soul.Controller.Runtime.Records;
 using Soul.Controller.Runtime.Requirements;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.Progressions;
 using Soul.Model.Runtime.Requirements;
 using Soul.Model.Runtime.SaveAndLoad;
 using TrackTime;
@@ -19,7 +20,7 @@ using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Upgrades
 {
-    public class UnlockAndUpgradeManager : GameComponent, ILoadComponent
+    public class UnlockAndUpgradeManager : ProgressionManager<RecordUpgrade> , ILoadComponent
     {
         public PlayerInventoryReference playerInventoryReference;
 
@@ -28,51 +29,40 @@ namespace Soul.Controller.Runtime.Upgrades
         [SerializeField]
         private RequirementForUpgrades requirementForUpgrades;
 
-        [SerializeField] private RecordUpgrade upgradeRecord;
-
         public BoxCollider currentBoxCollider;
 
         [SerializeField] private Transform parent;
-        [SerializeField] private Level currentLevel;
         [SerializeField] private UnlockManager unlockManager;
         [SerializeField] private Optional<PartsManager> upgradePartsManager;
 
-        private DelayHandle _delayHandle;
         private ISaveAbleReference _saveAbleReference;
 
-        public RequirementForUpgrade Required => requirementForUpgrades.GetRequirement(currentLevel);
+        public RequirementForUpgrade Required => requirementForUpgrades.GetRequirement(levelReference);
 
-        public UnityTimeSpan RequiredFullTime => Required.fullTime;
-        public UnityTimeSpan GetTimeAfterDiscount => upgradeRecord.Time.GetTimeAfterDiscount(Required.fullTime);
-        public UnityTimeSpan TimeRemaining => upgradeRecord.Time.Remaining(Required.fullTime);
-
-
-        public bool IsComplete => upgradeRecord.InProgression && upgradeRecord.Time.IsOver(RequiredFullTime);
-        public bool IsUnlocking => currentLevel == 0 && upgradeRecord.InProgression;
+        public override UnityTimeSpan FullTimeRequirement => Required.fullTime;
 
 
         public async UniTask<bool> Setup(AddressablePoolLifetime addressablePoolLifetime,
             PlayerInventoryReference playerInventory, RecordUpgrade recordOfUpgrade,
             ISaveAbleReference saveAbleReference, BoxCollider boxCollider, Level level)
         {
-            upgradeRecord = recordOfUpgrade;
+            bool canStart = base.Setup(recordOfUpgrade, level, saveAbleReference);
             currentBoxCollider = boxCollider;
             playerInventoryReference = playerInventory;
             _saveAbleReference = saveAbleReference;
             unlockManager.Setup(addressablePoolLifetime);
-            currentLevel = level;
-            if (currentLevel == 0)
+            
+            if (levelReference == 0)
             {
                 await unlockManager.InstantiateLockedAsync();
             }
             else
             {
                 await ShowUnlocked(boxCollider);
-                if (upgradePartsManager) upgradePartsManager.Value.Spawn(currentLevel - 1, boxCollider);
+                if (upgradePartsManager) upgradePartsManager.Value.Spawn(levelReference - 1, boxCollider);
             }
-
-            if (IsUnlocking) StartTimer(false);
-            return upgradeRecord.InProgression;
+            
+            return canStart;
         }
 
         private async Task ShowUnlocked(BoxCollider boxCollider)
@@ -81,50 +71,42 @@ namespace Soul.Controller.Runtime.Upgrades
             upgradePartsManager = unLockedGameObject.GetComponent<PartsManager>();
         }
 
-        private void StartTimer(bool startNow)
-        {
-            if (IsComplete)
-            {
-                if (currentLevel.IsLocked) OnCompleteUnlocking();
-                else OnCompleteUpgrading();
-                return;
-            }
-
-            float delay = startNow ? (float)GetTimeAfterDiscount.TotalSeconds : (float)TimeRemaining.TotalSeconds;
-            _delayHandle = App.Delay(delay, currentLevel.IsLocked ? OnCompleteUnlocking : OnCompleteUpgrading);
-            Track.Start(name, delay);
-        }
-
         [Button]
         public void Upgrade(int level)
         {
-            RecordModify();
-            StartTimer(true);
-            _saveAbleReference.Save();
+            TryStartProgression();
         }
 
-        public bool HasEnough()
+        public override bool HasEnough()
         {
             var currentCoin = playerInventoryReference.coins;
             if (currentCoin.Key != Required.currency.Key) return false;
             return currentCoin >= Required.currency.Value;
         }
 
-        private void RecordModify()
+        protected override void ModifyRecordBeforeProgression()
         {
-            upgradeRecord.InProgression = true;
-            upgradeRecord.worker.Set(Required.workerCount);
-            upgradeRecord.toLevel = currentLevel + 1;
-            upgradeRecord.Time.StartedAt = new UnityDateTime(DateTime.UtcNow);
-            upgradeRecord.Time.Discount = new UnityTimeSpan();
+            base.ModifyRecordBeforeProgression();
+            recordReference.worker.Set(Required.workerCount);
+            recordReference.toLevel = levelReference + 1;
+        }
+
+        public override void OnTimerStart()
+        {
+        }
+
+        public override void OnComplete()
+        {
+            recordReference.InProgression = false;
+            if (levelReference.IsLocked) OnCompleteUnlockingAsync().Forget();
+            else OnCompleteUpgrading();
         }
 
         private void OnCompleteUpgrading()
         {
-            upgradeRecord.InProgression = false;
-            currentLevel.Current = upgradeRecord.toLevel;
+            levelReference.Current = recordReference.toLevel;
             upgradePartsManager.Value.ClearInstantiatedParts();
-            upgradePartsManager.Value.Spawn(currentLevel - 1, currentBoxCollider);
+            upgradePartsManager.Value.Spawn(levelReference - 1, currentBoxCollider);
             _saveAbleReference.Save();
         }
 
@@ -141,23 +123,20 @@ namespace Soul.Controller.Runtime.Upgrades
 
         public void Unlock()
         {
-            RecordModify();
-            StartTimer(true);
-            _saveAbleReference.Save();
-        }
-
-        private void OnCompleteUnlocking()
-        {
-            OnCompleteUnlockingAsync().Forget();
+            TryStartProgression();
         }
 
         private async UniTask OnCompleteUnlockingAsync()
         {
-            upgradeRecord.InProgression = false;
             await ShowUnlocked(currentBoxCollider);
-            currentLevel.Current = 1;
-            upgradePartsManager.Value.Spawn(currentLevel - 1, currentBoxCollider);
+            levelReference.Current = 1;
+            upgradePartsManager.Value.Spawn(levelReference - 1, currentBoxCollider);
             _saveAbleReference.Save();
+        }
+
+        protected override void TakeRequirement()
+        {
+            playerInventoryReference.coins.Set(playerInventoryReference.coins - Required.currency.Value);
         }
     }
 }

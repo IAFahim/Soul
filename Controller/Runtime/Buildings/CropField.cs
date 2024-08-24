@@ -25,7 +25,8 @@ using UnityEngine;
 namespace Soul.Controller.Runtime.Buildings
 {
     public class CropField : GameComponent, ISelectCallBack, IGuid, ITitle, ISaveAble, ILocked, ILoadComponent,
-        IDropAble<Pair<Item, int>>, IAllowedToDropReference<Item>, IUpgrade, IUnlock, ISaveAbleReference, IInfoPanelReference
+        IDropAble<Pair<Item, int>>, IAllowedToDropReference<Item>, IUpgrade, IUnlock, ISaveAbleReference,
+        IInfoPanelReference
     {
         [SerializeField, Guid] private string guid;
         [SerializeField] private PlayerInventoryReference playerInventoryReference;
@@ -49,10 +50,12 @@ namespace Soul.Controller.Runtime.Buildings
             get => guid;
             set => guid = value;
         }
-
+        
+        public Level Level => level;
 
         public string Title => levelInfrastructureInfo.Title;
         public bool IsLocked => level.IsLocked;
+        public bool IsUpgrading => cropFieldRecord.recordUpgrade.InProgression;
         public bool MultipleDropMode => false;
         public bool CanDropNow => !IsLocked;
         public IInfoPanel InfoPanelPrefab => infoPanelPrefab;
@@ -81,8 +84,6 @@ namespace Soul.Controller.Runtime.Buildings
 
         public bool CanUpgrade => !level.IsMax;
 
-        [Button]
-        public void Upgrade() => unlockAndUpgradeManager.Upgrade(level + 1);
 
         public override string ToString() => Title;
 
@@ -102,23 +103,12 @@ namespace Soul.Controller.Runtime.Buildings
             Data.Save(key, cropFieldRecord);
         }
 
-        public Level Level => level;
-        public bool IsUpgrading => cropFieldRecord.recordUpgrade.InProgression;
+        
 
+        [Button]
+        public void Upgrade() => unlockAndUpgradeManager.Upgrade(level + 1);
 
-        private void Reset()
-        {
-            unlockAndUpgradeManager = GetComponentInChildren<UnlockAndUpgradeManager>();
-            cropProductionManager = GetComponentInChildren<CropProductionManager>();
-            boxCollider = GetComponentInChildren<BoxCollider>();
-        }
-
-        void ILoadComponent.OnLoadComponents()
-        {
-            Reset();
-        }
-
-        public bool IsUnlocking => unlockAndUpgradeManager.IsUnlocking;
+        public bool IsUnlocking => cropFieldRecord.recordUpgrade.InProgression;
         public bool CanUnlock => unlockAndUpgradeManager.HasEnough();
 
         public void Unlock()
@@ -157,6 +147,19 @@ namespace Soul.Controller.Runtime.Buildings
             }
 
             return false;
+        }
+
+
+        private void Reset()
+        {
+            unlockAndUpgradeManager = GetComponentInChildren<UnlockAndUpgradeManager>();
+            cropProductionManager = GetComponentInChildren<CropProductionManager>();
+            boxCollider = GetComponentInChildren<BoxCollider>();
+        }
+
+        void ILoadComponent.OnLoadComponents()
+        {
+            Reset();
         }
     }
 }
