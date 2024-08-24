@@ -101,18 +101,16 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         /// </summary>
         public void TempAdd(Pair<Item, int> itemKeyValuePair)
         {
-            queueItemValuePair = itemKeyValuePair; 
+            queueItemValuePair = itemKeyValuePair;
             playerInventoryReference.inventoryPreview.AddOrIncrease(queueItemValuePair, (int)WeightLimit);
             playerInventoryReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
         }
 
-        
 
         public override bool TryStartProgression()
         {
             return !isClaimable && base.TryStartProgression();
         }
-
 
         public override bool HasEnough() => playerInventoryReference.inventory.HasEnough(ProductionItem, capacity);
 
@@ -141,7 +139,9 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         /// </summary>
         protected override void ModifyRecordBeforeProgression()
         {
-            recordReference.worker.Set(WorkerCount);
+            var requiredWorker = Required.workerCount;
+            recordReference.worker.typeAndCount = new Pair<WorkerType, int>(basicWorkerType, requiredWorker);
+            playerInventoryReference.workerInventory.TryDecrease(basicWorkerType, requiredWorker);
             recordReference.productionItemValuePair = ProductionItem;
             recordReference.Time.Discount = new UnityTimeSpan();
             base.ModifyRecordBeforeProgression();
@@ -187,6 +187,8 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         private void ModifyRecordAfterProgression()
         {
             var singleReward = Reward;
+            var takenWorker = recordReference.worker.typeAndCount;
+            playerInventoryReference.workerInventory.AddOrIncrease(takenWorker.Key, takenWorker.Value);
             playerInventoryReference.inventory.AddOrIncrease(singleReward.Key, singleReward.Value);
             playerInventoryReference.coins.Set(CurrentCurrency + 10);
             recordReference.InProgression = false;

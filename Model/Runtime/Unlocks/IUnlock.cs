@@ -2,8 +2,8 @@
 {
     public interface IUnlock
     {
-        public bool IsUnlocking { get; }
         bool CanUnlock { get; }
+        public bool IsUnlocking { get; }
         void Unlock();
     }
 }
