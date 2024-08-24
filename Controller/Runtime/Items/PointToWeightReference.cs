@@ -1,7 +1,7 @@
 ﻿namespace Soul.Controller.Runtime.Items
 {
-    public interface IPointToWeightReference
+    public interface IKgToCount
     {
-        public float PointToWeight { get; set; }
+        public int KgToPoint { get; set; }
     }
 }

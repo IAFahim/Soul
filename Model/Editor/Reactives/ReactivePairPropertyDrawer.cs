@@ -18,8 +18,8 @@ namespace Soul.Model.Editor.Reactives
             EditorGUI.BeginProperty(position, label, property);
 
             var pairProperty = property.FindPropertyRelative("pair");
-            var keyProperty = pairProperty.FindPropertyRelative("key");
-            var valueProperty = pairProperty.FindPropertyRelative("value");
+            var keyProperty = pairProperty.FindPropertyRelative("first");
+            var valueProperty = pairProperty.FindPropertyRelative("second");
 
             var headerRect = new Rect(position.x, position.y, position.width, HeaderHeight);
             DrawHeader(headerRect, property, label, valueProperty);
@@ -61,11 +61,11 @@ namespace Soul.Model.Editor.Reactives
 
             // Draw Key
             propertyRect.y += PropertySpacing;
-            EditorGUI.PropertyField(propertyRect, keyProperty, new GUIContent("Key"));
+            EditorGUI.PropertyField(propertyRect, keyProperty, new GUIContent("first"));
             propertyRect.y += PropertyHeight + PropertySpacing;
 
             // Draw Value
-            EditorGUI.PropertyField(propertyRect, valueProperty, new GUIContent("Value"));
+            EditorGUI.PropertyField(propertyRect, valueProperty, new GUIContent("second"));
         }
 
         private string GetPreviewString(SerializedProperty property)

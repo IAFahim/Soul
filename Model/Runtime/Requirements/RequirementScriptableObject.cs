@@ -2,7 +2,7 @@
 
 namespace Soul.Model.Runtime.Requirements
 {
-    public class RequiremntScriptableObject<T> : ScriptableObject
+    public class RequirementScriptableObject<T> : ScriptableObject
     {
         [SerializeField] protected T[] requirements;
 

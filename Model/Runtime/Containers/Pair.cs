@@ -1,43 +1,56 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Model.Runtime.Containers
 {
     [Serializable]
     public struct Pair<T, TV>
     {
-        [SerializeField] private T key;
+        [FormerlySerializedAs("key")] [SerializeField] private T first;
 
-        [SerializeField] private TV value;
+        [FormerlySerializedAs("value")] [SerializeField] private TV second;
 
-        public Pair(T key, TV value)
+        public Pair(T first, TV second)
         {
-            this.key = key;
-            this.value = value;
+            this.first = first;
+            this.second = second;
         }
 
         public Pair(Pair<T, TV> source)
         {
-            key = source.key;
-            value = source.value;
+            first = source.first;
+            second = source.second;
         }
 
         public T Key
         {
-            get => key;
-            set => key = value;
+            get => first;
+            set => first = value;
+        }
+
+        public T First
+        {
+            get => first;
+            set => first = value;
         }
 
         public TV Value
         {
-            get => value;
-            set => this.value = value;
+            get => second;
+            set => this.second = value;
         }
-        
+
+        public TV Second
+        {
+            get => second;
+            set => this.second = value;
+        }
+
 
         private String GetIdentity()
         {
-            return "[" + key + " , " + value + "]";
+            return "[" + first + " , " + second + "]";
         }
 
         public override string ToString()
@@ -47,10 +60,10 @@ namespace Soul.Model.Runtime.Containers
 
         public override int GetHashCode()
         {
-            return key.GetHashCode() ^ value.GetHashCode();
+            return first.GetHashCode() ^ second.GetHashCode();
         }
-        
-        public static implicit operator T (Pair<T, TV> pair) => pair.key;
-        public static implicit operator TV (Pair<T, TV> pair) => pair.value;
+
+        public static implicit operator T(Pair<T, TV> pair) => pair.first;
+        public static implicit operator TV(Pair<T, TV> pair) => pair.second;
     }
 }

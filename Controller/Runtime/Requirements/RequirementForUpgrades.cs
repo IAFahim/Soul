@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Soul.Controller.Runtime.Requirements
 {
     [CreateAssetMenu(fileName = "Upgrd Requirement", menuName = "Soul/Requirement/Upgrades")]
-    public class RequirementForUpgrades : RequiremntScriptableObject<RequirementForUpgrade>
+    public class RequirementForUpgrades : RequirementScriptableObject<RequirementForUpgrade>
     {
         
     }

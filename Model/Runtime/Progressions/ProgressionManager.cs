@@ -74,6 +74,7 @@ namespace Soul.Model.Runtime.Progressions
 
         private void TimerStart(bool starsNow)
         {
+            OnTimerStart();
             if (IsComplete)
             {
                 OnComplete();
@@ -84,6 +85,8 @@ namespace Soul.Model.Runtime.Progressions
             DelayHandle = App.Delay(delay, OnComplete);
             Track.Start(name, delay);
         }
+
+        public abstract void OnTimerStart();
 
         public abstract void OnComplete();
     }

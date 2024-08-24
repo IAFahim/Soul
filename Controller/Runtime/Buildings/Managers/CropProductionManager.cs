@@ -3,11 +3,13 @@ using Pancake.Pools;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Converters;
 using Soul.Controller.Runtime.DragAndDrop;
-using Soul.Controller.Runtime.Grids;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Items;
+using Soul.Controller.Runtime.MeshPlanters;
 using Soul.Controller.Runtime.Records;
 using Soul.Controller.Runtime.Requirements;
+using Soul.Controller.Runtime.RequiresAndRewards;
+using Soul.Controller.Runtime.Rewards;
 using Soul.Controller.Runtime.SpritePopups;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
@@ -26,18 +28,18 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         IReward<Pair<Item, int>>
     {
         [SerializeField] private PlayerInventoryReference playerInventoryReference;
-        [FormerlySerializedAs("requirementScriptableObject")] [FormerlySerializedAs("basicRequirementScriptableObject")] [SerializeField] private RequirementForUpgrades requirementForUpgrades;
-        [SerializeField] private int capacity;
+        [SerializeField] private RequiredAndRewardForProductions requiredAndRewardForProductions;
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
 
         [SerializeField] private Seed queueItem;
         [SerializeField] private bool isClaimable;
 
-        [FormerlySerializedAs("rewardPopup")] [SerializeField]
-        private PopupIndicatorIconCount popupIndicator;
-        
-        public GridWayPointLimiter wayPointLimiter;
+        [SerializeField] private int capacity = 3;
+        [SerializeField] private PopupIndicatorIconCount popupIndicator;
+
+        [FormerlySerializedAs("meshPlantGridSystem")]
+        public MeshPlantPointGridSystem meshPlantPointGridSystem;
 
 
         // Properties
@@ -55,7 +57,10 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         public int CurrencyRequirement => 0;
         public int WorkerCount => recordReference.worker.typeAndCount;
 
-        public RequirementForUpgrade Required => requirementForUpgrades.GetRequirement(levelReference - 1);
+        public RequirementForProduction Required => requiredAndRewardForProductions.GetRequirement(levelReference - 1);
+        public RewardForProduction RewardForProduction => requiredAndRewardForProductions.GetReward(levelReference - 1);
+
+        public int PlantCount => capacity * ProductionItem.KgToPoint;
 
         public override UnityTimeSpan FullTimeRequirement => ProductionItem.growTime;
 
@@ -67,13 +72,16 @@ namespace Soul.Controller.Runtime.Buildings.Managers
             {
                 if (itemToItemConverter.TryConvert(ProductionItem, out var convertedItem))
                 {
-                    int productionAmount = (int)(convertedItem.Value * capacity);
+                    int productionAmount =
+                        (int)(convertedItem.Value * capacity * RewardForProduction.productionMultiplier);
                     return new Pair<Item, int>(convertedItem.Key, productionAmount);
                 }
 
                 return new Pair<Item, int>();
             }
         }
+
+        public IPlantStageMesh PlantStageMesh => Reward.Key as IPlantStageMesh;
 
         // Public Methods
 
@@ -131,6 +139,12 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         }
 
 
+        public override void OnTimerStart()
+        {
+            IPlantStageMesh plantStageMesh = PlantStageMesh;
+            meshPlantPointGridSystem.Plant(levelReference, plantStageMesh.StageMeshes[0], plantStageMesh.Size);
+        }
+
         /// <summary>
         /// Called when the production timer completes.
         /// </summary>
@@ -140,6 +154,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
             var instantiatedRewardPopup =
                 popupIndicator.gameObject.Request(Transform).GetComponent<PopupIndicatorIconCount>();
             instantiatedRewardPopup.Setup(this, this, true);
+            meshPlantPointGridSystem.ChangeMesh(PlantStageMesh.StageMeshes[^1]);
         }
 
         /// <summary>
@@ -147,7 +162,8 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         /// </summary>
         protected override void TakeRequirement()
         {
-            playerInventoryReference.inventory.TryDecrease(ProductionItem, capacity);
+            var seed = ProductionItem;
+            playerInventoryReference.inventory.TryDecrease(seed, capacity);
         }
 
         /// <summary>
@@ -156,6 +172,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         private void AddReward()
         {
             ModifyRecordAfterProgression();
+            meshPlantPointGridSystem.Clear();
         }
 
         private void ModifyRecordAfterProgression()
@@ -166,12 +183,6 @@ namespace Soul.Controller.Runtime.Buildings.Managers
             recordReference.InProgression = false;
             ProductionItem = null;
             SaveAbleReference.Save();
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            if (wayPointLimiter == null) return;
-            wayPointLimiter.OnDrawGizmosSelected();
         }
     }
 }

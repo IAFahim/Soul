@@ -5,12 +5,12 @@ using UnityEngine;
 namespace Soul.Controller.Runtime.Items
 {
     [CreateAssetMenu(fileName = "seed", menuName = "Soul/Item/Create Seed")]
-    public class Seed : Item, IPointToWeightReference
+    public class Seed : Item, IKgToCount
     {
-        [SerializeField] private float pointToWeight = 20;
+        [SerializeField] private int pointToWeight = 20;
         public UnityTimeSpan growTime;
 
-        public float PointToWeight
+        public int KgToPoint
         {
             get => pointToWeight;
             set => pointToWeight = value;
