@@ -2,36 +2,27 @@
 using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using Pancake.Common;
-using Soul.Controller.Runtime.Addressables;
-using Soul.Controller.Runtime.Buildings.Managers;
 using Soul.Controller.Runtime.Buildings.Records;
-using Soul.Controller.Runtime.InfoPanels;
-using Soul.Controller.Runtime.Inventories;
+using Soul.Controller.Runtime.Productions;
 using Soul.Controller.Runtime.Upgrades;
-using Soul.Model.Runtime.Buildings;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.CustomList;
 using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.Productions;
 using UnityEngine;
 
 namespace Soul.Controller.Runtime.Buildings
 {
-    public class CropField : UnlockUpgradeAbleBuilding, ILoadComponent, IAllowedToDropReference<Item>,
-        IDropAble<Pair<Item, int>>, IInfoPanelReference
+    public class CropField : GameBuilding, IProductionRecordReference<RecordProduction>, ILoadComponent,
+        IAllowedToDropReference<Item>, IDropAble<Pair<Item, int>>
     {
-        [SerializeField] private PlayerInventoryReference playerInventoryReference;
         [SerializeField] private CropFieldRecord cropFieldRecord;
         [SerializeField] private CropProductionManager cropProductionManager;
-        public AddressablePoolLifetime addressablePoolLifetime;
-        [SerializeField] private LevelInfrastructureInfo levelInfrastructureInfo;
-        [SerializeField] private BoxCollider boxCollider;
-        [SerializeField] private UnlockAndUpgradeManager unlockAndUpgradeManager;
-        [SerializeField] private InfoPanel infoPanelPrefab;
         [SerializeField] private ScriptableList<Item> allowedThingsToDrop;
 
-        private bool _loadDataOnEnable = true;
+        private readonly bool _loadDataOnEnable = true;
 
         #region Title
 
@@ -39,6 +30,36 @@ namespace Soul.Controller.Runtime.Buildings
 
         #endregion
 
+
+        #region ICurrentLevelReference
+
+        public override int CurrentLevel
+        {
+            get => cropFieldRecord.level;
+            set => cropFieldRecord.level = value;
+        }
+
+        #endregion
+
+        #region IUpgradeRecordReference
+
+        public override RecordUpgrade UpgradeRecord
+        {
+            get => cropFieldRecord.recordUpgrade;
+            set => cropFieldRecord.recordUpgrade = value;
+        }
+
+        #endregion
+
+        #region IProductionRecordReference
+
+        public RecordProduction ProductionRecord
+        {
+            get => cropFieldRecord.recordProduction;
+            set => cropFieldRecord.recordProduction = value;
+        }
+
+        #endregion
 
         public override void OnSelected(RaycastHit selfRayCastHit) => Debug.Log("Selected: " + this);
 
@@ -48,18 +69,17 @@ namespace Soul.Controller.Runtime.Buildings
             await SetUp(level);
         }
 
-        private async UniTask SetUp(Level currentLevel)
+        protected override async UniTask SetUp(Level currentLevel)
         {
-            await unlockAndUpgradeManager.Setup(addressablePoolLifetime, playerInventoryReference,
-                cropFieldRecord.recordUpgrade, this, boxCollider, currentLevel);
-            cropProductionManager.Setup(playerInventoryReference, cropFieldRecord.recordProduction, currentLevel, this);
+            await base.SetUp(currentLevel);
+            cropProductionManager.Setup(playerInventoryReference, this, currentLevel, this);
         }
 
         #region ISaveAble
 
         public override void Save(string key)
         {
-            cropFieldRecord.level = level.Current;
+            base.Save(key);
             Data.Save(key, cropFieldRecord);
         }
 
@@ -76,34 +96,9 @@ namespace Soul.Controller.Runtime.Buildings
         public override void Load(string key)
         {
             cropFieldRecord = Data.Load(key, cropFieldRecord);
-            level.vector2Int = new Vector2Int(cropFieldRecord.level, level.Max);
+            base.Load(key);
         }
-
-        #region IUpgrade
-
-        public override bool CanUpgrade => !cropFieldRecord.recordProduction.InProgression && !level.IsMax &&
-                                           unlockAndUpgradeManager.HasEnough();
-
-        public override bool IsUpgrading => cropFieldRecord.recordUpgrade.InProgression;
-
-        [Button]
-        public override void Upgrade() => unlockAndUpgradeManager.Upgrade(level + 1);
-
-        #endregion
-
-
-        #region IUnlock
-
-        public override bool CanUnlock => IsLocked && unlockAndUpgradeManager.HasEnough();
-
-        public override bool IsUnlocking => cropFieldRecord.recordUpgrade.InProgression;
-
-        public override void Unlock()
-        {
-            unlockAndUpgradeManager.Unlock();
-        }
-
-        #endregion
+        
 
         #region IAllowedToDropReference<Item>
 
@@ -146,17 +141,6 @@ namespace Soul.Controller.Runtime.Buildings
         #endregion
 
 
-        #region IInfoPanelReference
-
-        public IInfoPanel InfoPanelPrefab => infoPanelPrefab;
-
-        public Vector3 InfoPanelWorldPosition =>
-            transform.TransformPoint(levelInfrastructureInfo.GetInfoPanelPositionOffset(level));
-
-        #endregion
-
-        public override string ToString() => Title;
-
         private void Reset()
         {
             unlockAndUpgradeManager = GetComponentInChildren<UnlockAndUpgradeManager>();
@@ -167,12 +151,6 @@ namespace Soul.Controller.Runtime.Buildings
         void ILoadComponent.OnLoadComponents()
         {
             Reset();
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.color = Color.white;
-            Gizmos.DrawWireSphere(InfoPanelWorldPosition, 1f);
         }
     }
 }

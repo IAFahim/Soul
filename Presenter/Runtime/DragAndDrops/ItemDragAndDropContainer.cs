@@ -48,7 +48,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
 
         private bool TryUpdateUI(Item item, out (int singleDropAmount, int inventoryAmount) inventoryCheck)
         {
-            var hasEnough = TryAdd(item, out inventoryCheck);
+            var hasEnough = TryGetSingleInventory(item, out inventoryCheck);
             _inventoryCheckCache = inventoryCheck;
             if (!hasEnough)
             {
@@ -63,7 +63,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             return true;
         }
 
-        private bool TryAdd(Item item, out (int singleDropAmount, int inventoryAmount) inventoryCheck)
+        private bool TryGetSingleInventory(Item item, out (int singleDropAmount, int inventoryAmount) inventoryCheck)
         {
             inventoryCheck = InventoryCheck(item);
             return inventoryCheck.singleDropAmount > 0;
@@ -85,9 +85,9 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         private int AllowedWeight(Transform otherTransform)
         {
             float allowedAmount = 0;
-            if (otherTransform.TryGetComponent<IWeightCapacity>(out var weightCapacity))
+            if (otherTransform.TryGetComponent<IWeightCapacityReference>(out var weightCapacity))
             {
-                allowedAmount = weightCapacity.WeightLimit;
+                allowedAmount = weightCapacity.WeightCapacity;
             }
 
             return (int)allowedAmount;

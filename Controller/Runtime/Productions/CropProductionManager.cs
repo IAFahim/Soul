@@ -6,7 +6,6 @@ using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.MeshPlanters;
-using Soul.Controller.Runtime.Records;
 using Soul.Controller.Runtime.Requirements;
 using Soul.Controller.Runtime.RequiresAndRewards;
 using Soul.Controller.Runtime.Rewards;
@@ -16,15 +15,15 @@ using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Peoples.Workers;
+using Soul.Model.Runtime.Productions;
 using Soul.Model.Runtime.Progressions;
-using Soul.Model.Runtime.Rewards;
+using Soul.Model.Runtime.RequiredAndRewards.Rewards;
 using Soul.Model.Runtime.SaveAndLoad;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Soul.Controller.Runtime.Buildings.Managers
+namespace Soul.Controller.Runtime.Productions
 {
-    public class CropProductionManager : ProgressionManager<RecordProduction>, ISingleDrop, IWeightCapacity,
+    public class CropProductionManager : ProgressionManager<RecordProduction>, ISingleDrop, IWeightCapacityReference,
         IRewardClaim,
         IReward<Pair<Item, int>>
     {
@@ -36,10 +35,8 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         [SerializeField] private Pair<Item, int> queueItemValuePair;
         [SerializeField] private bool isClaimable;
 
-        [SerializeField] private int capacity = 3;
         [SerializeField] private PopupIndicatorIconCount popupIndicator;
 
-        [FormerlySerializedAs("meshPlantGridSystem")]
         public MeshPlantPointGridSystem meshPlantPointGridSystem;
 
 
@@ -55,14 +52,20 @@ namespace Soul.Controller.Runtime.Buildings.Managers
             set => recordReference.productionItemValuePair = value;
         }
 
-        public float WeightLimit => capacity;
-        public int CurrencyRequirement => 0;
-        public int WorkerCount => recordReference.worker.typeAndCount;
-
         public RequirementForProduction Required => requiredAndRewardForProductions.GetRequirement(levelReference - 1);
+        public Pair<Currency, int> CurrencyRequirement => Required.currency;
+
+        public int WorkerUsed
+        {
+            get => recordReference.worker.typeAndCount;
+            set => recordReference.worker.typeAndCount.Value = value;
+        }
+
+        public int WeightCapacity => Required.weightCapacity;
         public RewardForProduction RewardForProduction => requiredAndRewardForProductions.GetReward(levelReference - 1);
 
-        public int PlantCount => capacity * ((IKgToCount)ProductionItem.Key).KgToPoint;
+        public int PlantCount =>
+            recordReference.productionItemValuePair.Value * ((IKgToCount)ProductionItem.Key).KgToPoint;
 
         public override UnityTimeSpan FullTimeRequirement => ((ITimeRequirement)ProductionItem.Key).RequiredTime;
 
@@ -75,7 +78,8 @@ namespace Soul.Controller.Runtime.Buildings.Managers
                 if (itemToItemConverter.TryConvert(ProductionItem, out var convertedItem))
                 {
                     int productionAmount =
-                        (int)(convertedItem.Value * capacity * RewardForProduction.productionMultiplier);
+                        (int)(convertedItem.Multiplier * recordReference.productionItemValuePair.Value
+                                                       * RewardForProduction.productionMultiplier);
                     return new Pair<Item, int>(convertedItem.Key, productionAmount);
                 }
 
@@ -88,11 +92,12 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         // Public Methods
 
 
-        public bool Setup(PlayerInventoryReference inventoryReference, RecordProduction recordProduction, Level level,
+        public bool Setup(PlayerInventoryReference inventoryReference,
+            IProductionRecordReference<RecordProduction> recordProduction, Level level,
             ISaveAbleReference saveAbleReference)
         {
             playerInventoryReference = inventoryReference;
-            return Setup(recordProduction, level, saveAbleReference);
+            return Setup(recordProduction.ProductionRecord, level, saveAbleReference);
         }
 
 
@@ -102,7 +107,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         public void TempAdd(Pair<Item, int> itemKeyValuePair)
         {
             queueItemValuePair = itemKeyValuePair;
-            playerInventoryReference.inventoryPreview.AddOrIncrease(queueItemValuePair, (int)WeightLimit);
+            playerInventoryReference.inventoryPreview.AddOrIncrease(queueItemValuePair, (int)WeightCapacity);
             playerInventoryReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
         }
 
@@ -112,7 +117,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
             return !isClaimable && base.TryStartProgression();
         }
 
-        public override bool HasEnough() => playerInventoryReference.inventory.HasEnough(ProductionItem, capacity);
+        public override bool HasEnough() => playerInventoryReference.inventory.HasEnough(ProductionItem, WeightCapacity);
 
 
         /// <summary>
@@ -172,7 +177,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
         protected override void TakeRequirement()
         {
             var seed = ProductionItem;
-            playerInventoryReference.inventory.TryDecrease(seed, capacity);
+            playerInventoryReference.inventory.TryDecrease(seed, ProductionItem.Value);
         }
 
         /// <summary>

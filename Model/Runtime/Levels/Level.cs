@@ -12,7 +12,7 @@ namespace Soul.Model.Runtime.Levels
         public bool IncreaseLevel()
         {
             if (IsMax) return false;
-            vector2Int.x++;
+            currentAndMax.x++;
             return true;
         }
         

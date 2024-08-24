@@ -7,13 +7,12 @@ using Pancake.Common;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Addressables;
 using Soul.Controller.Runtime.Inventories;
-using Soul.Controller.Runtime.Records;
 using Soul.Controller.Runtime.Requirements;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Progressions;
-using Soul.Model.Runtime.Requirements;
 using Soul.Model.Runtime.SaveAndLoad;
+using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using TrackTime;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -43,10 +42,10 @@ namespace Soul.Controller.Runtime.Upgrades
 
 
         public async UniTask<bool> Setup(AddressablePoolLifetime addressablePoolLifetime,
-            PlayerInventoryReference playerInventory, RecordUpgrade recordOfUpgrade,
+            PlayerInventoryReference playerInventory, IUpgradeRecordReference<RecordUpgrade> recordOfUpgrade,
             ISaveAbleReference saveAbleReference, BoxCollider boxCollider, Level level)
         {
-            bool canStart = base.Setup(recordOfUpgrade, level, saveAbleReference);
+            bool canStart = base.Setup(recordOfUpgrade.UpgradeRecord, level, saveAbleReference);
             currentBoxCollider = boxCollider;
             playerInventoryReference = playerInventory;
             _saveAbleReference = saveAbleReference;

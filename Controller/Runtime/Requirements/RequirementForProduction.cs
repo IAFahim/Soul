@@ -9,6 +9,7 @@ namespace Soul.Controller.Runtime.Requirements
     {
         public int workerCount;
         public Pair<Currency, int> currency;
+        public int weightCapacity;
         public Pair<Item, int>[] items;
     }
 }

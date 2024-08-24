@@ -1,17 +1,17 @@
 ﻿using QuickEye.Utility;
 using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Inventories;
-using Soul.Controller.Runtime.Records;
+using Soul.Controller.Runtime.Productions;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Progressions;
-using Soul.Model.Runtime.Rewards;
+using Soul.Model.Runtime.RequiredAndRewards.Rewards;
 using Soul.Model.Runtime.SaveAndLoad;
 
 namespace Soul.Controller.Runtime.Buildings.Managers
 {
-    public class EggProductionManager : ProgressionManager<RecordProduction>, ISingleDrop, IWeightCapacity,
+    public class EggProductionManager : ProgressionManager<RecordProduction>, ISingleDrop, IWeightCapacityReference,
         IRewardClaim,
         IReward<Pair<Item, int>>
     {
@@ -41,7 +41,7 @@ namespace Soul.Controller.Runtime.Buildings.Managers
             throw new System.NotImplementedException();
         }
 
-        public float WeightLimit { get; }
+        public int WeightCapacity { get; set; }
         public bool CanClaim { get; }
 
         public void RewardClaim()

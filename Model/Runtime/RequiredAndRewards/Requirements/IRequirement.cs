@@ -1,4 +1,4 @@
-﻿namespace Soul.Model.Runtime.Requirements
+﻿namespace Soul.Model.Runtime.RequiredAndRewards.Requirements
 {
     public interface IRequirement
     {

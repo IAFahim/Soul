@@ -40,6 +40,12 @@ namespace Soul.Model.Runtime.Containers
             get => second;
             set => this.second = value;
         }
+        
+        public TV Multiplier
+        {
+            get => second;
+            set => this.second = value;
+        }
 
         public TV Second
         {

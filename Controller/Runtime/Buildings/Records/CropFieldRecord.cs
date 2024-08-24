@@ -1,5 +1,6 @@
 ﻿using System;
-using Soul.Controller.Runtime.Records;
+using Soul.Controller.Runtime.Productions;
+using Soul.Controller.Runtime.Upgrades;
 
 namespace Soul.Controller.Runtime.Buildings.Records
 {

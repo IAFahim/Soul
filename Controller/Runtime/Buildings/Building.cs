@@ -7,9 +7,9 @@ namespace Soul.Controller.Runtime.Buildings
 {
     public abstract class Building : GameComponent, IGuid, ITitle, ISelectCallBack
     {
-        #region GUID
-
         [SerializeField, Guid] protected string guid;
+
+        #region GUID
 
         public string Guid
         {

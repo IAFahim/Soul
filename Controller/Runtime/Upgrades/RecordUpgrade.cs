@@ -3,7 +3,7 @@ using Soul.Model.Runtime.Progressions;
 using Soul.Model.Runtime.Records;
 using UnityEngine;
 
-namespace Soul.Controller.Runtime.Records
+namespace Soul.Controller.Runtime.Upgrades
 {
     [Serializable]
     public class RecordUpgrade : ITimeBasedReference, IInProgression

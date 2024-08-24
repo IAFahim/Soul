@@ -1,4 +1,4 @@
-﻿using Soul.Model.Runtime.Requirements;
+﻿using Soul.Model.Runtime.RequiredAndRewards.Requirements;
 using UnityEngine;
 
 namespace Soul.Controller.Runtime.Requirements

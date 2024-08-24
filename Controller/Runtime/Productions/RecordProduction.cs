@@ -5,7 +5,7 @@ using Soul.Model.Runtime.Progressions;
 using Soul.Model.Runtime.Records;
 using UnityEngine;
 
-namespace Soul.Controller.Runtime.Records
+namespace Soul.Controller.Runtime.Productions
 {
     [Serializable]
     public class RecordProduction : ITimeBasedReference, IInProgression

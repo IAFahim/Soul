@@ -7,8 +7,30 @@ using UnityEngine;
 
 namespace Soul.Controller.Runtime.Buildings
 {
-    public abstract class UnlockUpgradeAbleBuilding : Building, IUpgrade, ILocked, IUnlock, ISaveAble, ISaveAbleReference
+    public abstract class UnlockUpgradeAbleBuilding : Building, ICurrentLevelReference<int>, ISaveAble,
+        ISaveAbleReference, IUpgrade, ILocked, IUnlock
     {
+        #region ICurrentLevelReference
+
+        public abstract int CurrentLevel { get; set; }
+
+        #endregion
+
+        #region ISaveAble
+
+        public abstract void Save(string key);
+
+        #endregion
+
+        #region ISaveAbleReference
+
+        public abstract void Save();
+
+        #endregion
+
+        public abstract void Load(string key);
+
+
         #region IUpgrade
 
         #region ILevel
@@ -37,18 +59,5 @@ namespace Soul.Controller.Runtime.Buildings
         public abstract void Unlock();
 
         #endregion
-
-        #region ISaveAble
-        
-        public abstract void Save(string key);
-
-        #endregion
-
-        #region ISaveAbleReference
-        public abstract void Save();
-
-        #endregion
-
-        public abstract void Load(string key);
     }
 }

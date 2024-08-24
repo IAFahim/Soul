@@ -5,7 +5,7 @@ using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.PopupIndicators;
-using Soul.Model.Runtime.Rewards;
+using Soul.Model.Runtime.RequiredAndRewards.Rewards;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Soul.Model.Runtime.Rewards
+﻿namespace Soul.Model.Runtime.RequiredAndRewards.Rewards
 {
     public interface IReward<out T>
     {
