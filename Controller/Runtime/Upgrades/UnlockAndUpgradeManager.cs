@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
@@ -6,27 +6,22 @@ using Pancake;
 using Pancake.Common;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Addressables;
+using Soul.Controller.Runtime.Constructions;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Requirements;
-using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Progressions;
 using Soul.Model.Runtime.SaveAndLoad;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
-using TrackTime;
 using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine.AddressableAssets;
 
 namespace Soul.Controller.Runtime.Upgrades
 {
-    public class UnlockAndUpgradeManager : ProgressionManager<RecordUpgrade> , ILoadComponent
+    public class UnlockAndUpgradeManager : ProgressionManager<RecordUpgrade>, ILoadComponent
     {
         public PlayerInventoryReference playerInventoryReference;
-
-        [FormerlySerializedAs("requirementScriptableObject")]
-        [FormerlySerializedAs("basicRequirementScriptableObject")]
-        [SerializeField]
-        private RequirementForUpgrades requirementForUpgrades;
+        [SerializeField] private RequirementForUpgrades requirementForUpgrades;
 
         public BoxCollider currentBoxCollider;
 
@@ -35,6 +30,16 @@ namespace Soul.Controller.Runtime.Upgrades
         [SerializeField] private Optional<PartsManager> upgradePartsManager;
 
         private ISaveAbleReference _saveAbleReference;
+
+
+        #region Enclosure
+
+        [SerializeField] private Optional<AssetReferenceGameObject> upgradeEnclosure;
+        private GameObject _enclosureGameObject;
+        private IConstruction _constructionEnclose;
+
+        #endregion
+
 
         public RequirementForUpgrade Required => requirementForUpgrades.GetRequirement(levelReference);
 
@@ -50,21 +55,21 @@ namespace Soul.Controller.Runtime.Upgrades
             playerInventoryReference = playerInventory;
             _saveAbleReference = saveAbleReference;
             unlockManager.Setup(addressablePoolLifetime);
-            
+
             if (levelReference == 0)
             {
                 await unlockManager.InstantiateLockedAsync();
             }
             else
             {
-                await ShowUnlocked(boxCollider);
+                await ShowUnlocked();
                 if (upgradePartsManager) upgradePartsManager.Value.Spawn(levelReference - 1, boxCollider);
             }
-            
+
             return canStart;
         }
 
-        private async Task ShowUnlocked(BoxCollider boxCollider)
+        private async Task ShowUnlocked()
         {
             var unLockedGameObject = await unlockManager.InstantiateUnLockedAsync();
             upgradePartsManager = unLockedGameObject.GetComponent<PartsManager>();
@@ -73,7 +78,10 @@ namespace Soul.Controller.Runtime.Upgrades
         [Button]
         public void Upgrade(int level)
         {
-            TryStartProgression();
+            if (TryStartProgression())
+            {
+                ShowEnclosure().Forget();
+            }
         }
 
         public override bool HasEnough()
@@ -94,12 +102,44 @@ namespace Soul.Controller.Runtime.Upgrades
         {
         }
 
+
         public override void OnComplete()
         {
             recordReference.InProgression = false;
+            EndConstruction().Forget();
             if (levelReference.IsLocked) OnCompleteUnlockingAsync().Forget();
             else OnCompleteUpgrading();
         }
+
+
+        #region Enclosure
+
+        private async UniTask ShowEnclosure()
+        {
+            if (upgradeEnclosure.Enabled)
+            {
+                await SpawnEnclosure();
+                await _constructionEnclose.StartConstruction();
+            }
+        }
+
+        private async UniTask SpawnEnclosure()
+        {
+            CancellationToken cancellationToken = default;
+            _enclosureGameObject = await upgradeEnclosure.Value.InstantiateAsync(parent)
+                .ToUniTask(cancellationToken: cancellationToken);
+            _constructionEnclose ??= _enclosureGameObject.GetComponent<IConstruction>();
+        }
+
+        private async UniTask EndConstruction()
+        {
+            if (upgradeEnclosure.Enabled)
+            {
+                if (_constructionEnclose != null) await _constructionEnclose.EndConstruction();
+            }
+        }
+
+        #endregion
 
         private void OnCompleteUpgrading()
         {
@@ -122,12 +162,15 @@ namespace Soul.Controller.Runtime.Upgrades
 
         public void Unlock()
         {
-            TryStartProgression();
+            if (TryStartProgression())
+            {
+                ShowEnclosure().Forget();
+            }
         }
 
         private async UniTask OnCompleteUnlockingAsync()
         {
-            await ShowUnlocked(currentBoxCollider);
+            await ShowUnlocked();
             levelReference.Current = 1;
             upgradePartsManager.Value.Spawn(levelReference - 1, currentBoxCollider);
             _saveAbleReference.Save();

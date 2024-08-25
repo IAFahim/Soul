@@ -11,7 +11,7 @@ namespace Soul.Controller.Runtime.Upgrades
     public class UnlockManager : GameComponent
     {
         [SerializeField] private AddressablePoolLifetime addressablePoolLifetime;
-        [SerializeField] private AssetReferenceGameObject lockedAssetReferenceGameObject;
+        [SerializeField] private Optional<AssetReferenceGameObject> lockedAssetReferenceGameObject;
         [SerializeField] private AssetReferenceGameObject unLockedAssetReferenceGameObject;
         [ShowInInspector] private Pair<AssetReferenceGameObject, GameObject> _instantiatedAssetPairReference;
 
@@ -23,9 +23,7 @@ namespace Soul.Controller.Runtime.Upgrades
         private async UniTask<GameObject> InstantiateAsync(AssetReferenceGameObject assetReferenceGameObject)
         {
             ReleaseInstance();
-            var instantiatedAsset = await addressablePoolLifetime.GetOrInstantiateAsync(
-                assetReferenceGameObject, transform.position, Quaternion.identity, Transform
-            );
+            var instantiatedAsset = await addressablePoolLifetime.GetOrInstantiateAsync(assetReferenceGameObject, Transform);
             _instantiatedAssetPairReference =
                 new Pair<AssetReferenceGameObject, GameObject>(assetReferenceGameObject, instantiatedAsset);
             return instantiatedAsset;
@@ -34,6 +32,7 @@ namespace Soul.Controller.Runtime.Upgrades
 
         public async UniTask<GameObject> InstantiateLockedAsync()
         {
+            if (!lockedAssetReferenceGameObject.Enabled) return null;
             return await InstantiateAsync(lockedAssetReferenceGameObject);
         }
 

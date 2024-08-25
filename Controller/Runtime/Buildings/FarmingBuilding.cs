@@ -8,14 +8,20 @@ using Soul.Model.Runtime.Buildings;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings
 {
-    public abstract class GameBuilding : UnlockUpgradeAbleBuilding, IInfoPanelReference,
+    
+    [RequireComponent(typeof(BoxCollider))]
+    public abstract class FarmingBuilding : UnlockUpgradeAbleBuilding, IInfoPanelReference,
         IUpgradeRecordReference<RecordUpgrade>
     {
         [SerializeField] protected PlayerInventoryReference playerInventoryReference;
-        [SerializeField] protected AddressablePoolLifetime addressablePoolLifetime;
+
+        [FormerlySerializedAs("addressablePoolLifetime")] [SerializeField]
+        protected AddressablePoolLifetime addressablePoolLifetimeReference;
+
         [SerializeField] protected LevelInfrastructureInfo levelInfrastructureInfo;
         [SerializeField] protected BoxCollider boxCollider;
         [SerializeField] protected UnlockAndUpgradeManager unlockAndUpgradeManager;
@@ -30,6 +36,15 @@ namespace Soul.Controller.Runtime.Buildings
         #endregion
 
 
+        public virtual async UniTask Setup(AddressablePoolLifetime addressablePoolLifetime,
+            PlayerInventoryReference playerInventory)
+        {
+            addressablePoolLifetimeReference = addressablePoolLifetime;
+            playerInventoryReference = playerInventory;
+            await SetUp(level);
+        }
+
+
         private async void Start()
         {
             if (_loadDataOnEnable) Load(Guid);
@@ -38,7 +53,7 @@ namespace Soul.Controller.Runtime.Buildings
 
         protected virtual async UniTask SetUp(Level currentLevel)
         {
-            await unlockAndUpgradeManager.Setup(addressablePoolLifetime, playerInventoryReference,
+            await unlockAndUpgradeManager.Setup(addressablePoolLifetimeReference, playerInventoryReference,
                 this, this, boxCollider, currentLevel);
         }
 
@@ -67,12 +82,12 @@ namespace Soul.Controller.Runtime.Buildings
         [Button]
         public override void Load(string key)
         {
-            level.currentAndMax = new Vector2Int(CurrentLevel, level.Max);
+            level.currentAndMax.Set(CurrentLevel, level.Max);
         }
 
         #region IUpgrade
 
-        public override bool CanUpgrade => !UpgradeRecord.InProgression && !level.IsMax && 
+        public override bool CanUpgrade => !UpgradeRecord.InProgression && !level.IsMax &&
                                            unlockAndUpgradeManager.HasEnough();
 
         public override bool IsUpgrading => UpgradeRecord.InProgression;

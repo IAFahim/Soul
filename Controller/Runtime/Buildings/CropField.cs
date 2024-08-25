@@ -2,7 +2,6 @@
 using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using Pancake.Common;
-using Soul.Controller.Runtime.Buildings.Records;
 using Soul.Controller.Runtime.Productions;
 using Soul.Controller.Runtime.Upgrades;
 using Soul.Model.Runtime.Containers;
@@ -12,13 +11,16 @@ using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Productions;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings
 {
-    public class CropField : GameBuilding, IProductionRecordReference<RecordProduction>, ILoadComponent,
+    public class CropField : FarmingBuilding, IProductionRecordReference<RecordProduction>, ILoadComponent,
         IAllowedToDropReference<Item>, IDropAble<Pair<Item, int>>
     {
-        [SerializeField] private CropFieldRecord cropFieldRecord;
+        [FormerlySerializedAs("cropFieldRecord")] [SerializeField]
+        private ProductionBuildingRecord productionBuildingRecord;
+
         [SerializeField] private CropProductionManager cropProductionManager;
         [SerializeField] private ScriptableList<Item> allowedThingsToDrop;
 
@@ -35,8 +37,8 @@ namespace Soul.Controller.Runtime.Buildings
 
         public override int CurrentLevel
         {
-            get => cropFieldRecord.level;
-            set => cropFieldRecord.level = value;
+            get => productionBuildingRecord.level;
+            set => productionBuildingRecord.level = value;
         }
 
         #endregion
@@ -45,8 +47,8 @@ namespace Soul.Controller.Runtime.Buildings
 
         public override RecordUpgrade UpgradeRecord
         {
-            get => cropFieldRecord.recordUpgrade;
-            set => cropFieldRecord.recordUpgrade = value;
+            get => productionBuildingRecord.recordUpgrade;
+            set => productionBuildingRecord.recordUpgrade = value;
         }
 
         #endregion
@@ -55,8 +57,8 @@ namespace Soul.Controller.Runtime.Buildings
 
         public RecordProduction ProductionRecord
         {
-            get => cropFieldRecord.recordProduction;
-            set => cropFieldRecord.recordProduction = value;
+            get => productionBuildingRecord.recordProduction;
+            set => productionBuildingRecord.recordProduction = value;
         }
 
         #endregion
@@ -80,7 +82,7 @@ namespace Soul.Controller.Runtime.Buildings
         public override void Save(string key)
         {
             base.Save(key);
-            Data.Save(key, cropFieldRecord);
+            Data.Save(key, productionBuildingRecord);
         }
 
         #endregion
@@ -95,10 +97,10 @@ namespace Soul.Controller.Runtime.Buildings
         [Button]
         public override void Load(string key)
         {
-            cropFieldRecord = Data.Load(key, cropFieldRecord);
+            productionBuildingRecord = Data.Load(key, productionBuildingRecord);
             base.Load(key);
         }
-        
+
 
         #region IAllowedToDropReference<Item>
 

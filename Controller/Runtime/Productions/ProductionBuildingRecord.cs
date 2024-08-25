@@ -1,11 +1,10 @@
 ﻿using System;
-using Soul.Controller.Runtime.Productions;
 using Soul.Controller.Runtime.Upgrades;
 
-namespace Soul.Controller.Runtime.Buildings.Records
+namespace Soul.Controller.Runtime.Productions
 {
     [Serializable]
-    public class CropFieldRecord
+    public class ProductionBuildingRecord
     {
         public int level;
         public RecordProduction recordProduction;
