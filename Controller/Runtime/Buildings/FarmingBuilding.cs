@@ -1,25 +1,25 @@
 ﻿using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
+using LitMotion;
 using Soul.Controller.Runtime.Addressables;
 using Soul.Controller.Runtime.InfoPanels;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Upgrades;
 using Soul.Model.Runtime.Buildings;
 using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.Selectors;
+using Soul.Model.Runtime.Tweens;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings
 {
     [RequireComponent(typeof(BoxCollider))]
-    public abstract class FarmingBuilding : UnlockUpgradeAbleBuilding, IInfoPanelReference,
+    public abstract class FarmingBuilding : UnlockUpgradeAbleBuilding, IReSelectedCallBack, IInfoPanelReference,
         IUpgradeRecordReference<RecordUpgrade>
     {
         [SerializeField] protected PlayerInventoryReference playerInventoryReference;
-
-        [FormerlySerializedAs("addressablePoolLifetime")] [SerializeField]
-        protected AddressablePoolLifetime addressablePoolLifetimeReference;
+        [SerializeField] protected AddressablePoolLifetime addressablePoolLifetimeReference;
 
         [SerializeField] protected LevelInfrastructureInfo levelInfrastructureInfo;
         [SerializeField] protected BoxCollider boxCollider;
@@ -118,6 +118,29 @@ namespace Soul.Controller.Runtime.Buildings
         #endregion
 
         public override string ToString() => Title;
+
+        #region Selected Animation
+
+        [SerializeField] protected TweenSettingsV3Ya selectTweenSettings;
+        protected MotionHandle SelectTweenMotionHandle;
+
+        protected void PlayDualSquishAndStretch()
+        {
+            if (SelectTweenMotionHandle.IsActive()) SelectTweenMotionHandle.Cancel();
+            SelectTweenMotionHandle = unlockAndUpgradeManager.Transform.DualSquishAndStretch(selectTweenSettings);
+        }
+
+        public override void OnSelected(RaycastHit selfRayCastHit)
+        {
+            PlayDualSquishAndStretch();
+        }
+
+        public virtual void OnReSelected(RaycastHit selfReRaycastHit)
+        {
+            PlayDualSquishAndStretch();
+        }
+
+        #endregion
 
         protected virtual void OnDrawGizmosSelected()
         {

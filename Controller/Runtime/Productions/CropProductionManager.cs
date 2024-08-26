@@ -107,9 +107,9 @@ namespace Soul.Controller.Runtime.Productions
         /// <summary>
         /// Temporarily adds items for preview purposes.
         /// </summary>
-        public void Add(Seed itemKeyValuePair)
+        public void Add(Seed seed)
         {
-            queueItem = itemKeyValuePair;
+            queueItem = seed;
             playerInventoryReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
         }
 

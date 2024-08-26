@@ -1,8 +1,7 @@
-﻿namespace Soul.Model.Runtime.Drops
+﻿namespace Soul.Model.Runtime.DragAndDrops
 {
     public interface IDropAble<in TDrop>
     {
-        public bool MultipleDropMode { get; }
         public bool CanDropNow { get; }
         public bool OnDragStart(TDrop drop);
         public bool OnDrag(TDrop drop);

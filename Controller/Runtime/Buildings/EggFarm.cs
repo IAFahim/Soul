@@ -8,31 +8,14 @@ using UnityEngine;
 
 namespace Soul.Controller.Runtime.Buildings
 {
-    public class EggFarm : FarmingBuilding , IReSelectedCallBack
+    public class EggFarm : FarmingBuilding
     {
         [SerializeField] private ProductionBuildingRecord productionBuildingRecord;
         public Vector3 startScale;
         public Vector3 endScale;
         public float duration;
         public AnimationCurve animationCurve;
-        private MotionHandle _motionHandle;
         public Transform models;
-
-        public override void OnSelected(RaycastHit selfRayCastHit)
-        {
-            PlayDualSquishAndStretch();
-        }
-
-        private void PlayDualSquishAndStretch()
-        {
-            if(_motionHandle.IsActive()) _motionHandle.Cancel();
-            _motionHandle = models.DualSquishAndStretch(startScale, endScale, duration, animationCurve);
-        }
-
-        public void OnReSelected(RaycastHit selfReRaycastHit)
-        {
-            PlayDualSquishAndStretch();
-        }
 
         public override int CurrentLevel
         {

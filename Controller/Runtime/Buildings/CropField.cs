@@ -7,7 +7,6 @@ using Soul.Controller.Runtime.Productions;
 using Soul.Controller.Runtime.Upgrades;
 using Soul.Model.Runtime.CustomList;
 using Soul.Model.Runtime.DragAndDrops;
-using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Productions;
@@ -16,7 +15,7 @@ using UnityEngine;
 namespace Soul.Controller.Runtime.Buildings
 {
     public class CropField : FarmingBuilding, IProductionRecordReference<RecordProduction>, ILoadComponent,
-        IAllowedToDropReference<Item>, IDropAble<Seed>
+        IAllowedToDropReference<Item>, IDropAble<Item>
     {
         [SerializeField] private ProductionBuildingRecord productionBuildingRecord;
 
@@ -60,8 +59,6 @@ namespace Soul.Controller.Runtime.Buildings
         }
 
         #endregion
-
-        public override void OnSelected(RaycastHit selfRayCastHit) => Debug.Log("Selected: " + this);
 
         private async void Start()
         {
@@ -108,46 +105,30 @@ namespace Soul.Controller.Runtime.Buildings
 
         #region IDropAble<Seed>
 
-        public bool MultipleDropMode => false;
         public bool CanDropNow => !IsLocked && !IsUpgrading;
-        
-        public bool OnDragStart(Seed drop)
+
+        public bool OnDragStart(Item drop)
         {
             Debug.Log($"OnDragStart: {drop}");
             return CanDropNow;
         }
 
-        public bool OnDrag(Seed drop)
+        public bool OnDrag(Item drop)
         {
             if (!CanDropNow) return false;
-            var hasEnough = ListOfAllowedToDrop.Contains(drop);
-            if (hasEnough)
-            {
-                cropProductionManager.Add(drop);
-            }
-
-            return hasEnough;
+            if (drop is Seed seed) cropProductionManager.Add(seed);
+            return ListOfAllowedToDrop.Contains(drop);
         }
 
-        public bool OnDrop(Seed dropPackage)
+        public bool OnDrop(Item dropPackage)
         {
-            if (OnDrag(dropPackage))
-            {
-                cropProductionManager.Add(dropPackage);
-                if (cropProductionManager.TryStartProgression())
-                {
-                    Save(Guid);
-                }
-
-                return true;
-            }
-
-            return false;
+            if (!OnDrag(dropPackage)) return false;
+            if (cropProductionManager.TryStartProgression()) Save(Guid);
+            return true;
         }
 
         public void OnDragCancel()
         {
-            
         }
 
         #endregion

@@ -1,5 +1,4 @@
-﻿using Soul.Model.Runtime.Drops;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Soul.Model.Runtime.DragAndDrops
@@ -28,6 +27,7 @@ namespace Soul.Model.Runtime.DragAndDrops
 
             if (_dropAble.CanDropNow)
             {
+                _dropAble.OnDrag(data);
                 CanDrop();
             }
             else

@@ -7,9 +7,9 @@ namespace Soul.Model.Runtime.Tweens
 {
     public static class PureTween
     {
-        public static MotionHandle PlayMoveWithRotate(this Transform transform, PositionRotation start,
-            PositionRotation end,
-            float duration, Ease ease)
+        public static MotionHandle PlayMoveWithRotate(this Transform transform,
+            PositionRotation start, PositionRotation end, float duration, Ease ease
+        )
         {
             LMotion.Create(start.rotation, end.rotation, duration)
                 .WithEase(ease)
@@ -19,13 +19,20 @@ namespace Soul.Model.Runtime.Tweens
                 .BindToPosition(transform);
         }
 
-        public static MotionHandle DualSquishAndStretch(this Transform transform, Vector3 start, Vector3 end,
-            float duration, AnimationCurve animationCurve)
+        public static MotionHandle DualSquishAndStretch(this Transform transform,
+            Vector3 start, Vector3 end, float duration, int loopCount, LoopType loopType, AnimationCurve animationCurve
+        )
         {
             return LMotion.Create(start, end, duration)
                 .WithEase(animationCurve)
-                .WithLoops(2, LoopType.Yoyo)
+                .WithLoops(loopCount, loopType)
                 .BindToLocalScale(transform);
+        }
+
+        public static MotionHandle DualSquishAndStretch(this Transform transform, TweenSettingsV3Ya settings)
+        {
+            return DualSquishAndStretch(transform, settings.start, settings.end, settings.duration,
+                settings.loopCount, settings.loopType, settings.animationCurve);
         }
     }
 }
