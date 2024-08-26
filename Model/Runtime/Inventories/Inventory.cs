@@ -20,7 +20,7 @@ namespace Soul.Model.Runtime.Inventories
         public event Action<InventoryChangeEventArgs<TKey, TValue>> OnItemChanged;
         public event Action OnInventoryCleared;
 
-        public bool TryGet(TKey key, out TValue amount) => items.TryGetValue(key, out amount);
+        public bool TryGetValue(TKey key, out TValue amount) => items.TryGetValue(key, out amount);
 
         [Button]
         public bool AddOrIncrease(TKey key, TValue addAmount)

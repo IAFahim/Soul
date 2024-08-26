@@ -12,7 +12,6 @@ using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings
 {
-    
     [RequireComponent(typeof(BoxCollider))]
     public abstract class FarmingBuilding : UnlockUpgradeAbleBuilding, IInfoPanelReference,
         IUpgradeRecordReference<RecordUpgrade>
@@ -74,12 +73,10 @@ namespace Soul.Controller.Runtime.Buildings
 
         #region ISaveAbleReference
 
-        [Button]
         public override void Save() => Save(Guid);
 
         #endregion
 
-        [Button]
         public override void Load(string key)
         {
             level.currentAndMax.Set(CurrentLevel, level.Max);

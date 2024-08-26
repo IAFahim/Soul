@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Soul.Model.Runtime.Drops
+namespace Soul.Model.Runtime.DragAndDrops
 {
     public interface IAllowedToDropReference<T>
     {

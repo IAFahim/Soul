@@ -2,24 +2,23 @@
 using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using Pancake.Common;
+using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.Productions;
 using Soul.Controller.Runtime.Upgrades;
-using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.CustomList;
+using Soul.Model.Runtime.DragAndDrops;
 using Soul.Model.Runtime.Drops;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Productions;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings
 {
     public class CropField : FarmingBuilding, IProductionRecordReference<RecordProduction>, ILoadComponent,
-        IAllowedToDropReference<Item>, IDropAble<Pair<Item, int>>
+        IAllowedToDropReference<Item>, IDropAble<Seed>
     {
-        [FormerlySerializedAs("cropFieldRecord")] [SerializeField]
-        private ProductionBuildingRecord productionBuildingRecord;
+        [SerializeField] private ProductionBuildingRecord productionBuildingRecord;
 
         [SerializeField] private CropProductionManager cropProductionManager;
         [SerializeField] private ScriptableList<Item> allowedThingsToDrop;
@@ -31,7 +30,6 @@ namespace Soul.Controller.Runtime.Buildings
         public override string Title => levelInfrastructureInfo.Title;
 
         #endregion
-
 
         #region ICurrentLevelReference
 
@@ -108,27 +106,34 @@ namespace Soul.Controller.Runtime.Buildings
 
         #endregion
 
-        #region IDropAble<Pair<Item, int>>
+        #region IDropAble<Seed>
 
         public bool MultipleDropMode => false;
         public bool CanDropNow => !IsLocked && !IsUpgrading;
+        
+        public bool OnDragStart(Seed drop)
+        {
+            Debug.Log($"OnDragStart: {drop}");
+            return CanDropNow;
+        }
 
-        public bool DropHovering(Pair<Item, int> thingToDrop)
+        public bool OnDrag(Seed drop)
         {
             if (!CanDropNow) return false;
-            var hasEnough = ListOfAllowedToDrop.Contains(thingToDrop.Key);
+            var hasEnough = ListOfAllowedToDrop.Contains(drop);
             if (hasEnough)
             {
-                cropProductionManager.TempAdd(thingToDrop);
+                cropProductionManager.Add(drop);
             }
 
             return hasEnough;
         }
 
-        public bool TryDrop(Pair<Item, int> dropPackage)
+        public bool OnDrop(Seed dropPackage)
         {
-            if (DropHovering(dropPackage))
+            if (OnDrag(dropPackage))
             {
+                cropProductionManager.Add(dropPackage);
                 if (cropProductionManager.TryStartProgression())
                 {
                     Save(Guid);
@@ -138,6 +143,11 @@ namespace Soul.Controller.Runtime.Buildings
             }
 
             return false;
+        }
+
+        public void OnDragCancel()
+        {
+            
         }
 
         #endregion

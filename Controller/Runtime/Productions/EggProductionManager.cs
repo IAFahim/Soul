@@ -1,5 +1,4 @@
 ﻿using QuickEye.Utility;
-using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
@@ -10,7 +9,7 @@ using Soul.Model.Runtime.SaveAndLoad;
 
 namespace Soul.Controller.Runtime.Productions
 {
-    public class EggProductionManager : ProgressionManager<RecordProduction>, ISingleDrop, IWeightCapacityReference,
+    public class EggProductionManager : ProgressionManager<RecordProduction>, IWeightCapacityReference,
         IRewardClaim,
         IReward<Pair<Item, int>>
     {

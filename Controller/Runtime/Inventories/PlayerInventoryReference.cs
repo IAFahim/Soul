@@ -14,7 +14,6 @@ namespace Soul.Controller.Runtime.Inventories
         public ReactivePair<Item, int> gems;
         public ReactivePair<Item, int> gemsPreview;
         public ItemInventory inventory;
-        public ItemInventory inventoryPreview;
 
         public WorkerInventory workerInventory;
         public WorkerInventory workerInventoryPreview;

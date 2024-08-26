@@ -52,7 +52,6 @@ namespace Soul.Presenter.Runtime.UI
             playerInventoryReference.weight.OnChange += WeightOnOnChange;
             // playerInventoryReference.inventoryPreview.OnAddedOrIncreased += OnTempAddedOrIncreased;
             // playerInventoryReference.inventory.OnDecreased += OnDecreased;
-            playerInventoryReference.inventoryPreview.OnInventoryCleared += OnAllTempItemClear;
             SetAllAlpha(0);
         }
 
@@ -83,7 +82,6 @@ namespace Soul.Presenter.Runtime.UI
             // playerInventoryReference.inventory.OnAddedOrIncreased -= OnAddedOrIncreased;
             // playerInventoryReference.inventoryPreview.OnAddedOrIncreased -= OnTempAddedOrIncreased;
             // playerInventoryReference.inventory.OnDecreased -= OnDecreased;
-            playerInventoryReference.inventoryPreview.OnInventoryCleared -= OnAllTempItemClear;
         }
 
         private void Start()
@@ -138,11 +136,7 @@ namespace Soul.Presenter.Runtime.UI
                 weightGoingToBeModifiedCanvasGroup.alpha = 1;
             }
         }
-
-        private void OnAllTempItemClear()
-        {
-            SetAllAlpha(0);
-        }
+        
 
 
         private void SetAllAlpha(float alpha)

@@ -2,7 +2,6 @@
 using Pancake.Pools;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Converters;
-using Soul.Controller.Runtime.DragAndDrop;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.MeshPlanters;
@@ -20,10 +19,11 @@ using Soul.Model.Runtime.Progressions;
 using Soul.Model.Runtime.RequiredAndRewards.Rewards;
 using Soul.Model.Runtime.SaveAndLoad;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Productions
 {
-    public class CropProductionManager : ProgressionManager<RecordProduction>, ISingleDrop, IWeightCapacityReference,
+    public class CropProductionManager : ProgressionManager<RecordProduction>, IWeightCapacityReference,
         IRewardClaim,
         IReward<Pair<Item, int>>
     {
@@ -32,7 +32,9 @@ namespace Soul.Controller.Runtime.Productions
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
 
-        [SerializeField] private Pair<Item, int> queueItemValuePair;
+        [FormerlySerializedAs("queueItemValuePair")] [SerializeField]
+        private Seed queueItem;
+
         [SerializeField] private bool isClaimable;
 
         [SerializeField] private PopupIndicatorIconCount popupIndicator;
@@ -46,7 +48,8 @@ namespace Soul.Controller.Runtime.Productions
             get
             {
                 var itemKeyValuePair = recordReference.productionItemValuePair;
-                if (!itemKeyValuePair.Key) return queueItemValuePair;
+                if (!itemKeyValuePair.Key)
+                    return new Pair<Item, int>(queueItem, recordReference.productionItemValuePair.Value);
                 return itemKeyValuePair;
             }
             set => recordReference.productionItemValuePair = value;
@@ -104,10 +107,9 @@ namespace Soul.Controller.Runtime.Productions
         /// <summary>
         /// Temporarily adds items for preview purposes.
         /// </summary>
-        public void TempAdd(Pair<Item, int> itemKeyValuePair)
+        public void Add(Seed itemKeyValuePair)
         {
-            queueItemValuePair = itemKeyValuePair;
-            playerInventoryReference.inventoryPreview.AddOrIncrease(queueItemValuePair, (int)WeightCapacity);
+            queueItem = itemKeyValuePair;
             playerInventoryReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
         }
 
@@ -117,7 +119,8 @@ namespace Soul.Controller.Runtime.Productions
             return !isClaimable && base.TryStartProgression();
         }
 
-        public override bool HasEnough() => playerInventoryReference.inventory.HasEnough(ProductionItem, WeightCapacity);
+        public override bool HasEnough() =>
+            playerInventoryReference.inventory.HasEnough(ProductionItem, WeightCapacity);
 
 
         /// <summary>
@@ -147,7 +150,7 @@ namespace Soul.Controller.Runtime.Productions
             var requiredWorker = Required.workerCount;
             recordReference.worker.typeAndCount = new Pair<WorkerType, int>(basicWorkerType, requiredWorker);
             playerInventoryReference.workerInventory.TryDecrease(basicWorkerType, requiredWorker);
-            recordReference.productionItemValuePair = ProductionItem;
+            ProductionItem = new Pair<Item, int>(queueItem, WeightCapacity);
             recordReference.Time.Discount = new UnityTimeSpan();
             base.ModifyRecordBeforeProgression();
         }

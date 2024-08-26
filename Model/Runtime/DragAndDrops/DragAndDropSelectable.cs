@@ -7,11 +7,14 @@ using Pancake.MobileInput;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Soul.Controller.Runtime.DragAndDrop
+namespace Soul.Model.Runtime.DragAndDrops
 {
-    public abstract class DragAndDropContainer : GameComponent, IDragHandler, IBeginDragHandler, IEndDragHandler
+    public abstract class DragAndDropSelectable : GameComponent, IDragHandler, IBeginDragHandler, IEndDragHandler
     {
         [SerializeField] private float moveSpeedLimit = 50;
+        [SerializeField] private float goingBackToOffsetDuration = .3f;
+        [SerializeField] private LayerMask raycastLayerMask = Physics.DefaultRaycastLayers; // Added layer mask field
+
         [DisableInEditMode] public bool isDragging;
         public Transform cardTransform;
         private Camera _mainCamera;
@@ -21,29 +24,37 @@ namespace Soul.Controller.Runtime.DragAndDrop
 
         private Vector3 FingerPos => TouchWrapper.Touch0.Position;
 
-        protected abstract void OnDragRayCast(bool isHit, RaycastHit rayCast);
-        protected abstract void OnDragRayCastEnd(bool isHit, RaycastHit rayCast);
-        
+        protected abstract void OnDragStart(PointerEventData eventData, bool isHit, RaycastHit rayCast);
+        protected abstract void OnDrag(PointerEventData eventData, bool isHit, RaycastHit rayCast);
+        protected abstract void OnEndDrag(PointerEventData eventData, bool isHit, RaycastHit rayCast);
+
         private void OnEnable()
         {
-            _mainCamera = Camera.main;
+            _mainCamera ??= Camera.main;
+        }
+
+        protected void Setup(Camera mainCamera)
+        {
+            _mainCamera = mainCamera;
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            OnDragRayCast(CastRayFinger0PosWorld(out var rayCastHit), rayCastHit);
+            OnDrag(eventData, CastRayFinger0PosWorld(out var rayCastHit), rayCastHit);
         }
 
         public void OnBeginDrag(PointerEventData eventData)
         {
             isDragging = true;
+            OnDragStart(eventData, CastRayFinger0PosWorld(out var rayCastHit), rayCastHit);
         }
+
 
         public void OnEndDrag(PointerEventData eventData)
         {
             isDragging = false;
-            OnDragRayCastEnd(CastRayFinger0PosWorld(out var rayCastHit, true), rayCastHit);
-            LMotion.Create(cardTransform.localPosition, offset, .3f).BindToLocalPosition(cardTransform);
+            OnEndDrag(eventData, CastRayFinger0PosWorld(out var rayCastHit, true), rayCastHit);
+            LMotion.Create(cardTransform.localPosition, offset, goingBackToOffsetDuration).BindToLocalPosition(cardTransform);
         }
 
         private void Update()
@@ -65,7 +76,7 @@ namespace Soul.Controller.Runtime.DragAndDrop
         private bool CastRayFinger0PosWorld(out RaycastHit raycastHit, bool useLasPosition = false)
         {
             Ray ray = useLasPosition ? ScreenPointToRay(_lastFingerPos) : ScreenPointToRay(_lastFingerPos = FingerPos);
-            return Physics.Raycast(ray, out raycastHit);
+            return Physics.Raycast(ray, out raycastHit, Mathf.Infinity, raycastLayerMask); // Use layer mask
         }
 
         private Ray ScreenPointToRay(Vector3 fingerPos)
