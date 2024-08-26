@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
+using LitMotion;
 using Pancake.Common;
 using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.Productions;
@@ -10,6 +11,7 @@ using Soul.Model.Runtime.DragAndDrops;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Productions;
+using Soul.Model.Runtime.Tweens;
 using UnityEngine;
 
 namespace Soul.Controller.Runtime.Buildings
@@ -21,7 +23,8 @@ namespace Soul.Controller.Runtime.Buildings
 
         [SerializeField] private CropProductionManager cropProductionManager;
         [SerializeField] private ScriptableList<Item> allowedThingsToDrop;
-
+        [SerializeField] private TweenSettingsV3Ya dropTweenSettingsV3Ya;
+        private MotionHandle _dropMotionHandle;
         private readonly bool _loadDataOnEnable = true;
 
         #region Title
@@ -107,13 +110,14 @@ namespace Soul.Controller.Runtime.Buildings
 
         public bool CanDropNow => !IsLocked && !IsUpgrading;
 
-        public bool OnDragStart(Item drop)
+        public bool OnDrag(Item drop)
         {
-            Debug.Log($"OnDragStart: {drop}");
-            return CanDropNow;
+            if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
+            _dropMotionHandle = unlockAndUpgradeManager.transform.TweenSquishAndStretch(dropTweenSettingsV3Ya);
+            return TryDropAdd(drop);
         }
 
-        public bool OnDrag(Item drop)
+        private bool TryDropAdd(Item drop)
         {
             if (!CanDropNow) return false;
             if (drop is Seed seed) cropProductionManager.Add(seed);
@@ -122,13 +126,17 @@ namespace Soul.Controller.Runtime.Buildings
 
         public bool OnDrop(Item dropPackage)
         {
-            if (!OnDrag(dropPackage)) return false;
+            if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
+            unlockAndUpgradeManager.transform.localScale = dropTweenSettingsV3Ya.start;
+            if (!TryDropAdd(dropPackage)) return false;
             if (cropProductionManager.TryStartProgression()) Save(Guid);
             return true;
         }
 
         public void OnDragCancel()
         {
+            if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
+            unlockAndUpgradeManager.transform.localScale = dropTweenSettingsV3Ya.start;
         }
 
         #endregion

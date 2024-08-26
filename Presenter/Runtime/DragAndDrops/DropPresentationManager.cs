@@ -21,7 +21,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         [FormerlySerializedAs("dragAndDropSeedPrefab")]
         public GameObject dragAndDropPrefab;
 
-        private Dictionary<Item, DragAndDropItem> _instantiateItemAndContainers;
+        private Dictionary<Item, DragAndDropItem> _instantiateItemAndContainers = new();
 
 
         private void OnEnable()
@@ -66,15 +66,14 @@ namespace Soul.Presenter.Runtime.DragAndDrops
 
         private Dictionary<Item, DragAndDropItem> SetupItemContainer(List<(GameObject, Item, int)> gameObjectWithCount)
         {
-            Dictionary<Item, DragAndDropItem> dragAndDropItems = new();
             foreach (var (instance, item, count) in gameObjectWithCount)
             {
                 var dragAndDrop = instance.GetComponent<DragAndDropItem>();
                 dragAndDrop.Setup(mainCamera, item, count, GetInventoryItemLimit(item));
-                dragAndDropItems.Add(item, dragAndDrop);
+                _instantiateItemAndContainers.Add(item, dragAndDrop);
             }
 
-            return dragAndDropItems;
+            return _instantiateItemAndContainers;
         }
 
         private int GetInventoryItemLimit(Item item) => playerInventoryReference.inventory.GetLimitValueOrDefault(item);

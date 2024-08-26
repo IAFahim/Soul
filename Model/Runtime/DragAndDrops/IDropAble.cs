@@ -3,7 +3,6 @@
     public interface IDropAble<in TDrop>
     {
         public bool CanDropNow { get; }
-        public bool OnDragStart(TDrop drop);
         public bool OnDrag(TDrop drop);
         public bool OnDrop(TDrop dropPackage);
         

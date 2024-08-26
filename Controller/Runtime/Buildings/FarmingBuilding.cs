@@ -127,7 +127,7 @@ namespace Soul.Controller.Runtime.Buildings
         protected void PlayDualSquishAndStretch()
         {
             if (SelectTweenMotionHandle.IsActive()) SelectTweenMotionHandle.Cancel();
-            SelectTweenMotionHandle = unlockAndUpgradeManager.Transform.DualSquishAndStretch(selectTweenSettings);
+            SelectTweenMotionHandle = unlockAndUpgradeManager.Transform.TweenSquishAndStretch(selectTweenSettings);
         }
 
         public override void OnSelected(RaycastHit selfRayCastHit)

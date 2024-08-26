@@ -19,7 +19,7 @@ namespace Soul.Model.Runtime.Tweens
                 .BindToPosition(transform);
         }
 
-        public static MotionHandle DualSquishAndStretch(this Transform transform,
+        public static MotionHandle TweenSquishAndStretch(this Transform transform,
             Vector3 start, Vector3 end, float duration, int loopCount, LoopType loopType, AnimationCurve animationCurve
         )
         {
@@ -29,9 +29,9 @@ namespace Soul.Model.Runtime.Tweens
                 .BindToLocalScale(transform);
         }
 
-        public static MotionHandle DualSquishAndStretch(this Transform transform, TweenSettingsV3Ya settings)
+        public static MotionHandle TweenSquishAndStretch(this Transform transform, TweenSettingsV3Ya settings)
         {
-            return DualSquishAndStretch(transform, settings.start, settings.end, settings.duration,
+            return TweenSquishAndStretch(transform, settings.start, settings.end, settings.duration,
                 settings.loopCount, settings.loopType, settings.animationCurve);
         }
     }

@@ -30,21 +30,16 @@ namespace Soul.Model.Runtime.DragAndDrops
                 _dropAble.OnDrag(data);
                 CanDrop();
             }
-            else
-            {
-                DropBusy();
-            }
+            else DropBusy();
         }
 
         protected override void OnDragStart(PointerEventData eventData, bool isHit, RaycastHit rayCast)
         {
-            if (isHit)
-            {
-                InvokeDropCheck(rayCast.transform);
-            }
+            if (isHit) InvokeDropCheck(rayCast.transform);
             else
             {
                 NoDropAbleFound();
+                _lastTransform = null;
             }
         }
 
@@ -58,6 +53,8 @@ namespace Soul.Model.Runtime.DragAndDrops
             else if (_dropAble != null)
             {
                 _dropAble.OnDragCancel();
+                _lastTransform = null;
+                _dropAble = null;
                 NoDropAbleFound();
             }
         }
@@ -66,7 +63,6 @@ namespace Soul.Model.Runtime.DragAndDrops
         {
             if (isHit && _dropAble != null)
             {
-                InvokeDropCheck(rayCast.transform);
                 if (_dropAble.OnDrop(data))
                 {
                     OnSuccessfulDrop();
@@ -80,6 +76,7 @@ namespace Soul.Model.Runtime.DragAndDrops
             {
                 NoDropAbleFound();
             }
+            _dropAble = null;
         }
 
         // Abstract methods for handling drop scenarios (Consider using Unity Events instead)
