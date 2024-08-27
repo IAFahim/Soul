@@ -15,16 +15,18 @@ namespace Soul.Controller.Runtime.Upgrades
         [SerializeField] private Bounds bounds;
         [SerializeField] private List<Pair<GameObject, bool>> instantiatedParts;
 
+        private UpgradeParts GetUpgradeParts(int index) => upgradeParts[Mathf.Clamp(index, 0, upgradeParts.Length - 1)];
+        
         [Button]
         public void Spawn(int index)
         {
-            instantiatedParts = new(upgradeParts[index].SpawnParts(Transform));
+            instantiatedParts = new(GetUpgradeParts(index).SpawnParts(Transform));
         }
 
         [Button]
         public void Spawn(int index, BoxCollider boxCollider)
         {
-            var parts = upgradeParts[index];
+            var parts = GetUpgradeParts(index);
             bounds = parts.bounds;
             instantiatedParts = new(parts.SpawnParts(Transform));
             SetBounds(boxCollider);

@@ -3,8 +3,10 @@ using Pancake;
 using Pancake.Common;
 using QuickEye.Utility;
 using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.ParticleEffects;
 using Soul.Model.Runtime.SaveAndLoad;
 using TrackTime;
+using UnityEngine;
 
 namespace Soul.Model.Runtime.Progressions
 {
@@ -17,7 +19,6 @@ namespace Soul.Model.Runtime.Progressions
 
         protected ISaveAbleReference SaveAbleReference;
         protected DelayHandle DelayHandle;
-
 
         public UnityDateTime StartedAt => recordReference.Time.StartedAt;
         public UnityTimeSpan TimeDiscount => recordReference.Time.Discount;
@@ -72,21 +73,21 @@ namespace Soul.Model.Runtime.Progressions
         }
 
 
-        private void TimerStart(bool starsNow)
+        private void TimerStart(bool startsNow)
         {
-            OnTimerStart();
+            OnTimerStart(startsNow);
             if (IsComplete)
             {
                 OnComplete();
                 return;
             }
 
-            float delay = starsNow ? (float)DiscountedTime.TotalSeconds : (float)TimeRemaining.TotalSeconds;
+            float delay = startsNow ? (float)DiscountedTime.TotalSeconds : (float)TimeRemaining.TotalSeconds;
             DelayHandle = App.Delay(delay, OnComplete);
             Track.Start(name, delay);
         }
 
-        public abstract void OnTimerStart();
+        public abstract void OnTimerStart(bool startsNow);
 
         public abstract void OnComplete();
     }

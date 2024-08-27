@@ -27,7 +27,7 @@ namespace Soul.Controller.Runtime.Upgrades
 
         [SerializeField] private Transform parent;
         [SerializeField] private UnlockManager unlockManager;
-        [SerializeField] private Optional<PartsManager> upgradePartsManager;
+        [SerializeField] private PartsManager upgradePartsManager;
 
         private ISaveAbleReference _saveAbleReference;
 
@@ -63,7 +63,7 @@ namespace Soul.Controller.Runtime.Upgrades
             else
             {
                 await ShowUnlocked();
-                if (upgradePartsManager) upgradePartsManager.Value.Spawn(levelReference - 1, boxCollider);
+                if (upgradePartsManager) upgradePartsManager.Spawn(levelReference - 1, boxCollider);
             }
 
             return canStart;
@@ -98,7 +98,7 @@ namespace Soul.Controller.Runtime.Upgrades
             recordReference.toLevel = levelReference + 1;
         }
 
-        public override void OnTimerStart()
+        public override void OnTimerStart(bool startsNow)
         {
         }
 
@@ -144,8 +144,8 @@ namespace Soul.Controller.Runtime.Upgrades
         private void OnCompleteUpgrading()
         {
             levelReference.Current = recordReference.toLevel;
-            upgradePartsManager.Value.ClearInstantiatedParts();
-            upgradePartsManager.Value.Spawn(levelReference - 1, currentBoxCollider);
+            upgradePartsManager.ClearInstantiatedParts();
+            upgradePartsManager.Spawn(levelReference - 1, currentBoxCollider);
             _saveAbleReference.Save();
         }
 
@@ -172,7 +172,7 @@ namespace Soul.Controller.Runtime.Upgrades
         {
             await ShowUnlocked();
             levelReference.Current = 1;
-            upgradePartsManager.Value.Spawn(levelReference - 1, currentBoxCollider);
+            upgradePartsManager.Spawn(levelReference - 1, currentBoxCollider);
             _saveAbleReference.Save();
         }
 

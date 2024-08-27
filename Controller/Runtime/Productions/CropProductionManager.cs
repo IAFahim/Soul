@@ -1,4 +1,5 @@
 ﻿using Alchemy.Inspector;
+using Pancake;
 using Pancake.Pools;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Converters;
@@ -13,13 +14,13 @@ using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.ParticleEffects;
 using Soul.Model.Runtime.Peoples.Workers;
 using Soul.Model.Runtime.Productions;
 using Soul.Model.Runtime.Progressions;
 using Soul.Model.Runtime.RequiredAndRewards.Rewards;
 using Soul.Model.Runtime.SaveAndLoad;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Productions
 {
@@ -32,14 +33,12 @@ namespace Soul.Controller.Runtime.Productions
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
 
-        [FormerlySerializedAs("queueItemValuePair")] [SerializeField]
-        private Seed queueItem;
-
+        [SerializeField] private Seed queueItem;
         [SerializeField] private bool isClaimable;
+        public MeshPlantPointGridSystem meshPlantPointGridSystem;
 
         [SerializeField] private PopupIndicatorIconCount popupIndicator;
-
-        public MeshPlantPointGridSystem meshPlantPointGridSystem;
+        [SerializeField] protected Optional<AddressableParticleEffect> particleEffect;
 
 
         // Properties
@@ -156,11 +155,13 @@ namespace Soul.Controller.Runtime.Productions
         }
 
 
-        public override void OnTimerStart()
+        public override void OnTimerStart(bool startsNow)
         {
+            if (particleEffect) particleEffect.Value.Load(true, Transform).Forget();
             IPlantStageMesh plantStageMesh = PlantStageMesh;
             meshPlantPointGridSystem.Plant(levelReference, plantStageMesh.StageMeshes[0], plantStageMesh.Size);
         }
+
 
         /// <summary>
         /// Called when the production timer completes.
@@ -172,6 +173,7 @@ namespace Soul.Controller.Runtime.Productions
                 popupIndicator.gameObject.Request(Transform).GetComponent<PopupIndicatorIconCount>();
             instantiatedRewardPopup.Setup(this, this, true);
             meshPlantPointGridSystem.ChangeMesh(PlantStageMesh.StageMeshes[^1]);
+            if(particleEffect) particleEffect.Value.Play();
         }
 
         /// <summary>

@@ -29,9 +29,9 @@ namespace Soul.Controller.Runtime.Productions
             throw new System.NotImplementedException();
         }
 
-        public override void OnTimerStart()
+        public override void OnTimerStart(bool startsNow)
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public override void OnComplete()
