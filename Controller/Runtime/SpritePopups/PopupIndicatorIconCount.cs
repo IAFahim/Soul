@@ -1,11 +1,11 @@
 ﻿using LitMotion;
 using Pancake.Common;
-using Soul.Controller.Runtime.Tweens;
 using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.PopupIndicators;
 using Soul.Model.Runtime.RequiredAndRewards.Rewards;
+using Soul.Model.Runtime.Tweens;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -46,7 +46,7 @@ namespace Soul.Controller.Runtime.SpritePopups
         protected virtual void StartTween()
         {
             if (_jumpOutMotionHandle.IsActive()) _jumpOutMotionHandle.Cancel();
-            _jumpOutMotionHandle = Tween.JumpOut(transform, jumpOutHeight, jumpOutDuration, jumpEase);
+            _jumpOutMotionHandle = PureTween.TweenHeight(transform, jumpOutHeight, jumpOutDuration, jumpEase);
         }
 
         public override void OnSelected(RaycastHit selfRayCastHit)

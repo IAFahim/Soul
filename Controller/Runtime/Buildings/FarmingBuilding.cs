@@ -120,14 +120,14 @@ namespace Soul.Controller.Runtime.Buildings
         public override string ToString() => Title;
 
         #region Selected Animation
-
-        [SerializeField] protected TweenSettingsV3Ya selectTweenSettings;
+        
+        [SerializeField] protected TweenSettingCurveSO<Vector3> selectTweenSetting;
         protected MotionHandle SelectTweenMotionHandle;
 
         protected void PlayDualSquishAndStretch()
         {
             if (SelectTweenMotionHandle.IsActive()) SelectTweenMotionHandle.Cancel();
-            SelectTweenMotionHandle = unlockAndUpgradeManager.Transform.TweenSquishAndStretch(selectTweenSettings);
+            SelectTweenMotionHandle = unlockAndUpgradeManager.Transform.TweenPlayer(selectTweenSetting);
         }
 
         public override void OnSelected(RaycastHit selfRayCastHit)

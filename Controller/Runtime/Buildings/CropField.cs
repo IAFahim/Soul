@@ -23,7 +23,7 @@ namespace Soul.Controller.Runtime.Buildings
 
         [SerializeField] private CropProductionManager cropProductionManager;
         [SerializeField] private ScriptableList<Item> allowedThingsToDrop;
-        [SerializeField] private TweenSettingsV3Ya dropTweenSettingsV3Ya;
+        [SerializeField] private TweenSettingCurveSO<Vector3> dropTweenSettings;
         private MotionHandle _dropMotionHandle;
         private readonly bool _loadDataOnEnable = true;
 
@@ -113,7 +113,7 @@ namespace Soul.Controller.Runtime.Buildings
         public bool OnDrag(Item drop)
         {
             if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
-            _dropMotionHandle = unlockAndUpgradeManager.transform.TweenSquishAndStretch(dropTweenSettingsV3Ya);
+            _dropMotionHandle = unlockAndUpgradeManager.transform.TweenPlayer(dropTweenSettings);
             return TryDropAdd(drop);
         }
 
@@ -127,7 +127,7 @@ namespace Soul.Controller.Runtime.Buildings
         public bool OnDrop(Item dropPackage)
         {
             if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
-            unlockAndUpgradeManager.transform.localScale = dropTweenSettingsV3Ya.start;
+            unlockAndUpgradeManager.transform.localScale = dropTweenSettings.start;
             if (!TryDropAdd(dropPackage)) return false;
             if (cropProductionManager.TryStartProgression()) Save(Guid);
             return true;
@@ -136,7 +136,7 @@ namespace Soul.Controller.Runtime.Buildings
         public void OnDragCancel()
         {
             if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
-            unlockAndUpgradeManager.transform.localScale = dropTweenSettingsV3Ya.start;
+            unlockAndUpgradeManager.transform.localScale = dropTweenSettings.start;
         }
 
         #endregion
