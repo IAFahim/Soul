@@ -24,5 +24,6 @@ namespace Soul.Controller.Runtime.Inventories
 
         public static implicit operator WorkerInventory(PlayerInventoryReference reference) =>
             reference.workerInventory;
+        public Camera mainCameraReference;
     }
 }

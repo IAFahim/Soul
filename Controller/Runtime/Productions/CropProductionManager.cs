@@ -25,8 +25,7 @@ using UnityEngine;
 namespace Soul.Controller.Runtime.Productions
 {
     public class CropProductionManager : ProgressionManager<RecordProduction>, IWeightCapacityReference,
-        IRewardClaim,
-        IReward<Pair<Item, int>>
+        IRewardClaim, IReward<Pair<Item, int>>
     {
         [SerializeField] private PlayerInventoryReference playerInventoryReference;
         [SerializeField] private RequiredAndRewardForProductions requiredAndRewardForProductions;
@@ -169,11 +168,11 @@ namespace Soul.Controller.Runtime.Productions
         public override void OnComplete()
         {
             isClaimable = true;
-            var instantiatedRewardPopup =
+            var instantiatedRewardPopup = 
                 popupIndicator.gameObject.Request(Transform).GetComponent<PopupIndicatorIconCount>();
-            instantiatedRewardPopup.Setup(this, this, true);
+            instantiatedRewardPopup.Setup(playerInventoryReference.mainCameraReference.transform, this, this, true);
             meshPlantPointGridSystem.ChangeMesh(PlantStageMesh.StageMeshes[^1]);
-            if(particleEffect) particleEffect.Value.Play();
+            if (particleEffect) particleEffect.Value.Play();
         }
 
         /// <summary>
@@ -192,6 +191,7 @@ namespace Soul.Controller.Runtime.Productions
         {
             ModifyRecordAfterProgression();
             meshPlantPointGridSystem.Clear();
+            particleEffect.Value.Stop();
         }
 
         private void ModifyRecordAfterProgression()

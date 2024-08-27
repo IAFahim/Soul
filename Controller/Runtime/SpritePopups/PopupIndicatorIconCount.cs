@@ -28,8 +28,9 @@ namespace Soul.Controller.Runtime.SpritePopups
 
         public Pair<Item, int> Reward => _rewardReference.Reward;
 
-        public void Setup(IRewardClaim rewardClaim, IReward<Pair<Item, int>> reward, bool clickReturnToPool)
+        public void Setup(Transform mainCamera,IRewardClaim rewardClaim, IReward<Pair<Item, int>> reward, bool clickReturnToPool)
         {
+            transform.rotation = mainCamera.rotation;
             _rewardClaimReference = rewardClaim;
             _rewardReference = reward;
             onClickReturnToPool = clickReturnToPool;

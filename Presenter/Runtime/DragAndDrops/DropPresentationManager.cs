@@ -7,18 +7,14 @@ using Soul.Model.Runtime.DragAndDrops;
 using Soul.Model.Runtime.Inventories;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.DragAndDrops
 {
     public class DropPresentationManager : GameComponent
     {
-        [SerializeField] private Camera mainCamera;
         [SerializeField] public Transform containerTransform;
         [SerializeField] private CanvasGroup containerCanvasGroup;
         public PlayerInventoryReference playerInventoryReference;
-
-        [FormerlySerializedAs("dragAndDropSeedPrefab")]
         public GameObject dragAndDropPrefab;
 
         private Dictionary<Item, DragAndDropItem> _instantiateItemAndContainers = new();
@@ -27,7 +23,6 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         private void OnEnable()
         {
             containerCanvasGroup.alpha = 0;
-            mainCamera ??= Camera.main;
             playerInventoryReference.inventory.OnItemChanged += InventoryOnOnItemChanged;
         }
 
@@ -56,7 +51,6 @@ namespace Soul.Presenter.Runtime.DragAndDrops
                 if (gameObjectWithCount.Count > 0)
                 {
                     containerCanvasGroup.alpha = 1;
-
                     _instantiateItemAndContainers = SetupItemContainer(gameObjectWithCount);
                 }
                 else CantDrop();
@@ -69,7 +63,9 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             foreach (var (instance, item, count) in gameObjectWithCount)
             {
                 var dragAndDrop = instance.GetComponent<DragAndDropItem>();
-                dragAndDrop.Setup(mainCamera, item, count, GetInventoryItemLimit(item));
+                dragAndDrop.Setup(playerInventoryReference.mainCameraReference, item, count,
+                    GetInventoryItemLimit(item)
+                );
                 _instantiateItemAndContainers.Add(item, dragAndDrop);
             }
 
@@ -98,7 +94,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         private void CantDrop()
         {
             containerCanvasGroup.alpha = 0;
-            if(_instantiateItemAndContainers == null) return;
+            if (_instantiateItemAndContainers == null) return;
             foreach (var itemAndGameObject in _instantiateItemAndContainers)
             {
                 itemAndGameObject.Value.GameObject.Return();

@@ -13,6 +13,7 @@ namespace Soul.Presenter.Runtime.UI
     public class ProfileInventoryManager : GameComponent, ILoadComponent
     {
         public PlayerInventoryReference playerInventoryReference;
+        public Camera mainCameraReference;
 
         [Header("Coin")] public Currency coin;
         public TMPFormat coinText;
@@ -43,6 +44,8 @@ namespace Soul.Presenter.Runtime.UI
         private void Awake()
         {
             StoreFormat();
+            if (mainCameraReference == null) mainCameraReference = Camera.main;
+            playerInventoryReference.mainCameraReference = mainCameraReference;
         }
 
         public void OnEnable()
@@ -136,7 +139,6 @@ namespace Soul.Presenter.Runtime.UI
                 weightGoingToBeModifiedCanvasGroup.alpha = 1;
             }
         }
-        
 
 
         private void SetAllAlpha(float alpha)

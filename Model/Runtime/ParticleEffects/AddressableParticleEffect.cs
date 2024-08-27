@@ -6,7 +6,7 @@ using UnityEngine.AddressableAssets;
 namespace Soul.Model.Runtime.ParticleEffects
 {
     [Serializable]
-    public struct AddressableParticleEffect
+    public class AddressableParticleEffect
     {
         public bool active;
         public ParticleSystem particleSystem;

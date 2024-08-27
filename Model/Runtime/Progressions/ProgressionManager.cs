@@ -3,10 +3,8 @@ using Pancake;
 using Pancake.Common;
 using QuickEye.Utility;
 using Soul.Model.Runtime.Levels;
-using Soul.Model.Runtime.ParticleEffects;
 using Soul.Model.Runtime.SaveAndLoad;
 using TrackTime;
-using UnityEngine;
 
 namespace Soul.Model.Runtime.Progressions
 {
