@@ -41,6 +41,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
 
         public void OnSelect(Transform selectedTransform)
         {
+            ClearAll();
             if (selectedTransform.TryGetComponent<IAllowedToDropReference<Item>>(out var allowedToDropReference))
             {
                 var gameObjectWithCount = GetGameObjectForInventory(
@@ -94,6 +95,11 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         private void CantDrop()
         {
             containerCanvasGroup.alpha = 0;
+            ClearAll();
+        }
+
+        private void ClearAll()
+        {
             if (_instantiateItemAndContainers == null) return;
             foreach (var itemAndGameObject in _instantiateItemAndContainers)
             {

@@ -61,7 +61,7 @@ namespace Soul.Controller.Runtime.Upgrades
         private void OnDrawGizmosSelected()
         {
             if (bounds.size == Vector3.zero) return;
-            Gizmos.color = Color.green;
+            Gizmos.color = Color.yellow;
             Gizmos.DrawWireCube(transform.TransformPoint(bounds.center), bounds.size);
         }
     }
