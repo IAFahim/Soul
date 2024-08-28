@@ -1,5 +1,7 @@
-﻿using Alchemy.Inspector;
+﻿using System;
+using Alchemy.Inspector;
 using Pancake;
+using Pancake.Common;
 using Pancake.Pools;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Converters;
@@ -25,7 +27,7 @@ using UnityEngine;
 namespace Soul.Controller.Runtime.Productions
 {
     public class CropProductionManager : ProgressionManager<RecordProduction>, IWeightCapacityReference,
-        IRewardClaim, IReward<Pair<Item, int>>
+        IRewardClaim, IReward<Pair<Item, int>>, ILoadComponent
     {
         [SerializeField] private PlayerInventoryReference playerInventoryReference;
         [SerializeField] private RequiredAndRewardForProductions requiredAndRewardForProductions;
@@ -204,6 +206,16 @@ namespace Soul.Controller.Runtime.Productions
             recordReference.InProgression = false;
             ProductionItem = new Pair<Item, int>();
             SaveAbleReference.Save();
+        }
+
+        void ILoadComponent.OnLoadComponents()
+        {
+            Reset();
+        }
+
+        protected void Reset()
+        {
+            meshPlantPointGridSystem = GetComponent<MeshPlantPointGridSystem>();
         }
     }
 }

@@ -11,6 +11,11 @@ namespace Soul.Controller.Runtime.Grids
         [SerializeField] private WayPoints wayPoints;
         [SerializeField] private Vector3Int stepOffset = Vector3Int.one;
 
+        public WayPoints WayPoints
+        {
+            set => wayPoints = value;
+        }
+
         [SerializeField] private Vector3Int[] levelOffsets =
         {
             new(2, 2, 2),

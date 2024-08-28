@@ -1,5 +1,7 @@
 ﻿using System;
+using _Root.Scripts.NPC_Ai.Runtime.WayPointGizmoTool;
 using Pancake;
+using Pancake.Common;
 using Pancake.Pools;
 using Soul.Controller.Runtime.Grids;
 using UnityEngine;
@@ -7,7 +9,7 @@ using UnityEngine;
 namespace Soul.Controller.Runtime.MeshPlanters
 {
     [Serializable]
-    public class MeshPlantPointGridSystem : GameComponent
+    public class MeshPlantPointGridSystem : GameComponent, ILoadComponent
     {
         public GridWayPointLimiter gridWayPointLimiter;
         public GameObject plantHolderPrefab;
@@ -47,5 +49,14 @@ namespace Soul.Controller.Runtime.MeshPlanters
             gridWayPointLimiter.OnDrawGizmosSelected();
         }
 #endif
+        void ILoadComponent.OnLoadComponents()
+        {
+            Reset();
+        }
+
+        private void Reset()
+        {
+            gridWayPointLimiter.WayPoints = transform.GetComponent<WayPoints>();
+        }
     }
 }

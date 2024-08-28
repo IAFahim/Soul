@@ -12,7 +12,7 @@ namespace Soul.Controller.Runtime.Upgrades
     {
         [SerializeField] private AddressablePoolLifetime addressablePoolLifetime;
         [SerializeField] private Optional<AssetReferenceGameObject> lockedAssetReferenceGameObject;
-        [SerializeField] private AssetReferenceGameObject unLockedAssetReferenceGameObject;
+        [SerializeField] private AssetReferenceGameObject unLockedPartsAssetReference;
         [ShowInInspector] private Pair<AssetReferenceGameObject, GameObject> _instantiatedAssetPairReference;
 
         public void Setup(AddressablePoolLifetime poolLifetime)
@@ -39,7 +39,7 @@ namespace Soul.Controller.Runtime.Upgrades
 
         public async UniTask<GameObject> InstantiateUnLockedAsync()
         {
-            return await InstantiateAsync(unLockedAssetReferenceGameObject);
+            return await InstantiateAsync(unLockedPartsAssetReference);
         }
 
         [Button]

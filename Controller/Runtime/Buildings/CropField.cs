@@ -145,7 +145,7 @@ namespace Soul.Controller.Runtime.Buildings
         private void Reset()
         {
             unlockAndUpgradeManager = GetComponentInChildren<UnlockAndUpgradeManager>();
-            cropProductionManager = GetComponentInChildren<CropProductionManager>();
+            cropProductionManager = GetComponent<CropProductionManager>();
             boxCollider = GetComponentInChildren<BoxCollider>();
         }
 
