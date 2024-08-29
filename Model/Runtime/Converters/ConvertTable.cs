@@ -9,9 +9,8 @@ namespace Soul.Model.Runtime.Converters
     {
         [SerializeField] protected UnityDictionary<TInput, TOutput> conversionDictionary;
 
-        public bool TryConvert(TInput input, out TOutput output)
-        {
-            return conversionDictionary.TryGetValue(input, out output);
-        }
+        public TOutput Convert(TInput input) => conversionDictionary[input];
+
+        public bool TryConvert(TInput input, out TOutput output) => conversionDictionary.TryGetValue(input, out output);
     }
 }

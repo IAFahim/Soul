@@ -6,6 +6,7 @@ using Soul.Model.Runtime.Inventories;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Limits;
+using Soul.Model.Runtime.Peoples.Workers;
 using UnityEngine;
 
 namespace Soul.Presenter.Runtime.UI
@@ -51,11 +52,17 @@ namespace Soul.Presenter.Runtime.UI
         public void OnEnable()
         {
             CalculateTotalWeightInInventoryAndShow();
-            playerInventoryReference.inventory.OnItemChanged += InventoryOnOnItemChanged;
+            playerInventoryReference.inventory.OnItemChanged += InventoryOnItemChanged;
+            playerInventoryReference.workerInventory.OnItemChanged += WorkerInventoryOnOnItemChanged;
             playerInventoryReference.weight.OnChange += WeightOnOnChange;
             // playerInventoryReference.inventoryPreview.OnAddedOrIncreased += OnTempAddedOrIncreased;
             // playerInventoryReference.inventory.OnDecreased += OnDecreased;
             SetAllAlpha(0);
+        }
+
+        private void WorkerInventoryOnOnItemChanged(InventoryChangeEventArgs<WorkerType, int> workerType)
+        {
+            workerText.SetTextInt(workerType.NewAmount);
         }
 
         private void WeightOnOnChange(LimitIntStruct old, LimitIntStruct newValue)
@@ -64,7 +71,7 @@ namespace Soul.Presenter.Runtime.UI
             weightText.SetTextInt(newValue);
         }
 
-        private void InventoryOnOnItemChanged(InventoryChangeEventArgs<Item, int> changeEventArgs)
+        private void InventoryOnItemChanged(InventoryChangeEventArgs<Item, int> changeEventArgs)
         {
             if (changeEventArgs.ChangeType == InventoryChangeType.Added ||
                 changeEventArgs.ChangeType == InventoryChangeType.Increased)
@@ -80,8 +87,9 @@ namespace Soul.Presenter.Runtime.UI
 
         public void OnDisable()
         {
-            playerInventoryReference.inventory.OnItemChanged -= InventoryOnOnItemChanged;
+            playerInventoryReference.inventory.OnItemChanged -= InventoryOnItemChanged;
             playerInventoryReference.weight.OnChange -= WeightOnOnChange;
+            playerInventoryReference.workerInventory.OnItemChanged -= WorkerInventoryOnOnItemChanged;
             // playerInventoryReference.inventory.OnAddedOrIncreased -= OnAddedOrIncreased;
             // playerInventoryReference.inventoryPreview.OnAddedOrIncreased -= OnTempAddedOrIncreased;
             // playerInventoryReference.inventory.OnDecreased -= OnDecreased;

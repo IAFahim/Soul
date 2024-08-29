@@ -8,6 +8,7 @@ namespace Soul.Controller.Runtime.Requirements
     public struct RequirementForProduction
     {
         public int workerCount;
+        public float timeMultiplier;
         public Pair<Currency, int> currency;
         public int weightCapacity;
         public Pair<Item, int>[] items;

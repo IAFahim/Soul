@@ -15,7 +15,12 @@ namespace Soul.Model.Runtime.Limits
             set => currentAndMax.x = value;
         }
         
-        public int Max => currentAndMax.y;
+        public int Max
+        {
+            get => currentAndMax.y;
+            set => currentAndMax.y = value;
+        }
+
         public bool IsMax => currentAndMax.x >= currentAndMax.y;
         public bool IsZero() => Current == 0;
         

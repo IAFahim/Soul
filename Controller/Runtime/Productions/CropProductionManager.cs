@@ -1,5 +1,4 @@
-﻿using System;
-using Alchemy.Inspector;
+﻿using Alchemy.Inspector;
 using Pancake;
 using Pancake.Common;
 using Pancake.Pools;
@@ -13,7 +12,6 @@ using Soul.Controller.Runtime.RequiresAndRewards;
 using Soul.Controller.Runtime.Rewards;
 using Soul.Controller.Runtime.SpritePopups;
 using Soul.Model.Runtime.Containers;
-using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.ParticleEffects;
@@ -29,28 +27,26 @@ namespace Soul.Controller.Runtime.Productions
     public class CropProductionManager : ProgressionManager<RecordProduction>, IWeightCapacityReference,
         IRewardClaim, IReward<Pair<Item, int>>, ILoadComponent
     {
+        // Serialized Fields
         [SerializeField] private PlayerInventoryReference playerInventoryReference;
         [SerializeField] private RequiredAndRewardForProductions requiredAndRewardForProductions;
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
-
         [SerializeField] private Seed queueItem;
         [SerializeField] private bool isClaimable;
-        public MeshPlantPointGridSystem meshPlantPointGridSystem;
-
+        [SerializeField] public MeshPlantPointGridSystem meshPlantPointGridSystem;
         [SerializeField] private PopupIndicatorIconCount popupIndicator;
         [SerializeField] protected Optional<AddressableParticleEffect> particleEffect;
 
-
         // Properties
-        public Pair<Item, int> ProductionItem
+        public Pair<Item, int> ProductionItemValuePair
         {
             get
             {
                 var itemKeyValuePair = recordReference.productionItemValuePair;
-                if (!itemKeyValuePair.Key)
-                    return new Pair<Item, int>(queueItem, recordReference.productionItemValuePair.Value);
-                return itemKeyValuePair;
+                return !itemKeyValuePair.Key
+                    ? new Pair<Item, int>(queueItem, recordReference.productionItemValuePair.Value)
+                    : itemKeyValuePair;
             }
             set => recordReference.productionItemValuePair = value;
         }
@@ -67,10 +63,10 @@ namespace Soul.Controller.Runtime.Productions
         public int WeightCapacity => Required.weightCapacity;
         public RewardForProduction RewardForProduction => requiredAndRewardForProductions.GetReward(levelReference - 1);
 
-        public int PlantCount =>
-            recordReference.productionItemValuePair.Value * ((IKgToCount)ProductionItem.Key).KgToPoint;
+        public int PlantCount => ProductionItemValuePair.Value * ((IKgToCount)ProductionItemValuePair.Key).KgToPoint;
 
-        public override UnityTimeSpan FullTimeRequirement => ((ITimeRequirement)ProductionItem.Key).RequiredTime;
+        public override UnityTimeSpan FullTimeRequirement =>
+            itemToItemConverter.Convert(ProductionItemValuePair.Key).RequiredTime * Required.timeMultiplier;
 
         public int CurrentCurrency => playerInventoryReference.coins.Value;
 
@@ -78,12 +74,12 @@ namespace Soul.Controller.Runtime.Productions
         {
             get
             {
-                if (itemToItemConverter.TryConvert(ProductionItem, out var convertedItem))
+                if (itemToItemConverter.TryConvert(ProductionItemValuePair, out var convertedItem))
                 {
-                    int productionAmount =
-                        (int)(convertedItem.Multiplier * recordReference.productionItemValuePair.Value
-                                                       * RewardForProduction.productionMultiplier);
-                    return new Pair<Item, int>(convertedItem.Key, productionAmount);
+                    int productionAmount = (int)(convertedItem.ratio * recordReference.productionItemValuePair.Value *
+                                                 RewardForProduction.productionMultiplier
+                        );
+                    return new Pair<Item, int>(convertedItem.data, productionAmount);
                 }
 
                 return new Pair<Item, int>();
@@ -92,9 +88,12 @@ namespace Soul.Controller.Runtime.Productions
 
         public IPlantStageMesh PlantStageMesh => Reward.Key as IPlantStageMesh;
 
+
         // Public Methods
 
-
+        /// <summary>
+        /// Initializes the CropProductionManager with the given parameters.
+        /// </summary>
         public bool Setup(PlayerInventoryReference inventoryReference,
             IProductionRecordReference<RecordProduction> recordProduction, Level level,
             ISaveAbleReference saveAbleReference)
@@ -102,7 +101,6 @@ namespace Soul.Controller.Runtime.Productions
             playerInventoryReference = inventoryReference;
             return Setup(recordProduction.ProductionRecord, level, saveAbleReference);
         }
-
 
         /// <summary>
         /// Temporarily adds items for preview purposes.
@@ -113,15 +111,19 @@ namespace Soul.Controller.Runtime.Productions
             playerInventoryReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
         }
 
-
+        /// <summary>
+        /// Tries to start the progression, overriding the base method to check the 'isClaimable' flag.
+        /// </summary>
         public override bool TryStartProgression()
         {
             return !isClaimable && base.TryStartProgression();
         }
 
+        /// <summary>
+        /// Checks if there are enough resources to start the progression.
+        /// </summary>
         public override bool HasEnough() =>
-            playerInventoryReference.inventory.HasEnough(ProductionItem, WeightCapacity);
-
+            playerInventoryReference.inventory.HasEnough(ProductionItemValuePair, WeightCapacity);
 
         /// <summary>
         /// Checks if the reward can be claimed.
@@ -129,7 +131,7 @@ namespace Soul.Controller.Runtime.Productions
         public bool CanClaim => isClaimable;
 
         /// <summary>
-        /// Claims the reward
+        /// Claims the reward if it can be claimed.
         /// </summary>
         [Button]
         public void RewardClaim()
@@ -143,19 +145,21 @@ namespace Soul.Controller.Runtime.Productions
         // Private Methods
 
         /// <summary>
-        /// Sets the production record data.
+        /// Modifies the record data before the progression starts.
         /// </summary>
         protected override void ModifyRecordBeforeProgression()
         {
             var requiredWorker = Required.workerCount;
             recordReference.worker.typeAndCount = new Pair<WorkerType, int>(basicWorkerType, requiredWorker);
             playerInventoryReference.workerInventory.TryDecrease(basicWorkerType, requiredWorker);
-            ProductionItem = new Pair<Item, int>(queueItem, WeightCapacity);
+            ProductionItemValuePair = new Pair<Item, int>(queueItem, WeightCapacity);
             recordReference.Time.Discount = new UnityTimeSpan();
             base.ModifyRecordBeforeProgression();
         }
 
-
+        /// <summary>
+        /// Called when the progression timer starts.
+        /// </summary>
         public override void OnTimerStart(bool startsNow)
         {
             if (particleEffect) particleEffect.Value.Load(true, Transform).Forget();
@@ -163,14 +167,13 @@ namespace Soul.Controller.Runtime.Productions
             meshPlantPointGridSystem.Plant(levelReference, plantStageMesh.StageMeshes[0], plantStageMesh.Size);
         }
 
-
         /// <summary>
-        /// Called when the production timer completes.
+        /// Called when the progression timer completes.
         /// </summary>
         public override void OnComplete()
         {
             isClaimable = true;
-            var instantiatedRewardPopup = 
+            var instantiatedRewardPopup =
                 popupIndicator.gameObject.Request(Transform).GetComponent<PopupIndicatorIconCount>();
             instantiatedRewardPopup.Setup(playerInventoryReference.mainCameraReference.transform, this, this, true);
             meshPlantPointGridSystem.ChangeMesh(PlantStageMesh.StageMeshes[^1]);
@@ -178,12 +181,12 @@ namespace Soul.Controller.Runtime.Productions
         }
 
         /// <summary>
-        /// Takes the required resources for production.
+        /// Takes the required resources for the progression.
         /// </summary>
         protected override void TakeRequirement()
         {
-            var seed = ProductionItem;
-            playerInventoryReference.inventory.TryDecrease(seed, ProductionItem.Value);
+            var seed = ProductionItemValuePair;
+            playerInventoryReference.inventory.TryDecrease(seed, ProductionItemValuePair.Value);
         }
 
         /// <summary>
@@ -196,6 +199,9 @@ namespace Soul.Controller.Runtime.Productions
             particleEffect.Value.Stop();
         }
 
+        /// <summary>
+        /// Modifies the record data after the progression completes.
+        /// </summary>
         private void ModifyRecordAfterProgression()
         {
             var singleReward = Reward;
@@ -204,15 +210,19 @@ namespace Soul.Controller.Runtime.Productions
             playerInventoryReference.inventory.AddOrIncrease(singleReward.Key, singleReward.Value);
             playerInventoryReference.coins.Set(CurrentCurrency + 10);
             recordReference.InProgression = false;
-            ProductionItem = new Pair<Item, int>();
+            ProductionItemValuePair = new Pair<Item, int>();
             SaveAbleReference.Save();
         }
 
+        // ILoadComponent implementation
         void ILoadComponent.OnLoadComponents()
         {
             Reset();
         }
 
+        /// <summary>
+        /// Resets the component, primarily used for initialization after loading.
+        /// </summary>
         protected void Reset()
         {
             meshPlantPointGridSystem = GetComponent<MeshPlantPointGridSystem>();

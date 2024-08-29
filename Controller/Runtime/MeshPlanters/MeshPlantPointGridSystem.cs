@@ -27,6 +27,7 @@ namespace Soul.Controller.Runtime.MeshPlanters
                 instances[i] = instance.GetComponent<MeshFilter>();
                 instances[i].mesh = mesh;
             }
+            Debug.Log("Planted");
         }
 
         public void ChangeMesh(Mesh mesh)
