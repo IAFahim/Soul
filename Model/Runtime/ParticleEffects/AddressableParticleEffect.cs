@@ -10,16 +10,14 @@ namespace Soul.Model.Runtime.ParticleEffects
 {
     [Serializable]
     public class AddressableParticleEffect
-    {
-        [FormerlySerializedAs("active")] [ShowInInspector]
+    { 
         private bool _isLoaded;
-
         private ParticleSystem particleSystem;
         [SerializeField] private AssetReferenceGameObject particleEffectAssetReference;
 
         public async UniTaskVoid Load(bool play, Transform transform)
         {
-            if (particleSystem)
+            if (_isLoaded)
             {
                 if (play) Play();
             }

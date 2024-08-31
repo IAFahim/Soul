@@ -2,7 +2,7 @@
 
 namespace Soul.Model.Runtime.Interfaces
 {
-    public interface ISize
+    public interface ISizeReference
     {
         Vector3 Size { get; }
     }

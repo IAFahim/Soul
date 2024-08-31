@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Soul.Controller.Runtime.Items
 {
-    public interface IPlantStageMesh: ISize
+    public interface IPlantStageMesh: ISizeReference
     {
         public Mesh[] StageMeshes { get; } 
     }

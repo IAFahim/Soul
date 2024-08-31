@@ -1,7 +1,7 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Pancake;
 using Pancake.Pools;
-using QuickEye.Utility;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Model.Runtime.Inventories;
 using Soul.Model.Runtime.Items;
@@ -10,15 +10,16 @@ using UnityEngine;
 
 namespace Soul.Presenter.Runtime.UI
 {
-    public class RewardNotifierManager : GameComponent, IRemoveSelfCallBack<Item>
+    public class RewardNotifierManager : GameComponent, IRemoveCallBack<Item>
     {
         public PlayerInventoryReference playerInventoryReference;
         public Transform spawnPoint;
         public RewardNotifier prefab;
-        public UnityDictionary<Item, RewardNotifier> instantiatedRewardNotifiers;
+        private Dictionary<Item, RewardNotifier> _instantiatedRewardNotifiers;
 
         private void OnEnable()
         {
+            _instantiatedRewardNotifiers = new Dictionary<Item, RewardNotifier>();
             playerInventoryReference.inventory.OnItemChanged += OnAddedOrIncreased;
         }
 
@@ -39,10 +40,10 @@ namespace Soul.Presenter.Runtime.UI
 
         private async UniTask OnAddedOrIncreasedAsync(Item item, int newAmount, int changeAmount, InventoryChangeType changeType)
         {
-            if (!instantiatedRewardNotifiers.TryGetValue(item, out var rewardNotifier))
+            if (!_instantiatedRewardNotifiers.TryGetValue(item, out var rewardNotifier))
             {
                 rewardNotifier = prefab.gameObject.Request<RewardNotifier>(spawnPoint);
-                instantiatedRewardNotifiers.Add(item, rewardNotifier);
+                _instantiatedRewardNotifiers.Add(item, rewardNotifier);
             }
 
             await UniTask.WaitForEndOfFrame(this);
@@ -52,12 +53,13 @@ namespace Soul.Presenter.Runtime.UI
 
         public void RemoveSelf(Item self)
         {
-            instantiatedRewardNotifiers.Remove(self);
+            _instantiatedRewardNotifiers.Remove(self);
         }
 
         private void OnDisable()
         {
             playerInventoryReference.inventory.OnItemChanged -= OnAddedOrIncreased;
+            _instantiatedRewardNotifiers.Clear();
         }
     }
 }

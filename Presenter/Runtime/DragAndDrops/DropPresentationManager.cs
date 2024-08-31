@@ -42,6 +42,12 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         public void OnSelect(Transform selectedTransform)
         {
             ClearAll();
+            if (!selectedTransform.TryGetComponent(out IDropAble<Item> dropAble) || !dropAble.CanDropNow)
+            {
+                CantDrop();
+                return;
+            }
+
             if (selectedTransform.TryGetComponent<IAllowedToDropReference<Item>>(out var allowedToDropReference))
             {
                 var gameObjectWithCount = GetGameObjectForInventory(

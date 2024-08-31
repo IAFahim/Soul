@@ -21,7 +21,7 @@ namespace Soul.Presenter.Runtime.UI
         [SerializeField] ProgressBar progressBar;
         [SerializeField, DisableInEditMode] Item itemReference;
 
-        private IRemoveSelfCallBack<Item> _removeSelfCallBack;
+        private IRemoveCallBack<Item> _removeCallBack;
 
         private void Awake()
         {
@@ -30,20 +30,20 @@ namespace Soul.Presenter.Runtime.UI
         }
 
         public void Setup(Item item, int newAmount, int added, LimitIntStruct limitInt,
-            IRemoveSelfCallBack<Item> removeSelfCallBack)
+            IRemoveCallBack<Item> removeCallBack)
         {
             totalText.TMP.SetText(totalText, newAmount);
             addedText.TMP.SetText("+" + addedText, added);
             icon.sprite = item.Icon;
             progressBar.Value = limitInt;
             itemReference = item;
-            _removeSelfCallBack = removeSelfCallBack;
+            _removeCallBack = removeCallBack;
             App.Delay(3f, OnComplete);
         }
 
         private void OnComplete()
         {
-            _removeSelfCallBack.RemoveSelf(itemReference);
+            _removeCallBack.RemoveSelf(itemReference);
             GameObject.Return();
         }
 

@@ -21,6 +21,7 @@ using Soul.Model.Runtime.Progressions;
 using Soul.Model.Runtime.RequiredAndRewards.Rewards;
 using Soul.Model.Runtime.SaveAndLoad;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Productions
 {
@@ -36,7 +37,7 @@ namespace Soul.Controller.Runtime.Productions
         [SerializeField] private bool isClaimable;
         [SerializeField] public MeshPlantPointGridSystem meshPlantPointGridSystem;
         [SerializeField] private PopupIndicatorIconCount popupIndicator;
-        [SerializeField] protected Optional<AddressableParticleEffect> particleEffect;
+        [FormerlySerializedAs("particleEffect")] [SerializeField] protected Optional<AddressableParticleEffect> onCompleteParticleEffect;
 
         // Properties
         public Pair<Item, int> ProductionItemValuePair
@@ -162,7 +163,6 @@ namespace Soul.Controller.Runtime.Productions
         /// </summary>
         public override void OnTimerStart(bool startsNow)
         {
-            if (particleEffect) particleEffect.Value.Load(true, Transform).Forget();
             IPlantStageMesh plantStageMesh = PlantStageMesh;
             meshPlantPointGridSystem.Plant(levelReference, plantStageMesh.StageMeshes[0], plantStageMesh.Size);
         }
@@ -172,12 +172,13 @@ namespace Soul.Controller.Runtime.Productions
         /// </summary>
         public override void OnComplete()
         {
+            
+            if (onCompleteParticleEffect) onCompleteParticleEffect.Value.Load(true, Transform).Forget();
             isClaimable = true;
             var instantiatedRewardPopup =
                 popupIndicator.gameObject.Request(Transform).GetComponent<PopupIndicatorIconCount>();
             instantiatedRewardPopup.Setup(playerInventoryReference.mainCameraReference.transform, this, this, true);
             meshPlantPointGridSystem.ChangeMesh(PlantStageMesh.StageMeshes[^1]);
-            if (particleEffect) particleEffect.Value.Play();
         }
 
         /// <summary>
@@ -195,8 +196,8 @@ namespace Soul.Controller.Runtime.Productions
         private void AddReward()
         {
             ModifyRecordAfterProgression();
-            meshPlantPointGridSystem.Clear();
-            particleEffect.Value.Stop();
+            meshPlantPointGridSystem.ClearAsync().Forget();
+            onCompleteParticleEffect.Value.Stop();
         }
 
         /// <summary>

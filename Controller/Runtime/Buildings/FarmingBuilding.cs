@@ -121,7 +121,7 @@ namespace Soul.Controller.Runtime.Buildings
 
         #region Selected Animation
         
-        [SerializeField] protected TweenSettingCurveSO<Vector3> selectTweenSetting;
+        [SerializeField] protected TweenSettingCurveScriptableObject<Vector3> selectTweenSetting;
         protected MotionHandle SelectTweenMotionHandle;
 
         protected void PlayDualSquishAndStretch()

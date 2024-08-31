@@ -1,6 +1,8 @@
 ﻿using LitMotion;
 using LitMotion.Extensions;
 using Soul.Model.Runtime.Containers;
+using Soul.Model.Runtime.Interfaces;
+using Soul.Model.Runtime.Tweens.Scriptable;
 using UnityEngine;
 
 namespace Soul.Model.Runtime.Tweens
@@ -19,7 +21,7 @@ namespace Soul.Model.Runtime.Tweens
                 .BindToPosition(transform);
         }
 
-        public static MotionHandle TweenPlayer(this Transform transform,
+        private static MotionHandle TweenPlayer(this Transform transform,
             Vector3 start, Vector3 end, float duration, int loopCount, LoopType loopType, AnimationCurve animationCurve
         )
         {
@@ -28,7 +30,34 @@ namespace Soul.Model.Runtime.Tweens
                 .WithLoops(loopCount, loopType)
                 .BindToLocalScale(transform);
         }
-        
+
+        private static MotionHandle TweenPlayer(this Transform transform,
+            Vector3 start, Vector3 end, float duration, Ease ease
+        )
+        {
+            return LMotion.Create(start, end, duration)
+                .WithEase(ease)
+                .BindToLocalScale(transform);
+        }
+
+
+        public static MotionHandle TweenPlayer(this Transform transform, TweenSettingFactor settings, Vector3 start) =>
+            TweenPlayer(transform, start, start * settings.factor, settings.duration, settings.ease);
+
+
+        public static MotionHandle TweenPlayer(this Transform transform, TweenSettingFactor settings,
+            ISizeReference sizeReference)
+        {
+            return TweenPlayer(transform, sizeReference.Size, sizeReference.Size * settings.factor, settings.duration,
+                settings.ease);
+        }
+
+
+        public static MotionHandle TweenPlayer(this Transform transform, TweenSettingScriptableObject<Vector3> settings)
+        {
+            return TweenPlayer(transform, settings.start, settings.end, settings.duration, settings.ease);
+        }
+
         public static MotionHandle TweenHeight(Transform targetTransform, float height, float duration, Ease ease)
         {
             var position = targetTransform.position;
@@ -38,11 +67,10 @@ namespace Soul.Model.Runtime.Tweens
         }
 
         public static MotionHandle TweenPlayer(this Transform transform,
-            TweenSettingCurveSO<Vector3> settings)
+            TweenSettingCurveScriptableObject<Vector3> settings)
         {
             return TweenPlayer(transform, settings.start, settings.end, settings.duration,
                 settings.loopCount, settings.loopType, settings.animationCurve);
         }
-        
     }
 }
