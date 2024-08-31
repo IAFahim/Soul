@@ -4,9 +4,8 @@ using UnityEngine;
 
 namespace Soul.Controller.Runtime.Lists
 {
-    [CreateAssetMenu(fileName = "newList", menuName = "Soul/List/Allowed/Item")]
-    public class AllowedItemList: ScriptableList<Item>
+    [CreateAssetMenu(fileName = "newList", menuName = "Soul/List/Item")]
+    public class ScriptableItemList : ScriptableList<Item>
     {
-        
     }
 }

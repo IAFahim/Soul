@@ -1,13 +1,14 @@
-﻿using Soul.Model.Runtime.Items;
-using Soul.Model.Runtime.LookUpTables;
+﻿using QuickEye.Utility;
+using Soul.Model.Runtime.Items;
 using UnityEngine;
 
 namespace Soul.Controller.Runtime.LookUpTables
 {
+    [CreateAssetMenu(fileName = "PriceLookUpTable", menuName = "Soul/LookUpTable/Price")]
     public class PriceLookUpTable : ScriptableObject
     {
-        public LookUpTable<Item, int> lookUpTable;
+        public UnityDictionary<Item, int> lookUpTable;
 
-        public bool TryGet(Item key, out int value) => lookUpTable.TryGet(key, out value);
+        public bool TryGetValue(Item key, out int value) => lookUpTable.TryGetValue(key, out value);
     }
 }

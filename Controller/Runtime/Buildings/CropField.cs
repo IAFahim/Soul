@@ -4,15 +4,16 @@ using Cysharp.Threading.Tasks;
 using LitMotion;
 using Pancake.Common;
 using Soul.Controller.Runtime.Items;
+using Soul.Controller.Runtime.Lists;
 using Soul.Controller.Runtime.Productions;
 using Soul.Controller.Runtime.Upgrades;
-using Soul.Model.Runtime.CustomList;
 using Soul.Model.Runtime.DragAndDrops;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Productions;
 using Soul.Model.Runtime.Tweens;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings
 {
@@ -22,7 +23,7 @@ namespace Soul.Controller.Runtime.Buildings
         [SerializeField] private ProductionBuildingRecord productionBuildingRecord;
 
         [SerializeField] private CropProductionManager cropProductionManager;
-        [SerializeField] private ScriptableList<Item> allowedThingsToDrop;
+        [FormerlySerializedAs("allowedItemList")] [SerializeField] private AllowedItemLists allowedItemLists;
         [SerializeField] private TweenSettingCurveSO<Vector3> dropTweenSettings;
         private MotionHandle _dropMotionHandle;
         private readonly bool _loadDataOnEnable = true;
@@ -102,7 +103,7 @@ namespace Soul.Controller.Runtime.Buildings
 
         #region IAllowedToDropReference<Item>
 
-        public IList<Item> ListOfAllowedToDrop => allowedThingsToDrop;
+        public IList<Item> ListOfAllowedToDrop => allowedItemLists.CurrentList;
 
         #endregion
 

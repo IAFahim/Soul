@@ -2,13 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Soul.Model.Runtime.Interfaces;
 using UnityEngine;
 
 namespace Soul.Model.Runtime.CustomList
 {
     [Serializable]
-    public class ScriptableList<T> : ScriptableObject, IList<T>
+    public class ScriptableList<T> : ScriptableObject, IList<T>, ITitle
     {
+        [SerializeField] private string title;
+        public string Title => title;
         [SerializeField] protected List<T> list = new List<T>();
         private readonly HashSet<T> _hashSet = new HashSet<T>();
 
@@ -100,7 +103,7 @@ namespace Soul.Model.Runtime.CustomList
         public IEnumerator<T> GetEnumerator() => list.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        
+
         private void OnEnable()
         {
             foreach (var item in list)
@@ -108,6 +111,5 @@ namespace Soul.Model.Runtime.CustomList
                 _hashSet.Add(item);
             }
         }
-        
     }
 }
