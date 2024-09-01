@@ -37,11 +37,16 @@ namespace Soul.Controller.Runtime.SpritePopups
             _rewardClaimReference = rewardClaim;
             _rewardReference = reward;
             onClickReturnToPool = clickReturnToPool;
-            Set(Reward.Key.icon, Reward.Value);
+            Reload();
             StartTween();
         }
 
-        public void Set(Sprite sprite, int count)
+        public void Reload()
+        {
+            Set(Reward.Key.icon, Reward.Value);
+        }
+
+        private void Set(Sprite sprite, int count)
         {
             spriteRenderer.sprite = sprite;
             countText.SetTextInt(count);

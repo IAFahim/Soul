@@ -1,4 +1,6 @@
-﻿using Pancake.Common;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
+using Pancake.Common;
 using Pancake.MobileInput;
 using Soul.Model.Runtime.Selectors;
 using UnityEngine;
@@ -14,7 +16,9 @@ namespace Soul.Controller.Runtime.Selectors
 
         private void OnEnable()
         {
-            selector.Subscribe(touchCamera, eventSystem);
+            var token = this.GetCancellationTokenOnDestroy();
+            selector.Subscribe(touchCamera, eventSystem, token);
+            App.Delay(0.1f, () => selector.selectProcessRunning = false);
         }
 
         private void OnDisable()

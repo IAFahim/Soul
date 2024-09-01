@@ -50,11 +50,11 @@ namespace Soul.Controller.Runtime.Upgrades
             PlayerInventoryReference playerInventory, IUpgradeRecordReference<RecordUpgrade> recordOfUpgrade,
             ISaveAbleReference saveAbleReference, BoxCollider boxCollider, Level level)
         {
+            unlockManager.Setup(addressablePoolLifetime);
             bool canStart = base.Setup(recordOfUpgrade.UpgradeRecord, level, saveAbleReference);
             currentBoxCollider = boxCollider;
             playerInventoryReference = playerInventory;
             _saveAbleReference = saveAbleReference;
-            unlockManager.Setup(addressablePoolLifetime);
 
             if (levelReference == 0)
             {

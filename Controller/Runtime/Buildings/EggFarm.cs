@@ -1,21 +1,32 @@
-﻿using LitMotion;
+﻿using Cysharp.Threading.Tasks;
 using Pancake.Common;
 using Soul.Controller.Runtime.Productions;
 using Soul.Controller.Runtime.Upgrades;
-using Soul.Model.Runtime.Selectors;
-using Soul.Model.Runtime.Tweens;
+using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.Productions;
 using UnityEngine;
 
 namespace Soul.Controller.Runtime.Buildings
 {
-    public class EggFarm : FarmingBuilding
+    public class EggFarm : FarmingBuilding, IProductionRecordReference<RecordProduction>
     {
         [SerializeField] private ProductionBuildingRecord productionBuildingRecord;
-        public Vector3 startScale;
-        public Vector3 endScale;
-        public float duration;
-        public AnimationCurve animationCurve;
-        public Transform models;
+        [SerializeField] private EggProductionManager eggProductionManager;
+        private readonly bool _loadDataOnEnable = true;
+
+        public async void Start()
+        {
+            if (_loadDataOnEnable) Load(Guid);
+            await SetUp(level);
+        }
+
+        protected override async UniTask SetUp(Level currentLevel)
+        {
+            await base.SetUp(currentLevel);
+            eggProductionManager.Setup(
+                playerInventoryReference, productionBuildingRecord.recordProduction, currentLevel, this
+            );
+        }
 
         public override int CurrentLevel
         {
@@ -41,6 +52,6 @@ namespace Soul.Controller.Runtime.Buildings
             base.Load(key);
         }
 
-        
+        public RecordProduction ProductionRecord { get; set; }
     }
 }

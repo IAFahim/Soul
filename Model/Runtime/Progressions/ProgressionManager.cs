@@ -36,7 +36,7 @@ namespace Soul.Model.Runtime.Progressions
             levelReference = level;
             SaveAbleReference = saveAbleReference;
             bool canStart = recordReference.InProgression;
-            if (canStart) TimerStart(false);
+            if (canStart) StartTimer(false);
             return canStart;
         }
 
@@ -50,7 +50,7 @@ namespace Soul.Model.Runtime.Progressions
             {
                 ModifyRecordBeforeProgression();
                 TakeRequirement();
-                TimerStart(true);
+                StartTimer(true);
             }
 
             return hasEnough;
@@ -71,7 +71,7 @@ namespace Soul.Model.Runtime.Progressions
         }
 
 
-        private void TimerStart(bool startsNow)
+        protected void StartTimer(bool startsNow)
         {
             OnTimerStart(startsNow);
             if (IsComplete)

@@ -13,7 +13,6 @@ using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Productions;
 using Soul.Model.Runtime.Tweens;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings
 {
@@ -23,7 +22,7 @@ namespace Soul.Controller.Runtime.Buildings
         [SerializeField] private ProductionBuildingRecord productionBuildingRecord;
 
         [SerializeField] private CropProductionManager cropProductionManager;
-        [FormerlySerializedAs("allowedItemList")] [SerializeField] private AllowedItemLists allowedItemLists;
+        [SerializeField] private AllowedItemLists allowedItemLists;
         [SerializeField] private TweenSettingCurveScriptableObject<Vector3> dropTweenSettings;
         private MotionHandle _dropMotionHandle;
         private readonly bool _loadDataOnEnable = true;

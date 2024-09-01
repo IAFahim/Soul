@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Pancake.MobileInput;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -15,40 +17,45 @@ namespace Soul.Model.Runtime.Selectors
         [SerializeField] private UnityEngine.Events.UnityEvent<Transform> onSelected;
         private TouchCamera _touchCamera;
         private EventSystem _eventSystem;
+        public bool selectProcessRunning;
+        private CancellationToken _token;
 
-        public void Subscribe(TouchCamera touchCamera, EventSystem eventSystem)
+        public void Subscribe(TouchCamera touchCamera, EventSystem eventSystem, CancellationToken tokenSource)
         {
             _touchCamera = touchCamera;
             _eventSystem = eventSystem;
-            TouchInput.OnStartDrag += TouchInputOnOnStartDrag;
-            TouchInput.OnStopDrag += TouchInputOnOnStopDrag;
-            TouchInput.OnFingerDown += TouchInputOnOnFingerDown;
+            selectProcessRunning = false;
+            _token = tokenSource;
+            TouchInput.OnStartDrag += TouchInputOnStartDrag;
+            TouchInput.OnStopDrag += TouchInputOnStopDrag;
+            TouchInput.OnFingerDown += TouchInputOnFingerDown;
         }
 
         public void UnSubscribe()
         {
-            TouchInput.OnStartDrag -= TouchInputOnOnStartDrag;
-            TouchInput.OnStopDrag -= TouchInputOnOnStopDrag;
-            TouchInput.OnFingerDown -= TouchInputOnOnFingerDown;
+            TouchInput.OnStartDrag -= TouchInputOnStartDrag;
+            TouchInput.OnStopDrag -= TouchInputOnStopDrag;
+            TouchInput.OnFingerDown -= TouchInputOnFingerDown;
+            selectProcessRunning = false;
             _touchCamera = null;
         }
 
-        private void TouchInputOnOnStopDrag(Vector3 arg1, Vector3 arg2)
+        private void TouchInputOnStopDrag(Vector3 arg1, Vector3 arg2)
         {
             canSelect = true;
         }
 
-        private void TouchInputOnOnStartDrag(Vector3 position, bool isLongTap)
+        private void TouchInputOnStartDrag(Vector3 position, bool isLongTap)
         {
             canSelect = false;
         }
 
-        private void TouchInputOnOnFingerDown(Vector3 screenPoint)
+        private void TouchInputOnFingerDown(Vector3 screenPoint)
         {
-            Select(screenPoint).Forget();
+            Select(screenPoint, _token).Forget();
         }
 
-        private async UniTask Select(Vector3 screenPoint)
+        private async UniTask Select(Vector3 screenPoint, CancellationToken token)
         {
             if (_eventSystem.IsPointerOverGameObject() || _eventSystem.currentSelectedGameObject != null)
             {
@@ -56,7 +63,15 @@ namespace Soul.Model.Runtime.Selectors
                 return;
             }
 
-            await UniTask.WaitForSeconds(waitForDrag);
+            if (selectProcessRunning) return;
+            selectProcessRunning = true;
+            await UniTask.WaitForSeconds(waitForDrag, cancellationToken: token);
+            Selection(screenPoint, token);
+        }
+
+        private void Selection(Vector3 screenPoint, CancellationToken token)
+        {
+            selectProcessRunning = false;
             if (!canSelect) return;
             var ray = _touchCamera.Cam.ScreenPointToRay(screenPoint);
             if (Physics.Raycast(ray, out var raycastHit))
@@ -76,10 +91,15 @@ namespace Soul.Model.Runtime.Selectors
             {
                 DeSelectInvoke(raycastHit);
             }
+
+            token.ThrowIfCancellationRequested();
         }
 
         private void SelectInvoke(RaycastHit raycastHit, Transform hitTransform)
         {
+#if UNITY_EDITOR
+            EditorGUIUtility.PingObject(hitTransform.gameObject);
+#endif
             currentTransform = hitTransform;
             onSelected.Invoke(currentTransform);
             var selectedCallBacks = currentTransform.GetComponents<ISelectCallBack>();

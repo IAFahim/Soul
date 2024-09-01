@@ -43,8 +43,8 @@ namespace Soul.Presenter.Runtime.UI
 
         private void OnComplete()
         {
-            _removeCallBack.RemoveSelf(itemReference);
             GameObject.Return();
+            _removeCallBack.RemoveSelf(itemReference);
         }
 
         void ILoadComponent.OnLoadComponents()
