@@ -21,14 +21,17 @@ namespace Soul.Controller.Runtime.SpritePopups
         [SerializeField] private float jumpOutHeight = 20f;
         [SerializeField] private Ease jumpEase;
         private MotionHandle _jumpOutMotionHandle;
-        [FormerlySerializedAs("onCollectReturnToPool")] [SerializeField] private bool onClickReturnToPool = true;
+
+        [FormerlySerializedAs("onCollectReturnToPool")] [SerializeField]
+        private bool onClickReturnToPool = true;
 
         private IRewardClaim _rewardClaimReference;
         private IReward<Pair<Item, int>> _rewardReference;
 
         public Pair<Item, int> Reward => _rewardReference.Reward;
 
-        public void Setup(Transform mainCamera,IRewardClaim rewardClaim, IReward<Pair<Item, int>> reward, bool clickReturnToPool)
+        public void Setup(Transform mainCamera, IRewardClaim rewardClaim, IReward<Pair<Item, int>> reward,
+            bool clickReturnToPool)
         {
             transform.rotation = mainCamera.rotation;
             _rewardClaimReference = rewardClaim;

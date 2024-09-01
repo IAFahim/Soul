@@ -1,5 +1,4 @@
 ﻿using QuickEye.Utility;
-using Soul.Model.Runtime.Interfaces;
 using UnityEngine;
 
 namespace Soul.Model.Runtime.Items

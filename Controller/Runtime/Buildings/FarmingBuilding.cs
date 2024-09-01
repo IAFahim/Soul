@@ -133,11 +133,13 @@ namespace Soul.Controller.Runtime.Buildings
         public override void OnSelected(RaycastHit selfRayCastHit)
         {
             PlayDualSquishAndStretch();
+            Debug.Log("Selected");
         }
 
         public virtual void OnReSelected(RaycastHit selfReRaycastHit)
         {
             PlayDualSquishAndStretch();
+            Debug.Log("ReSelected");
         }
 
         #endregion

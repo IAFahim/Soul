@@ -25,6 +25,14 @@ namespace Soul.Model.Runtime.Selectors
             TouchInput.OnFingerDown += TouchInputOnOnFingerDown;
         }
 
+        public void UnSubscribe()
+        {
+            TouchInput.OnStartDrag -= TouchInputOnOnStartDrag;
+            TouchInput.OnStopDrag -= TouchInputOnOnStopDrag;
+            TouchInput.OnFingerDown -= TouchInputOnOnFingerDown;
+            _touchCamera = null;
+        }
+
         private void TouchInputOnOnStopDrag(Vector3 arg1, Vector3 arg2)
         {
             canSelect = true;
@@ -54,7 +62,7 @@ namespace Soul.Model.Runtime.Selectors
             if (Physics.Raycast(ray, out var raycastHit))
             {
                 var hitTransform = raycastHit.transform;
-                if (currentTransform == hitTransform)
+                if (currentTransform != null && currentTransform == hitTransform)
                 {
                     ReSelectedInvoke(hitTransform, raycastHit);
                 }
@@ -74,29 +82,21 @@ namespace Soul.Model.Runtime.Selectors
         {
             currentTransform = hitTransform;
             onSelected.Invoke(currentTransform);
-            var selectedCallBacks = currentTransform.GetComponentsInChildren<ISelectCallBack>();
+            var selectedCallBacks = currentTransform.GetComponents<ISelectCallBack>();
             foreach (var receiver in selectedCallBacks) receiver.OnSelected(raycastHit);
         }
 
         private void DeSelectInvoke(RaycastHit raycastHit)
         {
-            var deSelectedCallBacks = currentTransform.GetComponentsInChildren<IDeSelectedCallBack>();
+            var deSelectedCallBacks = currentTransform.GetComponents<IDeSelectedCallBack>();
             foreach (var receiver in deSelectedCallBacks) receiver.OnDeSelected(raycastHit);
             currentTransform = null;
         }
 
         private static void ReSelectedInvoke(Transform hitTransform, RaycastHit raycastHit)
         {
-            var reSelectedCallBacks = hitTransform.GetComponentsInChildren<IReSelectedCallBack>();
+            var reSelectedCallBacks = hitTransform.GetComponents<IReSelectedCallBack>();
             foreach (var receiver in reSelectedCallBacks) receiver.OnReSelected(raycastHit);
-        }
-
-        public void UnSubscribe()
-        {
-            TouchInput.OnFingerDown -= TouchInputOnOnFingerDown;
-            TouchInput.OnStartDrag += TouchInputOnOnStartDrag;
-            TouchInput.OnStopDrag += TouchInputOnOnStopDrag;
-            _touchCamera = null;
         }
     }
 }
