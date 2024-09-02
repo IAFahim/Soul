@@ -56,7 +56,7 @@ namespace Soul.Controller.Runtime.Productions
         }
 
         public RequirementForProduction RequiredLimit =>
-            requiredAndRewardForProductions.GetRequirement(levelReference - 1);
+            requiredAndRewardForProductions.GetRequirement(LevelReference - 1);
 
 
         public Pair<Item, int> ProductionItemValuePair
@@ -109,7 +109,7 @@ namespace Soul.Controller.Runtime.Productions
             }
         }
 
-        public int WeightCapacity => requiredAndRewardForProductions.GetRequirement(levelReference - 1).weightCapacity;
+        public int WeightCapacity => requiredAndRewardForProductions.GetRequirement(LevelReference - 1).weightCapacity;
         public bool CanClaim => isClaimable;
 
         public void RewardClaim()

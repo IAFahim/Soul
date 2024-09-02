@@ -10,7 +10,6 @@ namespace Soul.Controller.Runtime.Upgrades
     [Serializable]
     public class UnlockAndUpgradeSetupInfo
     {
-        public UnlockManagerComponent unlockManagerComponent;
         public IUpgradeRecordReference<RecordUpgrade> recordOfUpgrade;
         public ISaveAbleReference saveAbleReference;
         public BoxCollider boxCollider;

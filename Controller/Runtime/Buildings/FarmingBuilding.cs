@@ -1,4 +1,5 @@
-﻿using Alchemy.Inspector;
+﻿using System;
+using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using Soul.Controller.Runtime.Addressables;
@@ -11,6 +12,7 @@ using Soul.Model.Runtime.Selectors;
 using Soul.Model.Runtime.Tweens;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 
 namespace Soul.Controller.Runtime.Buildings
@@ -19,13 +21,15 @@ namespace Soul.Controller.Runtime.Buildings
     public abstract class FarmingBuilding : UnlockUpgradeAbleBuilding, IReSelectedCallBack, IInfoPanelReference,
         IUpgradeRecordReference<RecordUpgrade>
     {
-        [Title("FarmingBuilding")] 
-        [SerializeField] protected AddressablePoolLifetime addressablePoolLifetime;
+        [Title("FarmingBuilding")] [SerializeField]
+        protected AddressablePoolLifetime addressablePoolLifetime;
 
         [SerializeField] protected PlayerInventoryReference playerInventory;
         [SerializeField] protected LevelInfrastructureInfo levelInfrastructureInfo;
-        [SerializeField] protected UnlockAndUpgradeManager unlockAndUpgradeManager;
-        [SerializeField] protected UnlockManagerComponent unlockManagerComponent;
+
+        [FormerlySerializedAs("unlockAndUpgradeManager")] [SerializeField]
+        protected UnlockAndUpgrade unlockAndUpgrade;
+
         [SerializeField] protected InfoPanel infoPanelPrefab;
 
 
@@ -48,14 +52,13 @@ namespace Soul.Controller.Runtime.Buildings
         {
             var info = new UnlockAndUpgradeSetupInfo
             {
-                unlockManagerComponent = unlockManagerComponent,
                 recordOfUpgrade = this,
                 saveAbleReference = this,
                 level = currentLevel,
                 onUnlockUpgradeStart = OnUnlockUpgradeStart,
                 onUnlockUpgradeComplete = OnUnlockUpgradeComplete
             };
-            await unlockAndUpgradeManager.Setup(addressablePoolLifetime, playerInventory, info);
+            await unlockAndUpgrade.Setup(addressablePoolLifetime, playerInventory, info);
         }
 
 
@@ -88,25 +91,25 @@ namespace Soul.Controller.Runtime.Buildings
         #region IUpgrade
 
         public override bool CanUpgrade => !UpgradeRecord.InProgression && !level.IsMax &&
-                                           unlockAndUpgradeManager.HasEnough();
+                                           unlockAndUpgrade.HasEnough();
 
         public override bool IsUpgrading => UpgradeRecord.InProgression;
 
         [Button]
-        public override void Upgrade() => unlockAndUpgradeManager.Upgrade();
+        public override void Upgrade() => unlockAndUpgrade.Upgrade();
 
         #endregion
 
 
         #region IUnlock
 
-        public override bool CanUnlock => IsLocked && unlockAndUpgradeManager.HasEnough();
+        public override bool CanUnlock => IsLocked && unlockAndUpgrade.HasEnough();
 
         public override bool IsUnlocking => UpgradeRecord.InProgression;
 
         public override void Unlock()
         {
-            unlockAndUpgradeManager.Unlock();
+            unlockAndUpgrade.Unlock();
         }
 
         #endregion
@@ -130,7 +133,7 @@ namespace Soul.Controller.Runtime.Buildings
         protected void PlayDualSquishAndStretch()
         {
             if (SelectTweenMotionHandle.IsActive()) SelectTweenMotionHandle.Cancel();
-            SelectTweenMotionHandle = unlockManagerComponent.Transform.TweenPlayer(selectTweenSetting);
+            SelectTweenMotionHandle = unlockAndUpgrade.unlockManagerComponent.Transform.TweenPlayer(selectTweenSetting);
         }
 
         public override void OnSelected(RaycastHit selfRayCastHit)
@@ -151,6 +154,13 @@ namespace Soul.Controller.Runtime.Buildings
         {
             Gizmos.color = Color.white;
             Gizmos.DrawWireSphere(InfoPanelWorldPosition, 1f);
+        }
+
+        protected virtual void Reset()
+        {
+            unlockAndUpgrade.unlockManagerComponent = GetComponentInChildren<UnlockManagerComponent>();
+            addressablePoolLifetime = FindObjectOfType<AddressablePoolLifetime>();
+            unlockAndUpgrade.unlockManagerComponent = GetComponentInChildren<UnlockManagerComponent>();
         }
     }
 }

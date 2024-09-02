@@ -4,7 +4,7 @@ using Soul.Controller.Runtime.Upgrades;
 namespace Soul.Controller.Runtime.Productions
 {
     [Serializable]
-    public class ProductionBuildingRecord
+    public class BuildingAndProductionRecord
     {
         public int level;
         public RecordProduction recordProduction;

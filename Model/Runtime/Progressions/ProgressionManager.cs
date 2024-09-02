@@ -12,10 +12,9 @@ namespace Soul.Model.Runtime.Progressions
     public abstract class ProgressionManager<TRecord> where TRecord : ITimeBasedReference, IInProgression
     {
         public TRecord recordReference;
-        public Level levelReference;
         public abstract UnityTimeSpan FullTimeRequirement { get; }
-
         protected ISaveAbleReference SaveAbleReference;
+        protected Level LevelReference;
         protected DelayHandle DelayHandle;
 
         public UnityDateTime StartedAt => recordReference.Time.StartedAt;
@@ -33,7 +32,7 @@ namespace Soul.Model.Runtime.Progressions
         protected virtual bool Setup(TRecord record, Level level, ISaveAbleReference saveAbleReference)
         {
             recordReference = record;
-            levelReference = level;
+            LevelReference = level;
             SaveAbleReference = saveAbleReference;
             bool canStart = !level.IsLocked && recordReference.InProgression;
             if (canStart) StartTimer(false);

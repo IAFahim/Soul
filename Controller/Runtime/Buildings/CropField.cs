@@ -3,8 +3,10 @@ using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using Pancake.Common;
+using Soul.Controller.Runtime.Addressables;
 using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.Lists;
+using Soul.Controller.Runtime.MeshPlanters;
 using Soul.Controller.Runtime.Productions;
 using Soul.Controller.Runtime.Upgrades;
 using Soul.Model.Runtime.DragAndDrops;
@@ -13,6 +15,7 @@ using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Productions;
 using Soul.Model.Runtime.Tweens;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Buildings
 {
@@ -20,10 +23,11 @@ namespace Soul.Controller.Runtime.Buildings
         IAllowedToDropReference<Item>, IDropAble<Item>
     {
         [Title("CropField")]
-        [SerializeField] private ProductionBuildingRecord productionBuildingRecord;
-        [SerializeField] private CropProductionManager cropProductionManager;
         [SerializeField] private AllowedItemLists allowedItemLists;
         [SerializeField] private TweenSettingCurveScriptableObject<Vector3> dropTweenSettings;
+        
+        [FormerlySerializedAs("productionBuildingRecord")] [SerializeField] private BuildingAndProductionRecord buildingAndProductionRecord;
+        [FormerlySerializedAs("cropProductionManager")] [SerializeField] private CropProduction cropProduction;
         private MotionHandle _dropMotionHandle;
         private readonly bool _loadDataOnEnable = true;
 
@@ -37,8 +41,8 @@ namespace Soul.Controller.Runtime.Buildings
 
         public override int CurrentLevel
         {
-            get => productionBuildingRecord.level;
-            set => productionBuildingRecord.level = value;
+            get => buildingAndProductionRecord.level;
+            set => buildingAndProductionRecord.level = value;
         }
 
         #endregion
@@ -47,8 +51,8 @@ namespace Soul.Controller.Runtime.Buildings
 
         public override RecordUpgrade UpgradeRecord
         {
-            get => productionBuildingRecord.recordUpgrade;
-            set => productionBuildingRecord.recordUpgrade = value;
+            get => buildingAndProductionRecord.recordUpgrade;
+            set => buildingAndProductionRecord.recordUpgrade = value;
         }
 
         #endregion
@@ -57,8 +61,8 @@ namespace Soul.Controller.Runtime.Buildings
 
         public RecordProduction ProductionRecord
         {
-            get => productionBuildingRecord.recordProduction;
-            set => productionBuildingRecord.recordProduction = value;
+            get => buildingAndProductionRecord.recordProduction;
+            set => buildingAndProductionRecord.recordProduction = value;
         }
 
         #endregion
@@ -72,7 +76,7 @@ namespace Soul.Controller.Runtime.Buildings
         protected override async UniTask SetUp(Level currentLevel)
         {
             await base.SetUp(currentLevel);
-            cropProductionManager.Setup(unlockManagerComponent.transform, playerInventory, this, currentLevel,
+            cropProduction.Setup(unlockAndUpgrade.unlockManagerComponent.transform, playerInventory, this, currentLevel,
                 this);
         }
 
@@ -81,7 +85,7 @@ namespace Soul.Controller.Runtime.Buildings
         public override void Save(string key)
         {
             base.Save(key);
-            Data.Save(key, productionBuildingRecord);
+            Data.Save(key, buildingAndProductionRecord);
         }
 
         #endregion
@@ -96,7 +100,7 @@ namespace Soul.Controller.Runtime.Buildings
         [Button]
         public override void Load(string key)
         {
-            productionBuildingRecord = Data.Load(key, productionBuildingRecord);
+            buildingAndProductionRecord = Data.Load(key, buildingAndProductionRecord);
             base.Load(key);
         }
 
@@ -122,39 +126,39 @@ namespace Soul.Controller.Runtime.Buildings
         public bool OnDrag(Item drop)
         {
             if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
-            _dropMotionHandle = unlockManagerComponent.transform.TweenPlayer(dropTweenSettings);
+            _dropMotionHandle = unlockAndUpgrade.unlockManagerComponent.transform.TweenPlayer(dropTweenSettings);
             return TryDropAdd(drop);
         }
 
         private bool TryDropAdd(Item drop)
         {
             if (!CanDropNow) return false;
-            if (drop is Seed seed) cropProductionManager.Add(seed);
+            if (drop is Seed seed) cropProduction.Add(seed);
             return ListOfAllowedToDrop.Contains(drop);
         }
 
         public bool OnDrop(Item dropPackage)
         {
             if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
-            unlockManagerComponent.transform.localScale = dropTweenSettings.start;
+            unlockAndUpgrade.unlockManagerComponent.transform.localScale = dropTweenSettings.start;
             if (!TryDropAdd(dropPackage)) return false;
-            if (cropProductionManager.TryStartProgression()) Save(Guid);
+            if (cropProduction.TryStartProgression()) Save(Guid);
             return true;
         }
 
         public void OnDragCancel()
         {
             if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
-            unlockManagerComponent.transform.localScale = dropTweenSettings.start;
+            unlockAndUpgrade.unlockManagerComponent.transform.localScale = dropTweenSettings.start;
         }
 
         #endregion
 
 
-        private void Reset()
+        protected override void Reset()
         {
-            unlockAndUpgradeManager = GetComponentInChildren<UnlockAndUpgradeManager>();
-            cropProductionManager = GetComponent<CropProductionManager>();
+            base.Reset();
+            cropProduction.meshPlantPointGridSystem = GetComponentInChildren<MeshPlantPointGridSystem>();
         }
 
         void ILoadComponent.OnLoadComponents()

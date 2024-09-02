@@ -27,12 +27,10 @@ using UnityEngine.Serialization;
 namespace Soul.Controller.Runtime.Productions
 {
     [Serializable]
-    public class CropProductionManager : ProgressionManager<RecordProduction>, IWeightCapacityReference,
+    public class CropProduction : ProgressionManager<RecordProduction>, IWeightCapacityReference,
         IRewardClaim, IReward<Pair<Item, int>>
     {
         // Serialized Fields
-        [SerializeField] private Transform parent;
-        [SerializeField] private PlayerInventoryReference playerInventoryReference;
         [SerializeField] private RequiredAndRewardForProductions requiredAndRewardForProductions;
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
@@ -40,7 +38,11 @@ namespace Soul.Controller.Runtime.Productions
         [SerializeField] private bool isClaimable;
         [SerializeField] public MeshPlantPointGridSystem meshPlantPointGridSystem;
         [SerializeField] private PopupIndicatorIconCount popupIndicator;
-        [FormerlySerializedAs("particleEffect")] [SerializeField] protected Optional<AddressableParticleEffect> onCompleteParticleEffect;
+        private Transform _parent;
+        private PlayerInventoryReference _playerInventoryReference;
+
+        [FormerlySerializedAs("particleEffect")] [SerializeField]
+        protected Optional<AddressableParticleEffect> onCompleteParticleEffect;
 
         // Properties
         public Pair<Item, int> ProductionItemValuePair
@@ -55,7 +57,7 @@ namespace Soul.Controller.Runtime.Productions
             set => recordReference.productionItemValuePair = value;
         }
 
-        public RequirementForProduction Required => requiredAndRewardForProductions.GetRequirement(levelReference - 1);
+        public RequirementForProduction Required => requiredAndRewardForProductions.GetRequirement(LevelReference - 1);
         public Pair<Currency, int> CurrencyRequirement => Required.currency;
 
         public int WorkerUsed
@@ -65,14 +67,14 @@ namespace Soul.Controller.Runtime.Productions
         }
 
         public int WeightCapacity => Required.weightCapacity;
-        public RewardForProduction RewardForProduction => requiredAndRewardForProductions.GetReward(levelReference - 1);
+        public RewardForProduction RewardForProduction => requiredAndRewardForProductions.GetReward(LevelReference - 1);
 
         public int PlantCount => ProductionItemValuePair.Value * ((IKgToCount)ProductionItemValuePair.Key).KgToPoint;
 
         public override UnityTimeSpan FullTimeRequirement =>
             itemToItemConverter.Convert(ProductionItemValuePair.Key).RequiredTime * Required.timeMultiplier;
 
-        public int CurrentCurrency => playerInventoryReference.coins.Value;
+        public int CurrentCurrency => _playerInventoryReference.coins.Value;
 
         public Pair<Item, int> Reward
         {
@@ -98,12 +100,12 @@ namespace Soul.Controller.Runtime.Productions
         /// <summary>
         /// Initializes the CropProductionManager with the given parameters.
         /// </summary>
-        public bool Setup(Transform parentTransform,PlayerInventoryReference inventoryReference,
+        public bool Setup(Transform parentTransform, PlayerInventoryReference inventoryReference,
             IProductionRecordReference<RecordProduction> recordProduction, Level level,
             ISaveAbleReference saveAbleReference)
         {
-            parent = parentTransform;
-            playerInventoryReference = inventoryReference;
+            _parent = parentTransform;
+            _playerInventoryReference = inventoryReference;
             return Setup(recordProduction.ProductionRecord, level, saveAbleReference);
         }
 
@@ -113,7 +115,7 @@ namespace Soul.Controller.Runtime.Productions
         public void Add(Seed seed)
         {
             queueItem = seed;
-            playerInventoryReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
+            _playerInventoryReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
         }
 
         /// <summary>
@@ -128,7 +130,7 @@ namespace Soul.Controller.Runtime.Productions
         /// Checks if there are enough resources to start the progression.
         /// </summary>
         public override bool HasEnough() =>
-            playerInventoryReference.inventory.HasEnough(ProductionItemValuePair, WeightCapacity);
+            _playerInventoryReference.inventory.HasEnough(ProductionItemValuePair, WeightCapacity);
 
         /// <summary>
         /// Checks if the reward can be claimed.
@@ -156,7 +158,7 @@ namespace Soul.Controller.Runtime.Productions
         {
             var requiredWorker = Required.workerCount;
             recordReference.worker.typeAndCount = new Pair<WorkerType, int>(basicWorkerType, requiredWorker);
-            playerInventoryReference.workerInventory.TryDecrease(basicWorkerType, requiredWorker);
+            _playerInventoryReference.workerInventory.TryDecrease(basicWorkerType, requiredWorker);
             ProductionItemValuePair = new Pair<Item, int>(queueItem, WeightCapacity);
             recordReference.Time.Discount = new UnityTimeSpan();
             base.ModifyRecordBeforeProgression();
@@ -168,7 +170,7 @@ namespace Soul.Controller.Runtime.Productions
         public override void OnTimerStart(bool startsNow)
         {
             IPlantStageMesh plantStageMesh = PlantStageMesh;
-            meshPlantPointGridSystem.Plant(levelReference, plantStageMesh.StageMeshes[0], plantStageMesh.Size);
+            meshPlantPointGridSystem.Plant(LevelReference, plantStageMesh.StageMeshes[0], plantStageMesh.Size);
         }
 
         /// <summary>
@@ -176,12 +178,11 @@ namespace Soul.Controller.Runtime.Productions
         /// </summary>
         public override void OnComplete()
         {
-            
-            if (onCompleteParticleEffect) onCompleteParticleEffect.Value.Load(true, parent).Forget();
+            if (onCompleteParticleEffect) onCompleteParticleEffect.Value.Load(true, _parent).Forget();
             isClaimable = true;
             var instantiatedRewardPopup =
-                popupIndicator.gameObject.Request(parent).GetComponent<PopupIndicatorIconCount>();
-            instantiatedRewardPopup.Setup(playerInventoryReference.mainCameraReference.transform, this, this, true);
+                popupIndicator.gameObject.Request(_parent).GetComponent<PopupIndicatorIconCount>();
+            instantiatedRewardPopup.Setup(_playerInventoryReference.mainCameraReference.transform, this, this, true);
             meshPlantPointGridSystem.ChangeMesh(PlantStageMesh.StageMeshes[^1]);
         }
 
@@ -191,7 +192,7 @@ namespace Soul.Controller.Runtime.Productions
         protected override void TakeRequirement()
         {
             var seed = ProductionItemValuePair;
-            playerInventoryReference.inventory.TryDecrease(seed, ProductionItemValuePair.Value);
+            _playerInventoryReference.inventory.TryDecrease(seed, ProductionItemValuePair.Value);
         }
 
         /// <summary>
@@ -211,9 +212,9 @@ namespace Soul.Controller.Runtime.Productions
         {
             var singleReward = Reward;
             var takenWorker = recordReference.worker.typeAndCount;
-            playerInventoryReference.workerInventory.AddOrIncrease(takenWorker.Key, takenWorker.Value);
-            playerInventoryReference.inventory.AddOrIncrease(singleReward.Key, singleReward.Value);
-            playerInventoryReference.coins.Set(CurrentCurrency + 10);
+            _playerInventoryReference.workerInventory.AddOrIncrease(takenWorker.Key, takenWorker.Value);
+            _playerInventoryReference.inventory.AddOrIncrease(singleReward.Key, singleReward.Value);
+            _playerInventoryReference.coins.Set(CurrentCurrency + 10);
             recordReference.InProgression = false;
             ProductionItemValuePair = new Pair<Item, int>();
             SaveAbleReference.Save();
@@ -221,7 +222,7 @@ namespace Soul.Controller.Runtime.Productions
 
         public override string ToString()
         {
-            return $"{parent.name}: {ProductionItemValuePair.Key} x {ProductionItemValuePair.Value}";
+            return $"{_parent.name}: {ProductionItemValuePair.Key} x {ProductionItemValuePair.Value}";
         }
     }
 }

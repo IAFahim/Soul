@@ -16,11 +16,11 @@ using UnityEngine.AddressableAssets;
 namespace Soul.Controller.Runtime.Upgrades
 {
     [Serializable]
-    public class UnlockAndUpgradeManager : ProgressionManager<RecordUpgrade>
+    public class UnlockAndUpgrade : ProgressionManager<RecordUpgrade>
     {
+        public UnlockManagerComponent unlockManagerComponent;
         public UnlockAndUpgradeSetupInfo info;
         [SerializeField] private RequirementForUpgrades requirementForUpgrades;
-        [SerializeField] private Transform parent;
         [SerializeField, DisableInEditMode] private PartsManager upgradePartsManager;
 
         private AddressablePoolLifetime _addressablePoolLifetime;
@@ -35,7 +35,7 @@ namespace Soul.Controller.Runtime.Upgrades
         #endregion
 
 
-        public RequirementForUpgrade Required => requirementForUpgrades.GetRequirement(levelReference);
+        public RequirementForUpgrade Required => requirementForUpgrades.GetRequirement(LevelReference);
 
         public override UnityTimeSpan FullTimeRequirement => Required.fullTime;
 
@@ -47,27 +47,27 @@ namespace Soul.Controller.Runtime.Upgrades
             _addressablePoolLifetime = addressablePoolLifetime;
             _playerInventory = inventoryReference;
             info = unlockAndUpgradeSetupInfo;
-            info.unlockManagerComponent.Setup(_addressablePoolLifetime);
+            unlockManagerComponent.Setup(_addressablePoolLifetime);
             return await ValidateStart();
         }
 
         private async Task ShowUnlocked()
         {
-            var unLockedGameObject = await info.unlockManagerComponent.InstantiateUnLockedAsync();
+            var unLockedGameObject = await unlockManagerComponent.InstantiateUnLockedAsync();
             upgradePartsManager = unLockedGameObject.GetComponent<PartsManager>();
         }
 
         private async UniTask<bool> ValidateStart()
         {
             bool canStart = base.Setup(info.recordOfUpgrade.UpgradeRecord, info.level, info.saveAbleReference);
-            if (levelReference == 0)
+            if (LevelReference == 0)
             {
-                await info.unlockManagerComponent.InstantiateLockedAsync();
+                await unlockManagerComponent.InstantiateLockedAsync();
             }
             else
             {
                 await ShowUnlocked();
-                if (upgradePartsManager) upgradePartsManager.Spawn(levelReference - 1, info.boxCollider);
+                if (upgradePartsManager) upgradePartsManager.Spawn(LevelReference - 1, info.boxCollider);
             }
 
             return canStart;
@@ -99,7 +99,7 @@ namespace Soul.Controller.Runtime.Upgrades
         {
             base.ModifyRecordBeforeProgression();
             recordReference.worker.Set(Required.workerCount);
-            recordReference.toLevel = levelReference + 1;
+            recordReference.toLevel = LevelReference + 1;
         }
 
         public override void OnTimerStart(bool startsNow)
@@ -120,7 +120,7 @@ namespace Soul.Controller.Runtime.Upgrades
         private async UniTask SpawnEnclosure()
         {
             CancellationToken cancellationToken = default;
-            _enclosureGameObject = await upgradeEnclosure.Value.InstantiateAsync(parent)
+            _enclosureGameObject = await upgradeEnclosure.Value.InstantiateAsync(unlockManagerComponent.transform)
                 .ToUniTask(cancellationToken: cancellationToken);
             _constructionEnclose ??= _enclosureGameObject.GetComponent<IConstruction>();
         }
@@ -139,18 +139,18 @@ namespace Soul.Controller.Runtime.Upgrades
         {
             recordReference.InProgression = false;
             EndConstruction().Forget();
-            if (levelReference.IsLocked) OnCompleteUnlockingAsync().Forget();
+            if (LevelReference.IsLocked) OnCompleteUnlockingAsync().Forget();
             else OnCompleteUpgrading();
-            info.onUnlockUpgradeComplete?.Invoke(levelReference);
+            info.onUnlockUpgradeComplete?.Invoke(LevelReference);
         }
 
 
         private void OnCompleteUpgrading()
         {
-            levelReference.Current = recordReference.toLevel;
+            LevelReference.Current = recordReference.toLevel;
             info.saveAbleReference.Save();
             upgradePartsManager.ClearInstantiatedParts();
-            upgradePartsManager.Spawn(levelReference - 1, info.boxCollider);
+            upgradePartsManager.Spawn(LevelReference - 1, info.boxCollider);
         }
 
 
@@ -164,15 +164,15 @@ namespace Soul.Controller.Runtime.Upgrades
 
         private async UniTask OnCompleteUnlockingAsync()
         {
-            levelReference.Current = 1;
+            LevelReference.Current = 1;
             info.saveAbleReference.Save();
             await ShowUnlocked();
-            upgradePartsManager.Spawn(levelReference - 1, info.boxCollider);
+            upgradePartsManager.Spawn(LevelReference - 1, info.boxCollider);
         }
 
         public override string ToString()
         {
-            return $"{parent.name} {levelReference} {recordReference}";
+            return $"{unlockManagerComponent.transform.parent.name} {LevelReference} {recordReference}";
         }
     }
 }
