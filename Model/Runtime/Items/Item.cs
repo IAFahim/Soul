@@ -1,4 +1,5 @@
 ﻿using System;
+using Alchemy.Inspector;
 using Soul.Model.Runtime.Interfaces;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ namespace Soul.Model.Runtime.Items
     [Serializable]
     public class Item : ScriptableObject, ITitle, IIcon
     {
+        [Title("Item")]
         public string title;
         [TextArea(3, 5)] public string description;
         public Sprite icon;

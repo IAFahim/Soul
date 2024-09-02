@@ -20,50 +20,47 @@ namespace Soul.Controller.Runtime.MeshPlanters
     {
         public GridWayPointLimiter gridWayPointLimiter;
         public GameObject plantHolderPrefab;
-        public MeshFilter[] instances;
+        public List<GameObject> instances;
         public TweenSettingFactor tweenSettingFactor;
         public Vector3 sizeReference;
         public int levelReference;
         public int batchMultiplier = 5;
 
-        public void Plant(int level, Mesh mesh, Vector3 size)
+        public void Setup(int level)
         {
-            var pointGrid = gridWayPointLimiter.SpawnPoints(level);
             levelReference = level;
-            sizeReference = size;
-            instances = new MeshFilter[pointGrid.Count];
-            for (var i = 0; i < pointGrid.Count; i++)
-            {
-                var point = pointGrid[i];
-                var instance = plantHolderPrefab.Request(point.position, point.rotation, Transform);
-                instance.transform.localScale = size;
-                instances[i] = instance.GetComponent<MeshFilter>();
-                instances[i].mesh = mesh;
-            }
-
-            Debug.Log("Planted");
         }
-
-        public void ChangeMesh(Mesh mesh)
-        {
-            foreach (var instance in instances)
-            {
-                instance.mesh = mesh;
-            }
-        }
-
+        
         public void Clear()
         {
             foreach (var instance in instances) instance.gameObject.Return();
         }
 
+        public void Plant(AddressableGameObjectPool stage)
+        {
+            Clear();
+            bool collectedSize = false;
+            var pointGrid = gridWayPointLimiter.SpawnPoints(levelReference);
+            for (var i = 0; i < pointGrid.Count; i++)
+            {
+                var point = pointGrid[i];
+                var instance = stage.Request(point.position, point.rotation, Transform);
+                instances.Add(instance);
+                if (!collectedSize)
+                {
+                    sizeReference = instance.transform.localScale;
+                    collectedSize = true;
+                }
+            }
+        }
+
         public async UniTaskVoid ClearAsync()
         {
             int batch = levelReference * batchMultiplier;
-            for (var i = 0; i < instances.Length; i++)
+            for (var i = 0; i < instances.Count; i++)
             {
                 var tasks = new List<UniTask>();
-                int batchEnd = Math.Min(i + batch, instances.Length);
+                int batchEnd = Math.Min(i + batch, instances.Count);
                 for (int j = i; j < batchEnd; j++) tasks.Add(Clear(j));
                 i = batchEnd - 1;
                 await UniTask.WhenAll(tasks);

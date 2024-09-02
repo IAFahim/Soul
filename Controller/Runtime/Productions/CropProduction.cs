@@ -92,7 +92,7 @@ namespace Soul.Controller.Runtime.Productions
             }
         }
 
-        public IPlantStageMesh PlantStageMesh => Reward.Key as IPlantStageMesh;
+        public IPlantStage PlantStage => Reward.Key as IPlantStage;
 
 
         // Public Methods
@@ -169,8 +169,8 @@ namespace Soul.Controller.Runtime.Productions
         /// </summary>
         public override void OnTimerStart(bool startsNow)
         {
-            IPlantStageMesh plantStageMesh = PlantStageMesh;
-            meshPlantPointGridSystem.Plant(LevelReference, plantStageMesh.StageMeshes[0], plantStageMesh.Size);
+            IPlantStage plantStage = PlantStage;
+            meshPlantPointGridSystem.Setup(LevelReference);
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace Soul.Controller.Runtime.Productions
             var instantiatedRewardPopup =
                 popupIndicator.gameObject.Request(_parent).GetComponent<PopupIndicatorIconCount>();
             instantiatedRewardPopup.Setup(_playerInventoryReference.mainCameraReference.transform, this, this, true);
-            meshPlantPointGridSystem.ChangeMesh(PlantStageMesh.StageMeshes[^1]);
+            meshPlantPointGridSystem.Plant(PlantStage.MeshStagePool[^1]);
         }
 
         /// <summary>

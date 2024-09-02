@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Pancake.Common;
 using Pancake.MobileInput;
 using Soul.Model.Runtime.Selectors;

@@ -4,7 +4,6 @@ using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Unlocks;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
-using Soul.Model.Runtime.Upgrades;
 using Soul.Model.Runtime.Variables;
 using TMPro;
 using UnityEngine;
@@ -38,6 +37,7 @@ namespace Soul.Presenter.Runtime.UI
         public GameObject levelContainer;
         public string levelLockedText = "Lock";
         public TMPFormat levelTMP;
+        public Event<Transform> onUpgradeAbleOrUnlockAbleSelected;
 
 
         private void Awake()
@@ -74,6 +74,7 @@ namespace Soul.Presenter.Runtime.UI
             }
             else
             {
+                onUpgradeAbleOrUnlockAbleSelected.Trigger(null);
                 HideCanvas();
             }
         }
@@ -106,18 +107,19 @@ namespace Soul.Presenter.Runtime.UI
             }
             else
             {
+                onUpgradeAbleOrUnlockAbleSelected.Trigger(null);
                 DisableUpgrade();
                 DisableLevelContainer();
             }
         }
-        
+
         private void Unlock()
         {
             var unlockReference = currentSelectedTransform.GetComponent<IUnlock>();
             if (unlockReference.CanUnlock) unlockReference.Unlock();
             OnSelected(currentSelectedTransform);
         }
-        
+
         public void Upgrade()
         {
             var upgradeReference = currentSelectedTransform.GetComponent<IUpgrade>();
@@ -127,6 +129,7 @@ namespace Soul.Presenter.Runtime.UI
 
         private void MarkUpgrade(Level levelValue)
         {
+            onUpgradeAbleOrUnlockAbleSelected.Trigger(currentSelectedTransform);
             unLockUpgradeButton.interactable = true;
             unLockUpgradeButton.onClick.AddListener(Upgrade);
             unLockUpgradeImage.sprite = upgradeButtonSprite;
@@ -136,18 +139,20 @@ namespace Soul.Presenter.Runtime.UI
 
         private void MarkMaxLevel(Level levelValue)
         {
+            onUpgradeAbleOrUnlockAbleSelected.Trigger(null);
             unLockUpgradeButton.interactable = false;
             unLockUpgradeImage.sprite = upgradeButtonSprite;
             unLockUpgradeButtonTMP.text = maxLevelText;
             levelTMP.SetTextInt(levelValue.Current);
         }
-        
+
         private void MarkedLock()
         {
+            onUpgradeAbleOrUnlockAbleSelected.Trigger(currentSelectedTransform);
             unLockUpgradeButton.interactable = true;
             unLockUpgradeButton.onClick.AddListener(Unlock);
             unLockUpgradeImage.sprite = unlockButtonSprite;
-            unLockUpgradeButtonTMP.text = unlockButtonText; 
+            unLockUpgradeButtonTMP.text = unlockButtonText;
             levelTMP.TMP.text = levelLockedText;
         }
 
