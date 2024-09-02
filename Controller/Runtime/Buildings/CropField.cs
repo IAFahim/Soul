@@ -19,8 +19,8 @@ namespace Soul.Controller.Runtime.Buildings
     public class CropField : FarmingBuilding, IProductionRecordReference<RecordProduction>, ILoadComponent,
         IAllowedToDropReference<Item>, IDropAble<Item>
     {
+        [Title("CropField")]
         [SerializeField] private ProductionBuildingRecord productionBuildingRecord;
-
         [SerializeField] private CropProductionManager cropProductionManager;
         [SerializeField] private AllowedItemLists allowedItemLists;
         [SerializeField] private TweenSettingCurveScriptableObject<Vector3> dropTweenSettings;
@@ -72,7 +72,8 @@ namespace Soul.Controller.Runtime.Buildings
         protected override async UniTask SetUp(Level currentLevel)
         {
             await base.SetUp(currentLevel);
-            cropProductionManager.Setup(playerInventoryReference, this, currentLevel, this);
+            cropProductionManager.Setup(unlockManagerComponent.transform, playerInventory, this, currentLevel,
+                this);
         }
 
         #region ISaveAble
@@ -106,8 +107,6 @@ namespace Soul.Controller.Runtime.Buildings
         public override void OnUnlockUpgradeComplete(int obj)
         {
         }
-        
-        
 
 
         #region IAllowedToDropReference<Item>
@@ -123,7 +122,7 @@ namespace Soul.Controller.Runtime.Buildings
         public bool OnDrag(Item drop)
         {
             if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
-            _dropMotionHandle = unlockAndUpgradeManager.transform.TweenPlayer(dropTweenSettings);
+            _dropMotionHandle = unlockManagerComponent.transform.TweenPlayer(dropTweenSettings);
             return TryDropAdd(drop);
         }
 
@@ -137,7 +136,7 @@ namespace Soul.Controller.Runtime.Buildings
         public bool OnDrop(Item dropPackage)
         {
             if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
-            unlockAndUpgradeManager.transform.localScale = dropTweenSettings.start;
+            unlockManagerComponent.transform.localScale = dropTweenSettings.start;
             if (!TryDropAdd(dropPackage)) return false;
             if (cropProductionManager.TryStartProgression()) Save(Guid);
             return true;
@@ -146,7 +145,7 @@ namespace Soul.Controller.Runtime.Buildings
         public void OnDragCancel()
         {
             if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
-            unlockAndUpgradeManager.transform.localScale = dropTweenSettings.start;
+            unlockManagerComponent.transform.localScale = dropTweenSettings.start;
         }
 
         #endregion
@@ -156,7 +155,6 @@ namespace Soul.Controller.Runtime.Buildings
         {
             unlockAndUpgradeManager = GetComponentInChildren<UnlockAndUpgradeManager>();
             cropProductionManager = GetComponent<CropProductionManager>();
-            boxCollider = GetComponentInChildren<BoxCollider>();
         }
 
         void ILoadComponent.OnLoadComponents()

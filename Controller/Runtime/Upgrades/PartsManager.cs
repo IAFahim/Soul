@@ -42,6 +42,7 @@ namespace Soul.Controller.Runtime.Upgrades
         [Button]
         private void SetBounds(BoxCollider boxCollider)
         {
+            if(boxCollider == null) return;
             boxCollider.center = bounds.center;
             boxCollider.size = bounds.size;
         }

@@ -1,4 +1,5 @@
-﻿using Pancake;
+﻿using System;
+using Pancake;
 using Pancake.Pools;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Converters;
@@ -20,10 +21,12 @@ using Math = Pancake.Common.Math;
 
 namespace Soul.Controller.Runtime.Productions
 {
+    [Serializable]
     public class EggProductionManager : ProgressionManager<RecordProduction>, IWeightCapacityReference,
         IRewardClaim,
         IReward<Pair<Item, int>>
     {
+        [SerializeField] private Transform parent;
         [SerializeField] private PlayerInventoryReference playerInventoryReference;
         [SerializeField] private RequiredAndRewardForProductions requiredAndRewardForProductions;
         [SerializeField] private WorkerType basicWorkerType;
@@ -40,9 +43,11 @@ namespace Soul.Controller.Runtime.Productions
         public override UnityTimeSpan FullTimeRequirement =>
             itemToItemConverter.Convert(ProductionItemValuePair.Key).timeRequired;
 
-        public bool Setup(PlayerInventoryReference inventoryReference, RecordProduction record, Level level,
+        public bool Setup(Transform parentTransform, PlayerInventoryReference inventoryReference,
+            RecordProduction record, Level level,
             ISaveAbleReference saveAbleReference)
         {
+            parent = parentTransform;
             playerInventoryReference = inventoryReference;
             record.InProgression = true;
             bool canStart = base.Setup(record, level, saveAbleReference);
@@ -80,7 +85,7 @@ namespace Soul.Controller.Runtime.Productions
             ProductionItemValuePair = new Pair<Item, int>(ProductionItemValuePair.Key, currentClamped);
             if (_popupIndicatorInstance == null)
             {
-                _popupIndicatorInstance = popupIndicatorPrefab.gameObject.Request(Transform)
+                _popupIndicatorInstance = popupIndicatorPrefab.gameObject.Request(parent)
                     .GetComponent<PopupIndicatorIconCount>();
                 _popupIndicatorInstance.Setup(playerInventoryReference.mainCameraReference.transform, this, this,
                     false);
@@ -128,5 +133,10 @@ namespace Soul.Controller.Runtime.Productions
 
 
         public Pair<Item, int> Reward => ProductionItemValuePair;
+
+        public override string ToString()
+        {
+            return $"{parent.name}: {ProductionItemValuePair.Key} {ProductionItemValuePair.Value}";
+        }
     }
 }

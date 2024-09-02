@@ -8,8 +8,8 @@ using TrackTime;
 
 namespace Soul.Model.Runtime.Progressions
 {
-    public abstract class ProgressionManager<TRecord> : GameComponent
-        where TRecord : ITimeBasedReference, IInProgression
+    [Serializable]
+    public abstract class ProgressionManager<TRecord> where TRecord : ITimeBasedReference, IInProgression
     {
         public TRecord recordReference;
         public Level levelReference;
@@ -82,8 +82,9 @@ namespace Soul.Model.Runtime.Progressions
 
             float delay = startsNow ? (float)DiscountedTime.TotalSeconds : (float)TimeRemaining.TotalSeconds;
             DelayHandle = App.Delay(delay, OnComplete, useRealTime: true);
-            Track.Start(name, delay);
+            Track.Start(ToString(), delay);
         }
+        
 
         public abstract void OnTimerStart(bool startsNow);
 

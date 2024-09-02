@@ -24,7 +24,7 @@ namespace Soul.Controller.Runtime.Buildings
         {
             await base.SetUp(currentLevel);
             eggProductionManager.Setup(
-                playerInventoryReference, productionBuildingRecord.recordProduction, currentLevel, this
+                transform, playerInventory, productionBuildingRecord.recordProduction, currentLevel, this
             );
         }
 
@@ -61,7 +61,7 @@ namespace Soul.Controller.Runtime.Buildings
         {
             eggProductionManager.TryStartProgression();
         }
-        
+
 
         public RecordProduction ProductionRecord { get; set; }
     }

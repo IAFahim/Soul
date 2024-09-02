@@ -1,4 +1,5 @@
-﻿using Pancake;
+﻿using Alchemy.Inspector;
+using Pancake;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Selectors;
 using UnityEngine;
@@ -7,6 +8,7 @@ namespace Soul.Controller.Runtime.Buildings
 {
     public abstract class Building : GameComponent, IGuid, ITitle, ISelectCallBack
     {
+        [Title("Building")]
         [SerializeField, Guid] protected string guid;
 
         #region GUID

@@ -1,4 +1,5 @@
-﻿using Alchemy.Inspector;
+﻿using System;
+using Alchemy.Inspector;
 using Pancake;
 using Pancake.Common;
 using Pancake.Pools;
@@ -25,10 +26,12 @@ using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.Productions
 {
+    [Serializable]
     public class CropProductionManager : ProgressionManager<RecordProduction>, IWeightCapacityReference,
-        IRewardClaim, IReward<Pair<Item, int>>, ILoadComponent
+        IRewardClaim, IReward<Pair<Item, int>>
     {
         // Serialized Fields
+        [SerializeField] private Transform parent;
         [SerializeField] private PlayerInventoryReference playerInventoryReference;
         [SerializeField] private RequiredAndRewardForProductions requiredAndRewardForProductions;
         [SerializeField] private WorkerType basicWorkerType;
@@ -95,10 +98,11 @@ namespace Soul.Controller.Runtime.Productions
         /// <summary>
         /// Initializes the CropProductionManager with the given parameters.
         /// </summary>
-        public bool Setup(PlayerInventoryReference inventoryReference,
+        public bool Setup(Transform parentTransform,PlayerInventoryReference inventoryReference,
             IProductionRecordReference<RecordProduction> recordProduction, Level level,
             ISaveAbleReference saveAbleReference)
         {
+            parent = parentTransform;
             playerInventoryReference = inventoryReference;
             return Setup(recordProduction.ProductionRecord, level, saveAbleReference);
         }
@@ -173,10 +177,10 @@ namespace Soul.Controller.Runtime.Productions
         public override void OnComplete()
         {
             
-            if (onCompleteParticleEffect) onCompleteParticleEffect.Value.Load(true, Transform).Forget();
+            if (onCompleteParticleEffect) onCompleteParticleEffect.Value.Load(true, parent).Forget();
             isClaimable = true;
             var instantiatedRewardPopup =
-                popupIndicator.gameObject.Request(Transform).GetComponent<PopupIndicatorIconCount>();
+                popupIndicator.gameObject.Request(parent).GetComponent<PopupIndicatorIconCount>();
             instantiatedRewardPopup.Setup(playerInventoryReference.mainCameraReference.transform, this, this, true);
             meshPlantPointGridSystem.ChangeMesh(PlantStageMesh.StageMeshes[^1]);
         }
@@ -215,18 +219,9 @@ namespace Soul.Controller.Runtime.Productions
             SaveAbleReference.Save();
         }
 
-        // ILoadComponent implementation
-        void ILoadComponent.OnLoadComponents()
+        public override string ToString()
         {
-            Reset();
-        }
-
-        /// <summary>
-        /// Resets the component, primarily used for initialization after loading.
-        /// </summary>
-        protected void Reset()
-        {
-            meshPlantPointGridSystem = GetComponent<MeshPlantPointGridSystem>();
+            return $"{parent.name}: {ProductionItemValuePair.Key} x {ProductionItemValuePair.Value}";
         }
     }
 }

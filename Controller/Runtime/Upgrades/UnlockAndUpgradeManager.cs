@@ -4,29 +4,27 @@ using System.Threading.Tasks;
 using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using Pancake;
-using Pancake.Common;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Addressables;
 using Soul.Controller.Runtime.Constructions;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Requirements;
-using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Progressions;
-using Soul.Model.Runtime.SaveAndLoad;
-using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 namespace Soul.Controller.Runtime.Upgrades
 {
-    public class UnlockAndUpgradeManager : ProgressionManager<RecordUpgrade>, ILoadComponent
+    [Serializable]
+    public class UnlockAndUpgradeManager : ProgressionManager<RecordUpgrade>
     {
         public UnlockAndUpgradeSetupInfo info;
         [SerializeField] private RequirementForUpgrades requirementForUpgrades;
         [SerializeField] private Transform parent;
-        [SerializeField] private UnlockManager unlockManager;
-        [SerializeField] private PartsManager upgradePartsManager;
-        
+        [SerializeField, DisableInEditMode] private PartsManager upgradePartsManager;
+
+        private AddressablePoolLifetime _addressablePoolLifetime;
+        private PlayerInventoryReference _playerInventory;
 
         #region Enclosure
 
@@ -42,15 +40,29 @@ namespace Soul.Controller.Runtime.Upgrades
         public override UnityTimeSpan FullTimeRequirement => Required.fullTime;
 
 
-        public async UniTask<bool> Setup(UnlockAndUpgradeSetupInfo unlockAndUpgradeSetupInfo)
+        public async UniTask<bool> Setup(AddressablePoolLifetime addressablePoolLifetime,
+            PlayerInventoryReference inventoryReference,
+            UnlockAndUpgradeSetupInfo unlockAndUpgradeSetupInfo)
         {
+            _addressablePoolLifetime = addressablePoolLifetime;
+            _playerInventory = inventoryReference;
             info = unlockAndUpgradeSetupInfo;
-            unlockManager.Setup(info.addressablePoolLifetime);
-            bool canStart = base.Setup(info.recordOfUpgrade.UpgradeRecord, info.level, info.saveAbleReference);
+            info.unlockManagerComponent.Setup(_addressablePoolLifetime);
+            return await ValidateStart();
+        }
 
+        private async Task ShowUnlocked()
+        {
+            var unLockedGameObject = await info.unlockManagerComponent.InstantiateUnLockedAsync();
+            upgradePartsManager = unLockedGameObject.GetComponent<PartsManager>();
+        }
+
+        private async UniTask<bool> ValidateStart()
+        {
+            bool canStart = base.Setup(info.recordOfUpgrade.UpgradeRecord, info.level, info.saveAbleReference);
             if (levelReference == 0)
             {
-                await unlockManager.InstantiateLockedAsync();
+                await info.unlockManagerComponent.InstantiateLockedAsync();
             }
             else
             {
@@ -62,14 +74,8 @@ namespace Soul.Controller.Runtime.Upgrades
         }
 
 
-        private async Task ShowUnlocked()
-        { 
-            var unLockedGameObject = await unlockManager.InstantiateUnLockedAsync();
-            upgradePartsManager = unLockedGameObject.GetComponent<PartsManager>();
-        }
-
         [Button]
-        public void Upgrade(int level)
+        public void Upgrade()
         {
             if (TryStartProgression())
             {
@@ -79,9 +85,14 @@ namespace Soul.Controller.Runtime.Upgrades
 
         public override bool HasEnough()
         {
-            var currentCoin = info.playerInventory.coins;
+            var currentCoin = _playerInventory.coins;
             if (currentCoin.Key != Required.currency.Key) return false;
             return currentCoin >= Required.currency.Value;
+        }
+
+        protected override void TakeRequirement()
+        {
+            _playerInventory.coins.Set(_playerInventory.coins - Required.currency.Value);
         }
 
         protected override void ModifyRecordBeforeProgression()
@@ -94,17 +105,6 @@ namespace Soul.Controller.Runtime.Upgrades
         public override void OnTimerStart(bool startsNow)
         {
         }
-
-
-        public override void OnComplete()
-        {
-            recordReference.InProgression = false;
-            EndConstruction().Forget();
-            if (levelReference.IsLocked) OnCompleteUnlockingAsync().Forget();
-            else OnCompleteUpgrading();
-            info.onUnlockUpgradeComplete?.Invoke(levelReference);
-        }
-
 
         #region Enclosure
 
@@ -135,6 +135,16 @@ namespace Soul.Controller.Runtime.Upgrades
 
         #endregion
 
+        public override void OnComplete()
+        {
+            recordReference.InProgression = false;
+            EndConstruction().Forget();
+            if (levelReference.IsLocked) OnCompleteUnlockingAsync().Forget();
+            else OnCompleteUpgrading();
+            info.onUnlockUpgradeComplete?.Invoke(levelReference);
+        }
+
+
         private void OnCompleteUpgrading()
         {
             levelReference.Current = recordReference.toLevel;
@@ -143,16 +153,6 @@ namespace Soul.Controller.Runtime.Upgrades
             upgradePartsManager.Spawn(levelReference - 1, info.boxCollider);
         }
 
-
-        void ILoadComponent.OnLoadComponents()
-        {
-            Reset();
-        }
-
-        public void Reset()
-        {
-            unlockManager = GetComponent<UnlockManager>();
-        }
 
         public void Unlock()
         {
@@ -170,9 +170,9 @@ namespace Soul.Controller.Runtime.Upgrades
             upgradePartsManager.Spawn(levelReference - 1, info.boxCollider);
         }
 
-        protected override void TakeRequirement()
+        public override string ToString()
         {
-            info.playerInventory.coins.Set(info.playerInventory.coins - Required.currency.Value);
+            return $"{parent.name} {levelReference} {recordReference}";
         }
     }
 }

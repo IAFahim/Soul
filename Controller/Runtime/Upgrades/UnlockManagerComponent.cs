@@ -8,22 +8,22 @@ using UnityEngine.AddressableAssets;
 
 namespace Soul.Controller.Runtime.Upgrades
 {
-    public class UnlockManager : GameComponent
+    public class UnlockManagerComponent : GameComponent
     {
-        [SerializeField] private AddressablePoolLifetime addressablePoolLifetime;
         [SerializeField] private Optional<AssetReferenceGameObject> lockedAssetReferenceGameObject;
         [SerializeField] private AssetReferenceGameObject unLockedPartsAssetReference;
-        [ShowInInspector] private Pair<AssetReferenceGameObject, GameObject> _instantiatedAssetPairReference;
-
+        
+        private Pair<AssetReferenceGameObject, GameObject> _instantiatedAssetPairReference;
+        private AddressablePoolLifetime _addressablePoolLifetime;
         public void Setup(AddressablePoolLifetime poolLifetime)
         {
-            addressablePoolLifetime = poolLifetime;
+            _addressablePoolLifetime = poolLifetime;
         }
 
         private async UniTask<GameObject> InstantiateAsync(AssetReferenceGameObject assetReferenceGameObject)
         {
             ReleaseInstance();
-            var instantiatedAsset = await addressablePoolLifetime.GetOrInstantiateAsync(assetReferenceGameObject, Transform);
+            var instantiatedAsset = await _addressablePoolLifetime.GetOrInstantiateAsync(assetReferenceGameObject, Transform);
             _instantiatedAssetPairReference =
                 new Pair<AssetReferenceGameObject, GameObject>(assetReferenceGameObject, instantiatedAsset);
             return instantiatedAsset;
@@ -46,7 +46,7 @@ namespace Soul.Controller.Runtime.Upgrades
         public void ReleaseInstance()
         {
             if (_instantiatedAssetPairReference.Value)
-                addressablePoolLifetime.ReturnToPool(_instantiatedAssetPairReference);
+                _addressablePoolLifetime.ReturnToPool(_instantiatedAssetPairReference);
         }
     }
 }

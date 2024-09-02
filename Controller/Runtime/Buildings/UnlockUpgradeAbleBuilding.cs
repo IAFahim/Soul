@@ -1,4 +1,5 @@
-﻿using Soul.Model.Runtime.Interfaces;
+﻿using Alchemy.Inspector;
+using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.SaveAndLoad;
 using Soul.Model.Runtime.Unlocks;
@@ -10,6 +11,7 @@ namespace Soul.Controller.Runtime.Buildings
     public abstract class UnlockUpgradeAbleBuilding : Building, ICurrentLevelReference<int>, ISaveAble,
         ISaveAbleReference, IUpgrade, ILocked, IUnlock
     {
+        [Title("Building")]
         #region ICurrentLevelReference
 
         public abstract int CurrentLevel { get; set; }

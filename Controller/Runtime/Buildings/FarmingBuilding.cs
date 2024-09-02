@@ -12,19 +12,22 @@ using Soul.Model.Runtime.Tweens;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using UnityEngine;
 
+
 namespace Soul.Controller.Runtime.Buildings
 {
     [RequireComponent(typeof(BoxCollider))]
     public abstract class FarmingBuilding : UnlockUpgradeAbleBuilding, IReSelectedCallBack, IInfoPanelReference,
         IUpgradeRecordReference<RecordUpgrade>
     {
-        [SerializeField] protected PlayerInventoryReference playerInventoryReference;
-        [SerializeField] protected AddressablePoolLifetime addressablePoolLifetimeReference;
+        [Title("FarmingBuilding")] 
+        [SerializeField] protected AddressablePoolLifetime addressablePoolLifetime;
 
+        [SerializeField] protected PlayerInventoryReference playerInventory;
         [SerializeField] protected LevelInfrastructureInfo levelInfrastructureInfo;
-        [SerializeField] protected BoxCollider boxCollider;
         [SerializeField] protected UnlockAndUpgradeManager unlockAndUpgradeManager;
+        [SerializeField] protected UnlockManagerComponent unlockManagerComponent;
         [SerializeField] protected InfoPanel infoPanelPrefab;
+
 
         private readonly bool _loadDataOnEnable = true;
 
@@ -33,15 +36,6 @@ namespace Soul.Controller.Runtime.Buildings
         public override string Title => levelInfrastructureInfo.Title;
 
         #endregion
-
-
-        public virtual async UniTask Setup(AddressablePoolLifetime addressablePoolLifetime,
-            PlayerInventoryReference playerInventory)
-        {
-            addressablePoolLifetimeReference = addressablePoolLifetime;
-            playerInventoryReference = playerInventory;
-            await SetUp(level);
-        }
 
 
         private async void Start()
@@ -54,16 +48,14 @@ namespace Soul.Controller.Runtime.Buildings
         {
             var info = new UnlockAndUpgradeSetupInfo
             {
-                addressablePoolLifetime = addressablePoolLifetimeReference,
-                playerInventory = playerInventoryReference,
+                unlockManagerComponent = unlockManagerComponent,
                 recordOfUpgrade = this,
                 saveAbleReference = this,
-                boxCollider = boxCollider,
                 level = currentLevel,
                 onUnlockUpgradeStart = OnUnlockUpgradeStart,
                 onUnlockUpgradeComplete = OnUnlockUpgradeComplete
             };
-            await unlockAndUpgradeManager.Setup(info);
+            await unlockAndUpgradeManager.Setup(addressablePoolLifetime, playerInventory, info);
         }
 
 
@@ -101,7 +93,7 @@ namespace Soul.Controller.Runtime.Buildings
         public override bool IsUpgrading => UpgradeRecord.InProgression;
 
         [Button]
-        public override void Upgrade() => unlockAndUpgradeManager.Upgrade(level + 1);
+        public override void Upgrade() => unlockAndUpgradeManager.Upgrade();
 
         #endregion
 
@@ -138,7 +130,7 @@ namespace Soul.Controller.Runtime.Buildings
         protected void PlayDualSquishAndStretch()
         {
             if (SelectTweenMotionHandle.IsActive()) SelectTweenMotionHandle.Cancel();
-            SelectTweenMotionHandle = unlockAndUpgradeManager.Transform.TweenPlayer(selectTweenSetting);
+            SelectTweenMotionHandle = unlockManagerComponent.Transform.TweenPlayer(selectTweenSetting);
         }
 
         public override void OnSelected(RaycastHit selfRayCastHit)
