@@ -20,9 +20,9 @@ namespace Soul.Controller.Runtime.Upgrades
     {
         public UnlockManagerComponent unlockManagerComponent;
         public UnlockAndUpgradeSetupInfo info;
-        [SerializeField] private RequirementForUpgrades requirementForUpgrades;
         [SerializeField, DisableInEditMode] private PartsManager upgradePartsManager;
 
+        private RequirementForUpgrades _requirementForUpgrades;
         private AddressablePoolLifetime _addressablePoolLifetime;
         private PlayerInventoryReference _playerInventory;
 
@@ -35,16 +35,18 @@ namespace Soul.Controller.Runtime.Upgrades
         #endregion
 
 
-        public RequirementForUpgrade Required => requirementForUpgrades.GetRequirement(LevelReference);
+        public RequirementForUpgrade Required => _requirementForUpgrades.GetRequirement(LevelReference);
 
         public override UnityTimeSpan FullTimeRequirement => Required.fullTime;
 
 
         public async UniTask<bool> Setup(AddressablePoolLifetime addressablePoolLifetime,
-            PlayerInventoryReference inventoryReference,
-            UnlockAndUpgradeSetupInfo unlockAndUpgradeSetupInfo)
+            RequirementForUpgrades requirementForUpgrades, PlayerInventoryReference inventoryReference,
+            UnlockAndUpgradeSetupInfo unlockAndUpgradeSetupInfo
+        )
         {
             _addressablePoolLifetime = addressablePoolLifetime;
+            _requirementForUpgrades = requirementForUpgrades;
             _playerInventory = inventoryReference;
             info = unlockAndUpgradeSetupInfo;
             unlockManagerComponent.Setup(_addressablePoolLifetime);

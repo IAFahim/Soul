@@ -1,4 +1,4 @@
-﻿namespace Soul.Model.Runtime.Unlocks
+﻿namespace Soul.Model.Runtime.UpgradeAndUnlock.Unlocks
 {
     public interface IUnlock
     {

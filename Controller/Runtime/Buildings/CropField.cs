@@ -3,7 +3,6 @@ using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using Pancake.Common;
-using Soul.Controller.Runtime.Addressables;
 using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.Lists;
 using Soul.Controller.Runtime.MeshPlanters;

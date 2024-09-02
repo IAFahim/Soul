@@ -5,6 +5,8 @@ using LitMotion;
 using Soul.Controller.Runtime.Addressables;
 using Soul.Controller.Runtime.InfoPanels;
 using Soul.Controller.Runtime.Inventories;
+using Soul.Controller.Runtime.Requirements;
+using Soul.Controller.Runtime.RequiresAndRewards;
 using Soul.Controller.Runtime.Upgrades;
 using Soul.Model.Runtime.Buildings;
 using Soul.Model.Runtime.Levels;
@@ -19,7 +21,7 @@ namespace Soul.Controller.Runtime.Buildings
 {
     [RequireComponent(typeof(BoxCollider))]
     public abstract class FarmingBuilding : UnlockUpgradeAbleBuilding, IReSelectedCallBack, IInfoPanelReference,
-        IUpgradeRecordReference<RecordUpgrade>
+        IUpgradeRecordReference<RecordUpgrade>, IRequirementForUpgradeScriptableReference
     {
         [Title("FarmingBuilding")] [SerializeField]
         protected AddressablePoolLifetime addressablePoolLifetime;
@@ -27,8 +29,12 @@ namespace Soul.Controller.Runtime.Buildings
         [SerializeField] protected PlayerInventoryReference playerInventory;
         [SerializeField] protected LevelInfrastructureInfo levelInfrastructureInfo;
 
-        [FormerlySerializedAs("unlockAndUpgradeManager")] [SerializeField]
+
+        [SerializeField] protected RequirementForUpgrades requirementForUpgrades;
+
+        [SerializeField]
         protected UnlockAndUpgrade unlockAndUpgrade;
+
 
         [SerializeField] protected InfoPanel infoPanelPrefab;
 
@@ -41,6 +47,7 @@ namespace Soul.Controller.Runtime.Buildings
 
         #endregion
 
+        public RequirementForUpgrades RequirementForUpgrades => requirementForUpgrades;
 
         private async void Start()
         {
@@ -58,7 +65,7 @@ namespace Soul.Controller.Runtime.Buildings
                 onUnlockUpgradeStart = OnUnlockUpgradeStart,
                 onUnlockUpgradeComplete = OnUnlockUpgradeComplete
             };
-            await unlockAndUpgrade.Setup(addressablePoolLifetime, playerInventory, info);
+            await unlockAndUpgrade.Setup(addressablePoolLifetime, requirementForUpgrades, playerInventory, info);
         }
 
 
