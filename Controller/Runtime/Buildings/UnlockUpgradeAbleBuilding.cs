@@ -2,7 +2,7 @@
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.SaveAndLoad;
 using Soul.Model.Runtime.Unlocks;
-using Soul.Model.Runtime.Upgrades;
+using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using UnityEngine;
 
 namespace Soul.Controller.Runtime.Buildings
@@ -43,6 +43,8 @@ namespace Soul.Controller.Runtime.Buildings
         public abstract bool CanUpgrade { get; }
         public abstract bool IsUpgrading { get; }
         public abstract void Upgrade();
+        public abstract void OnUnlockUpgradeStart();
+        public abstract void OnUnlockUpgradeComplete(int toLevel);
 
         #endregion
 

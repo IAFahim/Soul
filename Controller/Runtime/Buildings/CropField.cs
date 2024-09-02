@@ -99,6 +99,16 @@ namespace Soul.Controller.Runtime.Buildings
             base.Load(key);
         }
 
+        public override void OnUnlockUpgradeStart()
+        {
+        }
+
+        public override void OnUnlockUpgradeComplete(int obj)
+        {
+        }
+        
+        
+
 
         #region IAllowedToDropReference<Item>
 

@@ -35,7 +35,7 @@ namespace Soul.Model.Runtime.Progressions
             recordReference = record;
             levelReference = level;
             SaveAbleReference = saveAbleReference;
-            bool canStart = recordReference.InProgression;
+            bool canStart = !level.IsLocked && recordReference.InProgression;
             if (canStart) StartTimer(false);
             return canStart;
         }
@@ -88,5 +88,12 @@ namespace Soul.Model.Runtime.Progressions
         public abstract void OnTimerStart(bool startsNow);
 
         public abstract void OnComplete();
+        
+        public void Cancel()
+        {
+            DelayHandle?.Cancel();
+            recordReference.InProgression = false;
+            SaveAbleReference.Save();
+        }
     }
 }

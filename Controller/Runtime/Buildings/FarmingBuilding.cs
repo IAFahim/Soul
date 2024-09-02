@@ -52,9 +52,20 @@ namespace Soul.Controller.Runtime.Buildings
 
         protected virtual async UniTask SetUp(Level currentLevel)
         {
-            await unlockAndUpgradeManager.Setup(addressablePoolLifetimeReference, playerInventoryReference,
-                this, this, boxCollider, currentLevel);
+            var info = new UnlockAndUpgradeSetupInfo
+            {
+                addressablePoolLifetime = addressablePoolLifetimeReference,
+                playerInventory = playerInventoryReference,
+                recordOfUpgrade = this,
+                saveAbleReference = this,
+                boxCollider = boxCollider,
+                level = currentLevel,
+                onUnlockUpgradeStart = OnUnlockUpgradeStart,
+                onUnlockUpgradeComplete = OnUnlockUpgradeComplete
+            };
+            await unlockAndUpgradeManager.Setup(info);
         }
+
 
         #region IUpgradeRecordReference
 
@@ -120,7 +131,7 @@ namespace Soul.Controller.Runtime.Buildings
         public override string ToString() => Title;
 
         #region Selected Animation
-        
+
         [SerializeField] protected TweenSettingCurveScriptableObject<Vector3> selectTweenSetting;
         protected MotionHandle SelectTweenMotionHandle;
 

@@ -3,6 +3,7 @@ using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Unlocks;
+using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using Soul.Model.Runtime.Upgrades;
 using Soul.Model.Runtime.Variables;
 using TMPro;

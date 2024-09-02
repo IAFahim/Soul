@@ -52,6 +52,17 @@ namespace Soul.Controller.Runtime.Buildings
             base.Load(key);
         }
 
+        public override void OnUnlockUpgradeStart()
+        {
+            eggProductionManager.Cancel();
+        }
+
+        public override void OnUnlockUpgradeComplete(int obj)
+        {
+            eggProductionManager.TryStartProgression();
+        }
+        
+
         public RecordProduction ProductionRecord { get; set; }
     }
 }

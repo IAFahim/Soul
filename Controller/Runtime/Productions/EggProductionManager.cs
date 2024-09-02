@@ -45,7 +45,7 @@ namespace Soul.Controller.Runtime.Productions
         {
             playerInventoryReference = inventoryReference;
             record.InProgression = true;
-            bool canStart = base.Setup(record, level, saveAbleReference) && !level.IsLocked;
+            bool canStart = base.Setup(record, level, saveAbleReference);
             if (!canStart) return false;
             return true;
         }
