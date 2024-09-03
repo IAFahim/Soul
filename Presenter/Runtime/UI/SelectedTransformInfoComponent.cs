@@ -7,223 +7,225 @@ using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using Soul.Model.Runtime.Variables;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
-
 
 namespace Soul.Presenter.Runtime.UI
 {
     public class SelectedTransformInfoComponent : GameComponent
     {
-        public Transform currentSelectedTransform;
-
-        public CanvasGroup canvasGroup;
-        public SelectData selectData;
-
-        public GameObject titleContainer;
-        public TextMeshProUGUI title;
-
-        public TextMeshProUGUI unLockUpgradeButtonTMP;
-        public Sprite unlockButtonSprite;
-        public Sprite upgradeButtonSprite;
-        public Sprite closeSprite;
-        public Button closeButton;
-        public string upgradeButtonText = "Upgrade";
-        public string unlockButtonText = "Unlock";
-        public string maxLevelText = "Max";
-
-        [FormerlySerializedAs("unLockUpgradeButton")]
-        public Button unLockUpgradeActivationButton;
-
-        public Button unLockUpgradeStartButton;
-
-        public Image unLockUpgradeImage;
-
-        public TMPFormat unlockOrUpgradeTitleTMP;
-        public GameObject unlockAndUpgradePanel;
-        public VerticalLayoutGroup unlockOrUpgradeRequirementContainer;
-
-        public GameObject levelContainer;
-        public string levelLockedText = "Lock";
-        public TMPFormat levelTMP;
-
+        // --- Events ---
         public Event<Transform> onUpgradeAbleOrUnlockAbleSelected;
 
+        // --- UI Elements ---
+        [Header("General")] public CanvasGroup canvasGroup;
+        public SelectData selectData;
 
-        private void Awake()
-        {
-            levelTMP.StoreFormat();
-            unlockOrUpgradeTitleTMP.StoreFormat();
-        }
+        [Header("Title Section")] public GameObject titleContainer;
+        public TextMeshProUGUI titleText;
+
+        [Header("Level Section")] public GameObject levelContainer;
+        public TMPFormat levelTextFormat;
+
+        [Header("Unlock/Upgrade Section")] public Button unlockUpgradeToggleButton; // More descriptive name
+        public Button unlockUpgradeActionButton; // More descriptive name
+        public TMP_Text unlockUpgradeActionTitle;
+        public TMP_Text unlockUpgradeCoinRequirement;
+        public TMP_Text unlockUpgradeTimeRequirement;
+        public Image unlockUpgradeButtonImage;
+        public TextMeshProUGUI unlockUpgradeButtonText;
+        public TMPFormat unlockOrUpgradeTitleTextFormat;
+        public GameObject unlockAndUpgradePanel;
+        public VerticalLayoutGroup unlockOrUpgradeRequirementContainer;
+        public Button closeUnlockUpgradePanelButton; // More descriptive name
+
+        // --- Sprites & Text ---
+        [SerializeField] private Sprite unlockButtonSprite;
+        [SerializeField] private Sprite upgradeButtonSprite;
+        [SerializeField] private Sprite closeButtonSprite;
+        [SerializeField] private string upgradeButtonText = "Upgrade";
+        [SerializeField] private string unlockButtonText = "Unlock";
+        [SerializeField] private string maxLevelText = "Max";
+        [SerializeField] private string levelLockedText = "Lock";
+
+        // --- Internal State ---
+        private Transform currentSelectedTransform;
+
 
         private void OnEnable()
         {
-            HideCanvas();
-            HideUnlockPanel();
+            HideUI();
+            HideUnlockUpgradePanel();
         }
 
         private void OnDisable()
         {
-            RemoveListeners();
+            RemoveAllButtonListeners();
         }
-
-        public void RemoveListeners()
-        {
-            unLockUpgradeActivationButton.onClick.RemoveListener(ShowUnlockPanel);
-            unLockUpgradeActivationButton.onClick.RemoveListener(HideUnlockPanel);
-            unLockUpgradeStartButton.onClick.RemoveListener(Upgrade);
-            unLockUpgradeStartButton.onClick.RemoveListener(Unlock);
-            closeButton.onClick.RemoveListener(HideUnlockPanel);
-        }
-
+        
+        
         public void OnSelected(Transform selectedTransform)
         {
-            RemoveListeners();
+            RemoveAllButtonListeners();
             currentSelectedTransform = selectedTransform;
-            var found = selectData.GetDataFrom(selectedTransform);
-            if (found > 0)
+
+            if (selectData.GetDataFrom(selectedTransform) > 0)
             {
-                ShowCanvas();
-                TitleSetActive(selectData.title);
-                UnlockUpgradeLevelSetActive(selectData.level);
+                ShowUI();
+                UpdateTitle(selectData.title);
+                UpdateUnlockUpgradeLevel(selectData.level);
             }
             else
             {
                 onUpgradeAbleOrUnlockAbleSelected.Trigger(null);
-                HideCanvas();
+                HideUI();
             }
         }
 
-        private void TitleSetActive(InterfaceFinder<ITitle> selectDataTitle)
+        // --- Private Helper Methods ---
+
+        private void RemoveAllButtonListeners()
         {
-            if (selectDataTitle) title.text = selectDataTitle.Value.Title;
-            else titleContainer.SetActive(false);
+            unlockUpgradeToggleButton.onClick.RemoveAllListeners();
+            unlockUpgradeActionButton.onClick.RemoveAllListeners();
+            closeUnlockUpgradePanelButton.onClick.RemoveAllListeners();
         }
 
-        private void UnlockUpgradeLevelSetActive(InterfaceFinder<ILevel> selectDataLevel)
-        {
-            if (selectDataLevel)
-            {
-                Level levelValue = selectDataLevel.Value.Level;
-                unLockUpgradeActivationButton.gameObject.SetActive(true);
-                levelContainer.SetActive(true);
-                if (levelValue.IsLocked)
-                {
-                    MarkedLock();
-                }
-                else if (levelValue.IsMax)
-                {
-                    MarkMaxLevel(levelValue);
-                }
-                else
-                {
-                    MarkUpgrade(levelValue);
-                }
-            }
-            else
-            {
-                onUpgradeAbleOrUnlockAbleSelected.Trigger(null);
-                HideUnlockPanel();
-                DisableUpgrade();
-                DisableLevelContainer();
-            }
-        }
-
-        public void ShowUnlockPanel()
-        {
-            RemoveListeners();
-            closeButton.onClick.AddListener(HideUnlockPanel);
-            unLockUpgradeActivationButton.onClick.AddListener(HideUnlockPanel);
-            unLockUpgradeImage.sprite = closeSprite;
-            unlockAndUpgradePanel.SetActive(true);
-            unlockOrUpgradeRequirementContainer.gameObject.SetActive(true);
-        }
-
-        public void HideUnlockPanel()
-        {
-            closeButton.onClick.RemoveListener(HideUnlockPanel);
-            unLockUpgradeActivationButton.onClick.RemoveListener(HideUnlockPanel);
-            unlockAndUpgradePanel.SetActive(false);
-            unlockOrUpgradeRequirementContainer.gameObject.SetActive(false);
-            if (currentSelectedTransform) OnSelected(currentSelectedTransform);
-        }
-
-        private void Unlock()
-        {
-            var unlockReference = currentSelectedTransform.GetComponent<IUnlock>();
-            if (unlockReference.CanUnlock) unlockReference.Unlock();
-            OnSelected(currentSelectedTransform);
-        }
-
-        public void Upgrade()
-        {
-            var upgradeReference = currentSelectedTransform.GetComponent<IUpgrade>();
-            if (upgradeReference.CanUpgrade) upgradeReference.Upgrade();
-            OnSelected(currentSelectedTransform);
-        }
-
-        private void MarkUpgrade(Level levelValue)
-        {
-            unLockUpgradeStartButton.interactable = true;
-            onUpgradeAbleOrUnlockAbleSelected.Trigger(currentSelectedTransform);
-            unLockUpgradeActivationButton.interactable = true;
-            unLockUpgradeActivationButton.onClick.AddListener(ShowUnlockPanel);
-            unLockUpgradeImage.sprite = upgradeButtonSprite;
-            unLockUpgradeButtonTMP.text = upgradeButtonText;
-            levelTMP.SetTextInt(levelValue.Current);
-            if (selectData.title)
-                unlockOrUpgradeTitleTMP.TMP.text = string.Format(
-                    unlockOrUpgradeTitleTMP, selectData.title, levelValue.Current
-                );
-        }
-
-        private void MarkMaxLevel(Level levelValue)
-        {
-            unLockUpgradeStartButton.interactable = false;
-            onUpgradeAbleOrUnlockAbleSelected.Trigger(null);
-            unLockUpgradeActivationButton.interactable = false;
-            unLockUpgradeImage.sprite = upgradeButtonSprite;
-            unLockUpgradeButtonTMP.text = maxLevelText;
-            levelTMP.SetTextInt(levelValue.Current);
-            if (selectData.title) unlockOrUpgradeTitleTMP.TMP.text = selectData.title + " Maxed Level Reached";
-        }
-
-        private void MarkedLock()
-        {
-            unLockUpgradeStartButton.interactable = true;
-            unLockUpgradeStartButton.onClick.AddListener(Unlock);
-            onUpgradeAbleOrUnlockAbleSelected.Trigger(currentSelectedTransform);
-            unLockUpgradeActivationButton.interactable = true;
-            unLockUpgradeActivationButton.onClick.AddListener(ShowUnlockPanel);
-            unLockUpgradeImage.sprite = unlockButtonSprite;
-            unLockUpgradeButtonTMP.text = unlockButtonText;
-            levelTMP.TMP.text = levelLockedText;
-            if (selectData.title) unlockOrUpgradeTitleTMP.TMP.text = "Unlock " + selectData.title;
-        }
-
-        private void DisableLevelContainer()
-        {
-            levelContainer.SetActive(false);
-        }
-
-        public void DisableUpgrade()
-        {
-            unLockUpgradeActivationButton.gameObject.SetActive(false);
-        }
-
-
-        private void ShowCanvas()
+        private void ShowUI()
         {
             canvasGroup.alpha = 1;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
         }
 
-        private void HideCanvas()
+        private void HideUI()
         {
             canvasGroup.alpha = 0;
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
+        }
+
+        private void ShowUnlockUpgradePanel()
+        {
+            RemoveAllButtonListeners(); // Ensure only one listener is active
+            closeUnlockUpgradePanelButton.onClick.AddListener(HideUnlockUpgradePanel);
+            unlockUpgradeToggleButton.onClick.AddListener(HideUnlockUpgradePanel);
+            unlockUpgradeButtonImage.sprite = closeButtonSprite;
+            unlockAndUpgradePanel.SetActive(true);
+            unlockOrUpgradeRequirementContainer.gameObject.SetActive(true);
+        }
+
+        private void HideUnlockUpgradePanel()
+        {
+            unlockAndUpgradePanel.SetActive(false);
+            unlockOrUpgradeRequirementContainer.gameObject.SetActive(false);
+            if (currentSelectedTransform) OnSelected(currentSelectedTransform); // Refresh UI
+        }
+
+        private void Unlock()
+        {
+            var unlockReference = currentSelectedTransform.GetComponent<IUnlock>();
+            if (unlockReference.CanUnlock) unlockReference.Unlock();
+            Debug.Log("Unlocking");
+            OnSelected(currentSelectedTransform); // Refresh UI after unlock
+        }
+
+        private void Upgrade()
+        {
+            var upgradeReference = currentSelectedTransform.GetComponent<IUpgrade>();
+            if (upgradeReference.CanUpgrade) upgradeReference.Upgrade();
+            Debug.Log("Upgrading");
+            OnSelected(currentSelectedTransform); // Refresh UI after upgrade
+        }
+
+
+        // --- UI Update Methods ---
+        private void UpdateTitle(InterfaceFinder<ITitle> titleData)
+        {
+            titleContainer.SetActive(titleData);
+            if (titleData) titleText.text = titleData.Value.Title;
+        }
+
+        private void UpdateUnlockUpgradeLevel(InterfaceFinder<ILevel> levelData)
+        {
+            if (levelData)
+            {
+                Level levelValue = levelData.Value.Level;
+                unlockUpgradeToggleButton.gameObject.SetActive(true);
+                levelContainer.SetActive(true);
+
+                if (levelValue.IsLocked)
+                {
+                    ConfigureForLockedState();
+                }
+                else if (levelValue.IsMax)
+                {
+                    ConfigureForMaxLevelState(levelValue);
+                }
+                else
+                {
+                    ConfigureForUpgradableState(levelValue);
+                }
+            }
+            else
+            {
+                onUpgradeAbleOrUnlockAbleSelected.Trigger(null);
+                HideUnlockUpgradePanel();
+                DisableUpgradeButton();
+                DisableLevelContainer();
+            }
+        }
+
+        private void ConfigureForLockedState()
+        {
+            unlockUpgradeActionButton.interactable = true;
+            unlockUpgradeActionButton.onClick.AddListener(Unlock);
+            onUpgradeAbleOrUnlockAbleSelected.Trigger(currentSelectedTransform);
+            unlockUpgradeToggleButton.interactable = true;
+            unlockUpgradeToggleButton.onClick.AddListener(ShowUnlockUpgradePanel);
+            unlockUpgradeButtonImage.sprite = unlockButtonSprite;
+            unlockUpgradeButtonText.text = unlockButtonText;
+            levelTextFormat.TMP.text = levelLockedText;
+            if (selectData.title) unlockOrUpgradeTitleTextFormat.TMP.text = "Unlock " + selectData.title;
+        }
+
+        private void ConfigureForMaxLevelState(Level levelValue)
+        {
+            unlockUpgradeActionButton.interactable = false;
+            onUpgradeAbleOrUnlockAbleSelected.Trigger(null);
+            unlockUpgradeToggleButton.interactable = false;
+            unlockUpgradeButtonImage.sprite = upgradeButtonSprite;
+            unlockUpgradeButtonText.text = maxLevelText;
+            levelTextFormat.SetTextInt(levelValue.Current);
+            if (selectData.title) unlockOrUpgradeTitleTextFormat.TMP.text = selectData.title + " Maxed Level Reached";
+        }
+
+        private void ConfigureForUpgradableState(Level levelValue)
+        {
+            unlockUpgradeActionButton.interactable = true;
+            unlockUpgradeActionButton.onClick.AddListener(Upgrade);
+            onUpgradeAbleOrUnlockAbleSelected.Trigger(currentSelectedTransform);
+            unlockUpgradeToggleButton.interactable = true;
+            unlockUpgradeToggleButton.onClick.AddListener(ShowUnlockUpgradePanel);
+            unlockUpgradeButtonImage.sprite = upgradeButtonSprite;
+            unlockUpgradeButtonText.text = upgradeButtonText;
+            levelTextFormat.SetTextInt(levelValue.Current);
+
+            // Simplified title formatting
+            if (selectData.title)
+            {
+                unlockOrUpgradeTitleTextFormat.TMP.text =
+                    string.Format(selectData.title.Value.Title, levelValue.Current);
+            }
+        }
+        
+        private void DisableLevelContainer()
+        {
+            levelContainer.SetActive(false);
+        }
+
+        private void DisableUpgradeButton()
+        {
+            unlockUpgradeToggleButton.gameObject.SetActive(false);
         }
     }
 }
