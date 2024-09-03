@@ -14,12 +14,15 @@ namespace Soul.Model.Runtime.Reactives
             get => value;
             set
             {
-                T oldValue = this.value;
+                var oldValue = this.value;
                 this.value = value;
                 OnChange?.Invoke(oldValue, value);
             }
         }
-        
-        public static implicit operator T(Reactive<T> reactive) => reactive.Value;
+
+        public static implicit operator T(Reactive<T> reactive)
+        {
+            return reactive.Value;
+        }
     }
 }

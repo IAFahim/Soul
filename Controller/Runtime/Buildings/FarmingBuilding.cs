@@ -12,6 +12,7 @@ using Soul.Model.Runtime.Buildings;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Selectors;
 using Soul.Model.Runtime.Tweens;
+using Soul.Model.Runtime.Tweens.Scriptable;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -140,7 +141,7 @@ namespace Soul.Controller.Runtime.Buildings
         protected void PlayDualSquishAndStretch()
         {
             if (SelectTweenMotionHandle.IsActive()) SelectTweenMotionHandle.Cancel();
-            SelectTweenMotionHandle = unlockAndUpgrade.unlockManagerComponent.Transform.TweenPlayer(selectTweenSetting);
+            SelectTweenMotionHandle = unlockAndUpgrade.unlockManagerComponent.Transform.TweenScale(selectTweenSetting);
         }
 
         public override void OnSelected(RaycastHit selfRayCastHit)

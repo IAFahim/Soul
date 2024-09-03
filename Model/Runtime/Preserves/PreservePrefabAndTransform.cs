@@ -2,6 +2,7 @@
 using Alchemy.Inspector;
 using Pancake.Pools;
 using Soul.Model.Runtime.Extensions;
+using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -61,7 +62,7 @@ namespace Soul.Model.Runtime.Preserves
             if (!foundPrefab) return;
             LoadValueFrom(gameObject.transform);
 #if UNITY_EDITOR
-            UnityEditor.EditorUtility.SetDirty(gameObject.transform.parent);
+            EditorUtility.SetDirty(gameObject.transform.parent);
 #endif
             if (destroyObject) gameObject.SafeDestroy();
         }
@@ -71,13 +72,13 @@ namespace Soul.Model.Runtime.Preserves
 #if UNITY_EDITOR
             if (Application.isPlaying || gameObject == null) return false;
             var gameObjectNameWithoutClone = gameObject.name.Split("(Clone)")[0];
-            var guids = UnityEditor.AssetDatabase.FindAssets(gameObjectNameWithoutClone);
+            var guids = AssetDatabase.FindAssets(gameObjectNameWithoutClone);
 
             string path = null;
             if (guids.Length > 1)
                 foreach (var guid in guids)
                 {
-                    var paths = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                    var paths = AssetDatabase.GUIDToAssetPath(guid);
                     if (!paths.EndsWith(".fbx"))
                     {
                         path = paths;
@@ -85,10 +86,10 @@ namespace Soul.Model.Runtime.Preserves
                     }
                 }
             else
-                path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
+                path = AssetDatabase.GUIDToAssetPath(guids[0]);
 
 
-            prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             return true;
 #else
             return false;

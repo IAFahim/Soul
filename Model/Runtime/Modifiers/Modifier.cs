@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Soul.Model.Runtime.Modifiers
 {
@@ -10,7 +11,7 @@ namespace Soul.Model.Runtime.Modifiers
         [SerializeField] private float multiplier;
         [SerializeField] private float additive;
 
-        public float Value => (baseValue * multiplier) + additive;
+        public float Value => baseValue * multiplier + additive;
 
         public Modifier(float baseValue, float multiplier = 1f, float additive = 0f)
         {
@@ -45,28 +46,54 @@ namespace Soul.Model.Runtime.Modifiers
         }
 
         /// <summary>
-        /// Applies a chance-based multiplier to the current Value.
+        ///     Applies a chance-based multiplier to the current Value.
         /// </summary>
-        /// <param name="chance">The probability of applying the bonus multiplier. If >= 1, it's treated as a guaranteed multiplier.</param>
+        /// <param name="chance">
+        ///     The probability of applying the bonus multiplier. If >= 1, it's treated as a guaranteed
+        ///     multiplier.
+        /// </param>
         /// <param name="bonusMultiplier">The multiplier to apply if the chance check succeeds.</param>
         /// <returns>The result of Value multiplied by the determined multiplier.</returns>
         public float ApplyChanceMultiplier(float chance, float bonusMultiplier)
         {
-            float chanceMultiplier = chance >= 1f ? chance : (UnityEngine.Random.value < chance ? bonusMultiplier : 1f);
+            var chanceMultiplier = chance >= 1f ? chance : Random.value < chance ? bonusMultiplier : 1f;
             return Value * chanceMultiplier;
         }
 
-        public static implicit operator float(Modifier modifier) => modifier.Value;
-        public static implicit operator Modifier(float value) => new Modifier(value);
+        public static implicit operator float(Modifier modifier)
+        {
+            return modifier.Value;
+        }
 
-        public bool Equals(Modifier other) =>
-            baseValue.Equals(other.baseValue) && multiplier.Equals(other.multiplier) && additive.Equals(other.additive);
+        public static implicit operator Modifier(float value)
+        {
+            return new Modifier(value);
+        }
 
-        public override bool Equals(object obj) => obj is Modifier other && Equals(other);
+        public bool Equals(Modifier other)
+        {
+            return baseValue.Equals(other.baseValue) && multiplier.Equals(other.multiplier) &&
+                   additive.Equals(other.additive);
+        }
 
-        public override int GetHashCode() => HashCode.Combine(baseValue, multiplier, additive);
+        public override bool Equals(object obj)
+        {
+            return obj is Modifier other && Equals(other);
+        }
 
-        public static bool operator ==(Modifier left, Modifier right) => left.Equals(right);
-        public static bool operator !=(Modifier left, Modifier right) => !(left == right);
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(baseValue, multiplier, additive);
+        }
+
+        public static bool operator ==(Modifier left, Modifier right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Modifier left, Modifier right)
+        {
+            return !(left == right);
+        }
     }
 }

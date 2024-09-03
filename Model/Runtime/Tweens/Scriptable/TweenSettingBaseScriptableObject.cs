@@ -1,7 +1,7 @@
 ﻿using LitMotion;
 using UnityEngine;
 
-namespace Soul.Model.Runtime.Tweens
+namespace Soul.Model.Runtime.Tweens.Scriptable
 {
     public class TweenSettingBaseScriptableObject : ScriptableObject
     {

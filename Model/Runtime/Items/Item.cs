@@ -9,19 +9,22 @@ namespace Soul.Model.Runtime.Items
     [Serializable]
     public class Item : ScriptableObject, ITitle, IIcon
     {
-        [Title("Item")]
-        public string title;
+        [Title("Item")] public string title;
+
         [TextArea(3, 5)] public string description;
         public Sprite icon;
-        
-        public string Title => title;
         public Sprite Icon => icon;
+
+        public string Title => title;
 
         public override string ToString()
         {
             return title;
         }
-        
-        public static implicit operator Sprite(Item item) => item.icon;
+
+        public static implicit operator Sprite(Item item)
+        {
+            return item.icon;
+        }
     }
 }

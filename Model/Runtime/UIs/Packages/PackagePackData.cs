@@ -10,19 +10,15 @@ namespace Soul.Model.Runtime.UIs.Packages
     [CreateAssetMenu(menuName = "Pancake/Game/Shop/Package Data")]
     public class PackagePackData : ScriptableObject
     {
-        [Serializable]
-        public class RewardData
-        {
-            public EShopRewardType type;
-            public int value;
-        }
-
         [SerializeField] private Sprite packageSprite;
         [SerializeField] private LocaleText packageName;
         [SerializeField] private Color packageNameColor = Color.white;
         [SerializeField] private Color packageContentColor = Color.white;
         [SerializeField] private bool hasNameTag;
-        [SerializeField, ShowIf(nameof(hasNameTag)), Indent] private LocaleText nameTag;
+
+        [SerializeField] [ShowIf(nameof(hasNameTag))] [Indent]
+        private LocaleText nameTag;
+
         [SerializeField] private List<RewardData> rewards = new();
 #if UNITY_EDITOR
         [SerializeField] private string editorPrice;
@@ -40,5 +36,11 @@ namespace Soul.Model.Runtime.UIs.Packages
 #if UNITY_EDITOR
         public string EditorPrice => editorPrice;
 #endif
+        [Serializable]
+        public class RewardData
+        {
+            public EShopRewardType type;
+            public int value;
+        }
     }
 }

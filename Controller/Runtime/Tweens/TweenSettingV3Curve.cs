@@ -1,4 +1,5 @@
 ﻿using Soul.Model.Runtime.Tweens;
+using Soul.Model.Runtime.Tweens.Scriptable;
 using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 

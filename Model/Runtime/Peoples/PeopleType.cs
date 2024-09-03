@@ -6,6 +6,5 @@ namespace Soul.Model.Runtime.Peoples
     [HideScriptField]
     public class PeopleType : ScriptableObject
     {
-        
     }
 }

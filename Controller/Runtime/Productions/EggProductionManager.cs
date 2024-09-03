@@ -74,7 +74,7 @@ namespace Soul.Controller.Runtime.Productions
             return ProductionItemValuePair.Value < RequiredLimit.weightCapacity;
         }
 
-        public override void OnTimerStart(bool startsNow)
+        public override void OnTimerStart(float progressRatio)
         {
         }
 

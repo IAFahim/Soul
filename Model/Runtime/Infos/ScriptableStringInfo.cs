@@ -7,8 +7,8 @@ namespace Soul.Model.Runtime.Infos
     {
         [SerializeField] private string title;
         [TextArea(3, 5)] [SerializeField] private string description;
-        
-        public string Title => title;
         public string Description => description;
+
+        public string Title => title;
     }
 }

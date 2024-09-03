@@ -17,30 +17,21 @@ namespace Soul.Model.Runtime.DragAndDrops
 
         [DisableInEditMode] public bool isDragging;
         public Transform cardTransform;
-        private Camera _mainCamera;
         public Vector3 offset = new(0, 25, 0);
 
         private Vector3 _lastFingerPos;
+        private Camera _mainCamera;
 
         private Vector3 FingerPos => TouchWrapper.Touch0.Position;
 
-        protected abstract void OnDragStart(PointerEventData eventData, bool isHit, RaycastHit rayCast);
-        protected abstract void OnDrag(PointerEventData eventData, bool isHit, RaycastHit rayCast);
-        protected abstract void OnEndDrag(PointerEventData eventData, bool isHit, RaycastHit rayCast);
+        private void Update()
+        {
+            if (isDragging) SmoothlyTranslate();
+        }
 
         private void OnEnable()
         {
             _mainCamera ??= Camera.main;
-        }
-
-        protected void Setup(Camera mainCamera)
-        {
-            _mainCamera = mainCamera;
-        }
-
-        public void OnDrag(PointerEventData eventData)
-        {
-            OnDrag(eventData, CastRayFinger0PosWorld(out var rayCastHit), rayCastHit);
         }
 
         public void OnBeginDrag(PointerEventData eventData)
@@ -49,33 +40,43 @@ namespace Soul.Model.Runtime.DragAndDrops
             OnDragStart(eventData, CastRayFinger0PosWorld(out var rayCastHit), rayCastHit);
         }
 
+        public void OnDrag(PointerEventData eventData)
+        {
+            OnDrag(eventData, CastRayFinger0PosWorld(out var rayCastHit), rayCastHit);
+        }
+
 
         public void OnEndDrag(PointerEventData eventData)
         {
             isDragging = false;
             OnEndDrag(eventData, CastRayFinger0PosWorld(out var rayCastHit, true), rayCastHit);
-            LMotion.Create(cardTransform.localPosition, offset, goingBackToOffsetDuration).BindToLocalPosition(cardTransform);
+            LMotion.Create(cardTransform.localPosition, offset, goingBackToOffsetDuration)
+                .BindToLocalPosition(cardTransform);
         }
 
-        private void Update()
+        protected abstract void OnDragStart(PointerEventData eventData, bool isHit, RaycastHit rayCast);
+        protected abstract void OnDrag(PointerEventData eventData, bool isHit, RaycastHit rayCast);
+        protected abstract void OnEndDrag(PointerEventData eventData, bool isHit, RaycastHit rayCast);
+
+        protected void Setup(Camera mainCamera)
         {
-            if (isDragging) SmoothlyTranslate();
+            _mainCamera = mainCamera;
         }
 
-        void SmoothlyTranslate()
+        private void SmoothlyTranslate()
         {
             Vector2 worldPosition = FingerPos;
             Vector2 position = cardTransform.position;
-            Vector2 direction = (worldPosition - position).normalized;
+            var direction = (worldPosition - position).normalized;
             var pointerMoveSpeed = Vector2.Distance(position, worldPosition) / Time.deltaTime;
-            Vector2 velocity = direction * moveSpeedLimit.Min(pointerMoveSpeed);
+            var velocity = direction * moveSpeedLimit.Min(pointerMoveSpeed);
             cardTransform.Translate(velocity * Time.deltaTime);
         }
 
 
         private bool CastRayFinger0PosWorld(out RaycastHit raycastHit, bool useLasPosition = false)
         {
-            Ray ray = useLasPosition ? ScreenPointToRay(_lastFingerPos) : ScreenPointToRay(_lastFingerPos = FingerPos);
+            var ray = useLasPosition ? ScreenPointToRay(_lastFingerPos) : ScreenPointToRay(_lastFingerPos = FingerPos);
             return Physics.Raycast(ray, out raycastHit, Mathf.Infinity, raycastLayerMask); // Use layer mask
         }
 

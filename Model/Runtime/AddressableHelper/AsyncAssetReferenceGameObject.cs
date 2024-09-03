@@ -11,8 +11,8 @@ namespace Soul.Model.Runtime.AddressableHelper
     public class AsyncAssetReferenceGameObject
     {
         [SerializeField] private AssetReferenceGameObject assetReference;
-        private object _key;
         private bool _isDisposed;
+        private object _key;
 
         public void LoadRuntimeKey()
         {

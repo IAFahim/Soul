@@ -8,26 +8,26 @@ namespace Soul.Model.Runtime.Movements.Looks
     {
         public Transform transform;
         public Transform targetTransform;
-        
+
         [SerializeField] private Vector3 pivotOffset;
         [SerializeField] private Bounds bounds = new(Vector3.zero, new Vector3(140, 100, 100));
-        
+
+        private Vector3 FrontAndBaseClippedCenter =>
+            transform.position + new Vector3(0, bounds.size.y / 2, -bounds.size.z / 2);
+
 
         public void Setup(Transform selfTransform, Transform target)
         {
             transform = selfTransform;
-            this.targetTransform = target;
+            targetTransform = target;
             bounds = new Bounds(FrontAndBaseClippedCenter, bounds.size);
         }
 
-        
+
         public void Update()
         {
             if (IsAlignNeeded()) AlignCameraToTransform();
         }
-
-        private Vector3 FrontAndBaseClippedCenter =>
-            transform.position + new Vector3(0, bounds.size.y / 2, -bounds.size.z / 2);
 
         private bool IsAlignNeeded()
         {

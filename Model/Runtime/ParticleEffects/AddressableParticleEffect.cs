@@ -1,19 +1,16 @@
 ﻿using System;
-using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.Serialization;
 
 namespace Soul.Model.Runtime.ParticleEffects
 {
     [Serializable]
     public class AddressableParticleEffect
-    { 
+    {
+        [SerializeField] private AssetReferenceGameObject particleEffectAssetReference;
         private bool _isLoaded;
         private ParticleSystem particleSystem;
-        [SerializeField] private AssetReferenceGameObject particleEffectAssetReference;
 
         public async UniTaskVoid Load(bool play, Transform transform)
         {

@@ -11,9 +11,17 @@ namespace Soul.Model.Runtime.CustomList
     public class ScriptableList<T> : ScriptableObject, IList<T>, ITitle
     {
         [SerializeField] private string title;
-        public string Title => title;
-        [SerializeField] protected List<T> list = new List<T>();
-        private readonly HashSet<T> _hashSet = new HashSet<T>();
+        [SerializeField] protected List<T> list = new();
+        private readonly HashSet<T> _hashSet = new();
+
+        public bool IsEmpty => list.Count == 0;
+
+        public List<T> List => list;
+
+        private void OnEnable()
+        {
+            foreach (var item in list) _hashSet.Add(item);
+        }
 
         public void Add(T item)
         {
@@ -21,8 +29,6 @@ namespace Soul.Model.Runtime.CustomList
             list.Add(item);
             _hashSet.Add(item);
         }
-
-        public bool IsEmpty => list.Count == 0;
 
         public void CopyTo(T[] array, int arrayIndex)
         {
@@ -37,29 +43,60 @@ namespace Soul.Model.Runtime.CustomList
             return true;
         }
 
-        public void Remove(T item)
-        {
-            if (!_hashSet.Contains(item)) return;
-            list.Remove(item);
-            _hashSet.Remove(item);
-        }
-
         public void Clear()
         {
             list.Clear();
             _hashSet.Clear();
         }
 
-        public bool Contains(T item) => _hashSet.Contains(item);
+        public bool Contains(T item)
+        {
+            return _hashSet.Contains(item);
+        }
 
         public int Count => list.Count;
         public bool IsReadOnly => false;
 
-        public int IndexOf(T item) => list.IndexOf(item);
+        public int IndexOf(T item)
+        {
+            return list.IndexOf(item);
+        }
 
         public void Insert(int index, T item)
         {
             list.Insert(index, item);
+        }
+
+        public void RemoveAt(int index)
+        {
+            var item = list[index];
+            list.RemoveAt(index);
+            _hashSet.Remove(item);
+        }
+
+        public T this[int index]
+        {
+            get => list[index];
+            set => list[index] = value;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return list.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public string Title => title;
+
+        public void Remove(T item)
+        {
+            if (!_hashSet.Contains(item)) return;
+            list.Remove(item);
+            _hashSet.Remove(item);
         }
 
         public void AddRange(IEnumerable<T> items)
@@ -83,33 +120,6 @@ namespace Soul.Model.Runtime.CustomList
             }
 
             return false;
-        }
-
-        public void RemoveAt(int index)
-        {
-            var item = list[index];
-            list.RemoveAt(index);
-            _hashSet.Remove(item);
-        }
-
-        public T this[int index]
-        {
-            get => list[index];
-            set => list[index] = value;
-        }
-
-        public List<T> List => list;
-
-        public IEnumerator<T> GetEnumerator() => list.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        private void OnEnable()
-        {
-            foreach (var item in list)
-            {
-                _hashSet.Add(item);
-            }
         }
     }
 }

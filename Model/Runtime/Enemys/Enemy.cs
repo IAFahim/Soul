@@ -7,7 +7,7 @@ public class Enemy : MonoBehaviour
     public HealthBar healthBar; // Assign this in the Inspector
     public float maxHealth = 100f;
 
-    void Start()
+    private void Start()
     {
         // Initialize the HealthBar
         healthBar.Initialize(maxHealth, OnHealthChange, OnDeath);

@@ -7,6 +7,9 @@ namespace Soul.Model.Runtime.UIs
     {
         [SerializeField] private TextMeshProUGUI textValue;
 
-        public void Setup(string value) { textValue.text = value; }
+        public void Setup(string value)
+        {
+            textValue.text = value;
+        }
     }
 }

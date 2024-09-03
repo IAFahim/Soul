@@ -21,7 +21,67 @@ namespace Soul.Model.Runtime.Tweens
                 .BindToPosition(transform);
         }
 
-        private static MotionHandle TweenPlayer(this Transform transform,
+        public static MotionHandle TweenPosition(this Transform transform,
+            Vector3 start, Vector3 end, float duration, Ease ease
+        )
+        {
+            return LMotion.Create(start, end, duration)
+                .WithEase(ease)
+                .BindToPosition(transform);
+        }
+
+        public static MotionHandle TweenPosition(this Transform transform,
+            TweenSettingScriptableObject<Vector3> tweenSettings)
+        {
+            return TweenPosition(transform, tweenSettings.start, tweenSettings.end, tweenSettings.duration,
+                tweenSettings.ease);
+        }
+
+        public static MotionHandle TweenPosition(this Transform transform,
+            Vector3 start, Vector3 end, float duration, int loopCount, LoopType loopType, AnimationCurve animationCurve
+        )
+        {
+            return LMotion.Create(start, end, duration)
+                .WithEase(animationCurve)
+                .WithLoops(loopCount, loopType)
+                .BindToPosition(transform);
+        }
+
+
+        public static MotionHandle TweenPosition(this Transform transform,
+            TweenSettingCurveScriptableObject<Vector3> tweenSettings)
+        {
+            return TweenPosition(transform, tweenSettings.start, tweenSettings.end, tweenSettings.duration,
+                tweenSettings.loopCount, tweenSettings.loopType, tweenSettings.animationCurve);
+        }
+
+        private static MotionHandle TweenScale(this Transform transform,
+            Vector3 start, Vector3 end, float duration, Ease ease
+        )
+        {
+            return LMotion.Create(start, end, duration)
+                .WithEase(ease)
+                .BindToLocalScale(transform);
+        }
+
+        public static MotionHandle TweenScale(this Transform transform, TweenSettingFactor settings, Vector3 start)
+        {
+            return TweenScale(transform, start, start * settings.factor, settings.duration, settings.ease);
+        }
+
+        public static MotionHandle TweenScale(this Transform transform, TweenSettingFactor settings,
+            ISizeReference sizeReference)
+        {
+            return TweenScale(transform, sizeReference.Size, sizeReference.Size * settings.factor, settings.duration,
+                settings.ease);
+        }
+
+        public static MotionHandle TweenScale(this Transform transform, TweenSettingScriptableObject<Vector3> settings)
+        {
+            return TweenScale(transform, settings.start, settings.end, settings.duration, settings.ease);
+        }
+
+        private static MotionHandle TweenScale(this Transform transform,
             Vector3 start, Vector3 end, float duration, int loopCount, LoopType loopType, AnimationCurve animationCurve
         )
         {
@@ -31,31 +91,11 @@ namespace Soul.Model.Runtime.Tweens
                 .BindToLocalScale(transform);
         }
 
-        private static MotionHandle TweenPlayer(this Transform transform,
-            Vector3 start, Vector3 end, float duration, Ease ease
-        )
+        public static MotionHandle TweenScale(this Transform transform,
+            TweenSettingCurveScriptableObject<Vector3> settings)
         {
-            return LMotion.Create(start, end, duration)
-                .WithEase(ease)
-                .BindToLocalScale(transform);
-        }
-
-
-        public static MotionHandle TweenPlayer(this Transform transform, TweenSettingFactor settings, Vector3 start) =>
-            TweenPlayer(transform, start, start * settings.factor, settings.duration, settings.ease);
-
-
-        public static MotionHandle TweenPlayer(this Transform transform, TweenSettingFactor settings,
-            ISizeReference sizeReference)
-        {
-            return TweenPlayer(transform, sizeReference.Size, sizeReference.Size * settings.factor, settings.duration,
-                settings.ease);
-        }
-
-
-        public static MotionHandle TweenPlayer(this Transform transform, TweenSettingScriptableObject<Vector3> settings)
-        {
-            return TweenPlayer(transform, settings.start, settings.end, settings.duration, settings.ease);
+            return TweenScale(transform, settings.start, settings.end, settings.duration,
+                settings.loopCount, settings.loopType, settings.animationCurve);
         }
 
         public static MotionHandle TweenHeight(Transform targetTransform, float height, float duration, Ease ease)
@@ -64,13 +104,6 @@ namespace Soul.Model.Runtime.Tweens
             return LMotion.Create(position, new Vector3(position.x, height, position.z), duration)
                 .WithEase(ease)
                 .BindToPosition(targetTransform);
-        }
-
-        public static MotionHandle TweenPlayer(this Transform transform,
-            TweenSettingCurveScriptableObject<Vector3> settings)
-        {
-            return TweenPlayer(transform, settings.start, settings.end, settings.duration,
-                settings.loopCount, settings.loopType, settings.animationCurve);
         }
     }
 }

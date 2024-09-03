@@ -1,77 +1,124 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using _Root.Scripts.NPC_Ai.Runtime.WayPointGizmoTool;
 using Cysharp.Threading.Tasks;
 using LitMotion;
+using LitMotion.Extensions;
 using Pancake;
 using Pancake.Common;
 using Pancake.Pools;
 using Soul.Controller.Runtime.Grids;
-using Soul.Model.Runtime.Tweens;
+using Soul.Controller.Runtime.LookUpTables;
+using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Tweens.Scriptable;
 using UnityEngine;
-using Math = System.Math;
+using DelayType = Cysharp.Threading.Tasks.DelayType;
 
 namespace Soul.Controller.Runtime.MeshPlanters
 {
     [Serializable]
     public class MeshPlantPointGridSystem : GameComponent, ILoadComponent
     {
-        public GridWayPointLimiter gridWayPointLimiter;
-        public GameObject plantHolderPrefab;
-        public List<GameObject> instances;
-        public TweenSettingFactor tweenSettingFactor;
-        public Vector3 sizeReference;
-        public int levelReference;
-        public int batchMultiplier = 5;
+        [SerializeField] private GridWayPointLimiter gridWayPointLimiter;
+        [SerializeField] private ItemPoolsLookupTable itemPoolsLookupTable;
 
-        public void Setup(int level)
+        [SerializeField] private float height = 10;
+        [SerializeField] private TweenSettingBaseScriptableObject tweenSetting;
+
+
+        private Item _currentItem;
+        private int _levelReference;
+        private int _currentStage = -1;
+        private AddressableGameObjectPool[] _stagePools;
+        private List<List<GameObject>> _coredInstances;
+
+        public void Setup(int level, Item item, float progress)
         {
-            levelReference = level;
+            if (_currentItem != item) itemPoolsLookupTable.TryGetValue(item, out _stagePools);
+            _currentItem = item;
+            _levelReference = level;
+            if (Mathf.Approximately(progress, 0))
+            {
+                Clear();
+                Plant(_stagePools[_currentStage = 0]);
+            }
+            else if (Mathf.Approximately(progress, 1))
+            {
+                Clear();
+                Plant(_stagePools[_currentStage = _stagePools.Length - 1]);
+            }
+            else
+            {
+                Clear();
+                Plant(_stagePools[_currentStage = Mathf.FloorToInt(progress * _stagePools.Length)]);
+            }
         }
-        
+
+
+        private void Plant(AddressableGameObjectPool stage)
+        {
+            _coredInstances = new List<List<GameObject>>();
+            var pointGrid = gridWayPointLimiter.CoredPoints(_levelReference);
+            foreach (var point in pointGrid)
+            {
+                var coredInstance = new List<GameObject>();
+                foreach (var (position, rotation) in point)
+                {
+                    var instance = stage.Request(position, rotation, Transform);
+                    coredInstance.Add(instance);
+                }
+
+                _coredInstances.Add(coredInstance);
+            }
+        }
+
         public void Clear()
         {
-            foreach (var instance in instances) instance.gameObject.Return();
-        }
-
-        public void Plant(AddressableGameObjectPool stage)
-        {
-            Clear();
-            bool collectedSize = false;
-            var pointGrid = gridWayPointLimiter.SpawnPoints(levelReference);
-            for (var i = 0; i < pointGrid.Count; i++)
+            if (_currentStage == -1) return;
+            var pool = _stagePools[_currentStage];
+            foreach (var coredInstance in _coredInstances)
             {
-                var point = pointGrid[i];
-                var instance = stage.Request(point.position, point.rotation, Transform);
-                instances.Add(instance);
-                if (!collectedSize)
+                foreach (var o in coredInstance)
                 {
-                    sizeReference = instance.transform.localScale;
-                    collectedSize = true;
+                    pool.Return(o);
                 }
             }
         }
 
-        public async UniTaskVoid ClearAsync()
+        public void Complete()
         {
-            int batch = levelReference * batchMultiplier;
-            for (var i = 0; i < instances.Count; i++)
+            if (_currentStage == _stagePools.Length - 1) return;
+            Clear();
+            Plant(_stagePools[_currentStage = _stagePools.Length - 1]);
+        }
+
+        public async UniTask ClearAsync()
+        {
+            var pool = _stagePools[_currentStage];
+            for (var i = 0; i < _coredInstances.Count; i++)
             {
-                var tasks = new List<UniTask>();
-                int batchEnd = Math.Min(i + batch, instances.Count);
-                for (int j = i; j < batchEnd; j++) tasks.Add(Clear(j));
-                i = batchEnd - 1;
-                await UniTask.WhenAll(tasks);
+                await ClearCoreAsync(pool, i);
             }
         }
 
-        private async UniTask Clear(int index)
+
+        private async UniTask ClearCoreAsync(AddressableGameObjectPool pool, int index)
         {
-            var instance = instances[index];
-            await instance.transform.TweenPlayer(tweenSettingFactor, sizeReference).GetAwaiter();
-            instance.gameObject.Return();
+            var coredInstance = _coredInstances[index];
+            var duration = tweenSetting.duration;
+            var ease = tweenSetting.ease;
+            foreach (var o in coredInstance)
+            {
+                var x = o.transform.position.y;
+                LMotion.Create(x, x + height, duration).WithEase(ease).BindToPositionY(o.transform);
+            }
+
+            await UniTask.Delay(TimeSpan.FromSeconds(duration), DelayType.Realtime);
+
+            foreach (var o in coredInstance)
+            {
+                pool.Return(o);
+            }
         }
 
 #if UNITY_EDITOR

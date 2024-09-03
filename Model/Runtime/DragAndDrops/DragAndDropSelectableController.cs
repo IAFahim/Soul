@@ -6,8 +6,8 @@ namespace Soul.Model.Runtime.DragAndDrops
     public abstract class DragAndDropSelectableController<TData> : DragAndDropSelectable
     {
         public TData data;
-        private Transform _lastTransform;
         private IDropAble<TData> _dropAble;
+        private Transform _lastTransform;
 
         public virtual void Setup(Camera mainCamera, TData selectedData)
         {
@@ -30,12 +30,18 @@ namespace Soul.Model.Runtime.DragAndDrops
                 _dropAble.OnDrag(data);
                 CanDrop();
             }
-            else DropBusy();
+            else
+            {
+                DropBusy();
+            }
         }
 
         protected override void OnDragStart(PointerEventData eventData, bool isHit, RaycastHit rayCast)
         {
-            if (isHit) InvokeDropCheck(rayCast.transform);
+            if (isHit)
+            {
+                InvokeDropCheck(rayCast.transform);
+            }
             else
             {
                 NoDropAbleFound();
@@ -64,18 +70,15 @@ namespace Soul.Model.Runtime.DragAndDrops
             if (isHit && _dropAble != null)
             {
                 if (_dropAble.OnDrop(data))
-                {
                     OnSuccessfulDrop();
-                }
                 else
-                {
                     OnDropFailed();
-                }
             }
             else
             {
                 NoDropAbleFound();
             }
+
             _dropAble = null;
         }
 

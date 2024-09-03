@@ -5,9 +5,9 @@
         public bool CanDropNow { get; }
         public bool OnDrag(TDrop drop);
         public bool OnDrop(TDrop dropPackage);
-        
+
         /// <summary>
-        /// When the drag is canceled or goes out of bounds
+        ///     When the drag is canceled or goes out of bounds
         /// </summary>
         public void OnDragCancel();
     }

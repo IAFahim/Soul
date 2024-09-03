@@ -10,7 +10,7 @@ namespace Soul.Model.Runtime.Links
 
         protected void OnEnable()
         {
-            getGameObjectEvent.gameObject = this.gameObject;
+            getGameObjectEvent.gameObject = gameObject;
         }
 
         protected void OnDisable()

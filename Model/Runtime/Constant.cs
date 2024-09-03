@@ -1,4 +1,5 @@
 // ReSharper disable InconsistentNaming
+
 namespace Soul.Model.Runtime
 {
     public static class Constant

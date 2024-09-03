@@ -13,6 +13,7 @@ using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Productions;
 using Soul.Model.Runtime.Tweens;
+using Soul.Model.Runtime.Tweens.Scriptable;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -26,7 +27,7 @@ namespace Soul.Controller.Runtime.Buildings
         [SerializeField] private TweenSettingCurveScriptableObject<Vector3> dropTweenSettings;
         
         [FormerlySerializedAs("productionBuildingRecord")] [SerializeField] private BuildingAndProductionRecord buildingAndProductionRecord;
-        [FormerlySerializedAs("cropProductionManager")] [SerializeField] private CropProduction cropProduction;
+        [FormerlySerializedAs("cropProduction")] [SerializeField] private CropProductionManager cropProductionManager;
         private MotionHandle _dropMotionHandle;
         private readonly bool _loadDataOnEnable = true;
 
@@ -75,7 +76,7 @@ namespace Soul.Controller.Runtime.Buildings
         protected override async UniTask SetUp(Level currentLevel)
         {
             await base.SetUp(currentLevel);
-            cropProduction.Setup(unlockAndUpgrade.unlockManagerComponent.transform, playerInventory, this, currentLevel,
+            cropProductionManager.Setup(unlockAndUpgrade.unlockManagerComponent.transform, playerInventory, this, currentLevel,
                 this);
         }
 
@@ -125,14 +126,14 @@ namespace Soul.Controller.Runtime.Buildings
         public bool OnDrag(Item drop)
         {
             if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
-            _dropMotionHandle = unlockAndUpgrade.unlockManagerComponent.transform.TweenPlayer(dropTweenSettings);
+            _dropMotionHandle = unlockAndUpgrade.unlockManagerComponent.transform.TweenScale(dropTweenSettings);
             return TryDropAdd(drop);
         }
 
         private bool TryDropAdd(Item drop)
         {
             if (!CanDropNow) return false;
-            if (drop is Seed seed) cropProduction.Add(seed);
+            if (drop is Seed seed) cropProductionManager.Add(seed);
             return ListOfAllowedToDrop.Contains(drop);
         }
 
@@ -141,7 +142,7 @@ namespace Soul.Controller.Runtime.Buildings
             if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
             unlockAndUpgrade.unlockManagerComponent.transform.localScale = dropTweenSettings.start;
             if (!TryDropAdd(dropPackage)) return false;
-            if (cropProduction.TryStartProgression()) Save(Guid);
+            if (cropProductionManager.TryStartProgression()) Save(Guid);
             return true;
         }
 
@@ -157,7 +158,7 @@ namespace Soul.Controller.Runtime.Buildings
         protected override void Reset()
         {
             base.Reset();
-            cropProduction.meshPlantPointGridSystem = GetComponentInChildren<MeshPlantPointGridSystem>();
+            cropProductionManager.meshPlantPointGridSystem = GetComponentInChildren<MeshPlantPointGridSystem>();
         }
 
         void ILoadComponent.OnLoadComponents()

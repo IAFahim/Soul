@@ -104,7 +104,7 @@ namespace Soul.Controller.Runtime.Upgrades
             recordReference.toLevel = LevelReference + 1;
         }
 
-        public override void OnTimerStart(bool startsNow)
+        public override void OnTimerStart(float progressRatio)
         {
         }
 

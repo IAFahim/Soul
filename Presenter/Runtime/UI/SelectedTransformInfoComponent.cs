@@ -35,7 +35,6 @@ namespace Soul.Presenter.Runtime.UI
         public TextMeshProUGUI unlockUpgradeButtonText;
         public TMPFormat unlockOrUpgradeTitleTextFormat;
         public GameObject unlockAndUpgradePanel;
-        public VerticalLayoutGroup unlockOrUpgradeRequirementContainer;
         public Button closeUnlockUpgradePanelButton; // More descriptive name
 
         // --- Sprites & Text ---
@@ -111,13 +110,11 @@ namespace Soul.Presenter.Runtime.UI
             unlockUpgradeToggleButton.onClick.AddListener(HideUnlockUpgradePanel);
             unlockUpgradeButtonImage.sprite = closeButtonSprite;
             unlockAndUpgradePanel.SetActive(true);
-            unlockOrUpgradeRequirementContainer.gameObject.SetActive(true);
         }
 
         private void HideUnlockUpgradePanel()
         {
             unlockAndUpgradePanel.SetActive(false);
-            unlockOrUpgradeRequirementContainer.gameObject.SetActive(false);
             if (currentSelectedTransform) OnSelected(currentSelectedTransform); // Refresh UI
         }
 

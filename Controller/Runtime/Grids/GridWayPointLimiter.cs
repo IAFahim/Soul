@@ -37,16 +37,37 @@ namespace Soul.Controller.Runtime.Grids
         };
 
         // Cache for the last calculated spawn points
-        private List<(Vector3 position, Quaternion rotation)> _cachedSpawnPoints;
+        private List<List<(Vector3 position, Quaternion rotation)>> _cachedSpawnPoints;
         private Vector3Int _cachedStepOffset;
 
-        public List<(Vector3 position, Quaternion rotation)> SpawnPoints(int level)
+        public List<(Vector3 position, Quaternion rotation)> PointList(int level)
         {
             stepOffset = levelOffsets[level - 1];
-            return SpawnPoints(stepOffset);
+            return PointList(stepOffset);
+        }
+        
+        public List<List<(Vector3 position, Quaternion rotation)>> CoredPoints(int level)
+        {
+            stepOffset = levelOffsets[level - 1];
+            return CoredPoints(stepOffset);
         }
 
-        private List<(Vector3 position, Quaternion rotation)> SpawnPoints(Vector3Int step)
+        private List<(Vector3 position, Quaternion rotation)> PointList(Vector3Int step)
+        {
+            var points = CoredPoints(step);
+            List<(Vector3 position, Quaternion rotation)> spawnPoints = new();
+            foreach (var point in points)
+            {
+                spawnPoints.AddRange(point);
+            }
+
+            return spawnPoints;
+        }
+        
+        
+
+
+        public List<List<(Vector3 position, Quaternion rotation)>> CoredPoints(Vector3Int step)
         {
             // Check if the stepOffset has changed
             if (_cachedStepOffset == step && _cachedSpawnPoints != null)
@@ -60,8 +81,9 @@ namespace Soul.Controller.Runtime.Grids
             int stepZ = Mathf.Max(1, step.z);
 
             // Recalculate spawn points since stepOffset is different
-            List<(Vector3 position, Quaternion rotation)> placeAbleSpots = new();
             int waypointCount = 0;
+            int coreToBeAdded = Mathf.CeilToInt(cores.Length / (float)stepX);
+            List<List<(Vector3 position, Quaternion rotation)>> placeAbleSpots = new();
 
             // Iterate over each core (group of waypoints)
             for (int coreIndex = 0; coreIndex < cores.Length; coreIndex++)
@@ -74,6 +96,7 @@ namespace Soul.Controller.Runtime.Grids
                 // Check if this core should be processed based on the step offset
                 if (coreIndex % stepX == 0)
                 {
+                    List<(Vector3 position, Quaternion rotation)> coreSpots = new();
                     // Iterate over each line in the core, skipping lines based on the step offset
                     for (int lineIndex = 0; lineIndex < numLines; lineIndex += stepY)
                     {
@@ -87,10 +110,16 @@ namespace Soul.Controller.Runtime.Grids
                             int currentIndex = startIndex + waypointIndex;
 
                             // Add the waypoint's position and rotation to the list
-                            placeAbleSpots.Add((wayPoints.positions[currentIndex], wayPoints.rotations[currentIndex]));
+                            coreSpots.Add((wayPoints.positions[currentIndex], wayPoints.rotations[currentIndex]));
                         }
                     }
+
+                    if (coreSpots.Count > 0)
+                    {
+                        placeAbleSpots.Add(coreSpots);
+                    }
                 }
+
 
                 // Update the total waypoint count
                 waypointCount += numLines * waypointsPerLine;
@@ -107,7 +136,7 @@ namespace Soul.Controller.Runtime.Grids
         internal void OnDrawGizmosSelected()
         {
             if (wayPoints == null) return;
-            foreach (var position in SpawnPoints(stepOffset)) Gizmos.DrawWireSphere(position.position, 1);
+            foreach (var position in PointList(stepOffset)) Gizmos.DrawWireSphere(position.position, 1);
         }
 #endif
     }

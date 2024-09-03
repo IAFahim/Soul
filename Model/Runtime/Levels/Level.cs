@@ -1,6 +1,5 @@
 ﻿using System;
 using Soul.Model.Runtime.Limits;
-using UnityEngine;
 
 namespace Soul.Model.Runtime.Levels
 {
@@ -15,7 +14,10 @@ namespace Soul.Model.Runtime.Levels
             currentAndMax.x++;
             return true;
         }
-        
-        public static implicit operator int(Level level) => level.Current;
+
+        public static implicit operator int(Level level)
+        {
+            return level.Current;
+        }
     }
 }

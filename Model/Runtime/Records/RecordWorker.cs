@@ -8,11 +8,12 @@ namespace Soul.Model.Runtime.Records
     public struct RecordWorker
     {
         public Pair<WorkerType, int> typeAndCount;
+
         public void Set(int amount)
         {
             typeAndCount.Value = amount;
         }
-        
+
         public int Get()
         {
             return typeAndCount.Value;

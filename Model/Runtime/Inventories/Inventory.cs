@@ -17,10 +17,21 @@ namespace Soul.Model.Runtime.Inventories
 
         public bool RemoveIfZero { get; set; } = true;
 
+        public int Count => items.Count;
+
+        [Button]
+        public void Save(string key)
+        {
+            Data.Save(key, ToList());
+        }
+
         public event Action<InventoryChangeEventArgs<TKey, TValue>> OnItemChanged;
         public event Action OnInventoryCleared;
 
-        public bool TryGetValue(TKey key, out TValue amount) => items.TryGetValue(key, out amount);
+        public bool TryGetValue(TKey key, out TValue amount)
+        {
+            return items.TryGetValue(key, out amount);
+        }
 
         [Button]
         public bool AddOrIncrease(TKey key, TValue addAmount)
@@ -45,10 +56,7 @@ namespace Soul.Model.Runtime.Inventories
         [Button]
         public bool TryDecrease(TKey key, TValue subtractAmount)
         {
-            if (!items.TryGetValue(key, out var currentAmount))
-            {
-                return false;
-            }
+            if (!items.TryGetValue(key, out var currentAmount)) return false;
 
             var newAmount = SubtractValues(currentAmount, subtractAmount);
             if (newAmount.CompareTo(default) <= 0 && RemoveIfZero)
@@ -68,10 +76,14 @@ namespace Soul.Model.Runtime.Inventories
         }
 
         public bool HasEnough(TKey key, TValue amount)
-            => items.TryGetValue(key, out var currentAmount) && currentAmount.CompareTo(amount) >= 0;
+        {
+            return items.TryGetValue(key, out var currentAmount) && currentAmount.CompareTo(amount) >= 0;
+        }
 
         public bool HasEnough(IEnumerable<Pair<TKey, TValue>> requiredItems)
-            => requiredItems.All(kvp => HasEnough(kvp.Key, kvp.Value));
+        {
+            return requiredItems.All(kvp => HasEnough(kvp.Key, kvp.Value));
+        }
 
         [Button]
         public bool Remove(TKey key)
@@ -99,18 +111,13 @@ namespace Soul.Model.Runtime.Inventories
             return items.Select(pair => new Pair<TKey, TValue>(pair.Key, pair.Value)).ToList();
         }
 
-        public bool Has(TKey key) => items.ContainsKey(key);
-
-        public int Count => items.Count;
+        public bool Has(TKey key)
+        {
+            return items.ContainsKey(key);
+        }
 
         protected abstract TValue AddValues(TValue a, TValue b);
         protected abstract TValue SubtractValues(TValue a, TValue b);
-
-        [Button]
-        public void Save(string key)
-        {
-            Data.Save(key, ToList());
-        }
 
         [Button]
         public bool Load(string key)
@@ -119,10 +126,7 @@ namespace Soul.Model.Runtime.Inventories
             if (loadedItems == null) return false;
 
             items.Clear();
-            foreach (var item in loadedItems.Where(item => item.Key != null))
-            {
-                items[item.Key] = item.Value;
-            }
+            foreach (var item in loadedItems.Where(item => item.Key != null)) items[item.Key] = item.Value;
 
             return true;
         }
@@ -133,7 +137,7 @@ namespace Soul.Model.Runtime.Inventories
         Added,
         Increased,
         Removed,
-        Decreased,
+        Decreased
     }
 
     public struct InventoryChangeEventArgs<TKey, TValue>

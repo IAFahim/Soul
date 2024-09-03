@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Pancake.MobileInput;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 namespace Soul.Model.Runtime.Selectors
@@ -14,11 +15,11 @@ namespace Soul.Model.Runtime.Selectors
         public float waitForDrag = .1f;
         [SerializeField] private Transform currentTransform;
         [SerializeField] private bool canSelect = true;
-        [SerializeField] private UnityEngine.Events.UnityEvent<Transform> onSelected;
-        private TouchCamera _touchCamera;
-        private EventSystem _eventSystem;
+        [SerializeField] private UnityEvent<Transform> onSelected;
         public bool selectProcessRunning;
+        private EventSystem _eventSystem;
         private CancellationToken _token;
+        private TouchCamera _touchCamera;
 
         public void Subscribe(TouchCamera touchCamera, EventSystem eventSystem, CancellationToken tokenSource)
         {

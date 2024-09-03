@@ -10,7 +10,7 @@ namespace Soul.Model.Runtime.Upgrades
     public class UpgradeParts
     {
         public Bounds bounds;
-        [SerializeField] PreservePrefabAndTransform[] parts;
+        [SerializeField] private PreservePrefabAndTransform[] parts;
 
         public PreservePrefabAndTransform[] Parts => parts;
 
@@ -23,10 +23,10 @@ namespace Soul.Model.Runtime.Upgrades
             PreservePrefabAndTransform[] preservePrefabAndTransforms)
         {
             var instantiatedParts = new Pair<GameObject, bool>[preservePrefabAndTransforms.Length];
-            for (int i = 0; i < preservePrefabAndTransforms.Length; i++)
+            for (var i = 0; i < preservePrefabAndTransforms.Length; i++)
             {
                 var part = preservePrefabAndTransforms[i];
-                bool usePool = part.PoolOrInstantiate(parent, out GameObject partGameObject);
+                var usePool = part.PoolOrInstantiate(parent, out var partGameObject);
                 instantiatedParts[i] = new Pair<GameObject, bool>(partGameObject, usePool);
             }
 
@@ -37,12 +37,10 @@ namespace Soul.Model.Runtime.Upgrades
         {
             List<PreservePrefabAndTransform> extraPreservePrefabAndTransforms = new();
             foreach (var next in nextLevelParts.Parts)
+            foreach (var part in parts)
             {
-                foreach (var part in parts)
-                {
-                    if (part.prefab == next.prefab) continue;
-                    extraPreservePrefabAndTransforms.Add(next);
-                }
+                if (part.prefab == next.prefab) continue;
+                extraPreservePrefabAndTransforms.Add(next);
             }
 
             return PopulateArrayBySpawn(parent, extraPreservePrefabAndTransforms.ToArray());
@@ -50,9 +48,9 @@ namespace Soul.Model.Runtime.Upgrades
 
         public void StoreAllChildren(Transform parent)
         {
-            int childCount = parent.childCount;
+            var childCount = parent.childCount;
             parts = new PreservePrefabAndTransform[childCount];
-            for (int i = 0; i < childCount; i++)
+            for (var i = 0; i < childCount; i++)
             {
                 var child = parent.GetChild(i);
                 var preservePrefabAndTransform = new PreservePrefabAndTransform(child.gameObject, false);

@@ -12,7 +12,7 @@
         Gate,
         OuterWall,
         City,
-        Map,
+        Map
     }
 
     public enum EQuality
@@ -26,7 +26,7 @@
     {
         Claimable = 0,
         Claimed = 1,
-        Locked = 2,
+        Locked = 2
     }
 
     public enum EProgress

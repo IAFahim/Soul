@@ -7,14 +7,15 @@ namespace Soul.Model.Runtime.Limits
     [Serializable]
     public class Limit
     {
-        [FormerlySerializedAs("vector2Int")] [BarAttribute.Bar] public Vector2Int currentAndMax;
+        [FormerlySerializedAs("vector2Int")] [BarAttribute.Bar]
+        public Vector2Int currentAndMax;
 
         public int Current
         {
             get => currentAndMax.x;
             set => currentAndMax.x = value;
         }
-        
+
         public int Max
         {
             get => currentAndMax.y;
@@ -22,8 +23,15 @@ namespace Soul.Model.Runtime.Limits
         }
 
         public bool IsMax => currentAndMax.x >= currentAndMax.y;
-        public bool IsZero() => Current == 0;
-        
-        public static implicit operator int(Limit limit) => limit.Current;
+
+        public bool IsZero()
+        {
+            return Current == 0;
+        }
+
+        public static implicit operator int(Limit limit)
+        {
+            return limit.Current;
+        }
     }
 }

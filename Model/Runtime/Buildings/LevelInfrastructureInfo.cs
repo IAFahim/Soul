@@ -8,6 +8,10 @@ namespace Soul.Model.Runtime.Buildings
     public class LevelInfrastructureInfo : ScriptableStringInfo
     {
         public Vector3[] infoPanelPositionOffsets;
-        public Vector3 GetInfoPanelPositionOffset(int index) => infoPanelPositionOffsets[Math.Min(index, infoPanelPositionOffsets.Length - 1)];
+
+        public Vector3 GetInfoPanelPositionOffset(int index)
+        {
+            return infoPanelPositionOffsets[Math.Min(index, infoPanelPositionOffsets.Length - 1)];
+        }
     }
 }

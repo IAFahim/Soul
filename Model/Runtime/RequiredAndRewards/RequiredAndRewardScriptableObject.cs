@@ -7,10 +7,21 @@ namespace Soul.Model.Runtime.RequiredAndRewards
     {
         [SerializeField] protected Pair<TRequirement, TReward>[] requiredAndRewards;
 
-        public Pair<TRequirement, TReward> GetRequiredAndRewards(int index) => requiredAndRewards[index];
-        public TRequirement GetRequirement(int index) => requiredAndRewards[index].First;
-        public TReward GetReward(int index) => requiredAndRewards[index].Second;
-
         public int Length => requiredAndRewards.Length;
+
+        public Pair<TRequirement, TReward> GetRequiredAndRewards(int index)
+        {
+            return requiredAndRewards[index];
+        }
+
+        public TRequirement GetRequirement(int index)
+        {
+            return requiredAndRewards[index].First;
+        }
+
+        public TReward GetReward(int index)
+        {
+            return requiredAndRewards[index].Second;
+        }
     }
 }

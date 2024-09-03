@@ -5,8 +5,8 @@ namespace Soul.Model.Runtime.Effects
     public interface IEffect
     {
         public float EffectStrength { get; }
-        public EffectType GetEffectType();
         DelayHandle EffectDelayDelayHandle { get; }
+        public EffectType GetEffectType();
         DelayHandle Apply(IEffectTarget target, float strength, float duration);
         void OnComplete();
         void Cancel(IEffectTarget effectTarget);

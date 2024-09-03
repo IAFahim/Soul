@@ -3,9 +3,8 @@ using UnityEngine;
 
 namespace Soul.Model.Runtime.Selectors
 {
-    public class ItemSelection : ScriptableObject 
+    public class ItemSelection : ScriptableObject
     {
         public Selection<Item> selection;
-        
     }
 }

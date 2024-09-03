@@ -11,14 +11,20 @@ namespace Soul.Model.Runtime.Times
         public UnityTimeSpan timeSpan;
         public UnityTimeSpan TimeRequired => timeSpan;
 
-        public TimeSpan RemainingTimeSpan(DateTime startTime, DateTime currentDateTime) =>
-            currentDateTime.Subtract(startTime).Add(timeSpan);
+        public TimeSpan RemainingTimeSpan(DateTime startTime, DateTime currentDateTime)
+        {
+            return currentDateTime.Subtract(startTime).Add(timeSpan);
+        }
 
-        public float RemainingSeconds(DateTime startTime, DateTime currentDateTime) =>
-            (float)currentDateTime.Subtract(startTime).Add(timeSpan).TotalSeconds;
+        public float RemainingSeconds(DateTime startTime, DateTime currentDateTime)
+        {
+            return (float)currentDateTime.Subtract(startTime).Add(timeSpan).TotalSeconds;
+        }
 
-        public static implicit operator float(TimeRequirement timeRequirement) =>
-            (int)timeRequirement.timeSpan.TotalSeconds;
+        public static implicit operator float(TimeRequirement timeRequirement)
+        {
+            return (int)timeRequirement.timeSpan.TotalSeconds;
+        }
 
         public DelayHandle Start(Action onComplete, bool useRealTime)
         {
@@ -29,7 +35,7 @@ namespace Soul.Model.Runtime.Times
         public (bool completed, DelayHandle delayHandle) Resume(DateTime startTime, DateTime currentDateTime,
             Action onComplete, bool useRealTime)
         {
-            float remainingSeconds = RemainingSeconds(startTime, currentDateTime);
+            var remainingSeconds = RemainingSeconds(startTime, currentDateTime);
             if (remainingSeconds < 0 || Mathf.Approximately(remainingSeconds, 0))
             {
                 onComplete.Invoke();

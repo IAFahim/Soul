@@ -11,7 +11,7 @@ namespace Soul.Model.Runtime.Game
             {
                 UserData.SetFirstOpen(true);
 
-                string userId = UserData.UserId;
+                var userId = UserData.UserId;
                 Data.Save(Constant.User.KEY_ID, userId);
             }
         }

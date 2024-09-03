@@ -8,8 +8,8 @@ namespace Soul.Model.Runtime.Effects
     public abstract class Effect : IEffect
     {
         [SerializeField] private float effectStrength = 1;
-        private DelayHandle _effectDelayHandle;
-        private IEffectTarget _effectTarget;
+
+        public IEffectTarget EffectTarget { get; private set; }
 
         public float EffectStrength
         {
@@ -19,16 +19,14 @@ namespace Soul.Model.Runtime.Effects
 
         public abstract EffectType GetEffectType();
 
-        public DelayHandle EffectDelayDelayHandle => _effectDelayHandle;
-
-        public IEffectTarget EffectTarget => _effectTarget;
+        public DelayHandle EffectDelayDelayHandle { get; private set; }
 
         public virtual DelayHandle Apply(IEffectTarget target, float strength, float duration)
         {
-            _effectTarget = target;
+            EffectTarget = target;
             effectStrength = strength;
             EffectTarget.AddEffect(this);
-            return _effectDelayHandle = App.Delay(duration, OnComplete, OnUpdate);
+            return EffectDelayDelayHandle = App.Delay(duration, OnComplete, OnUpdate);
         }
 
         public abstract void OnComplete();

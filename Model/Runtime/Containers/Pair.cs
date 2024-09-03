@@ -7,9 +7,11 @@ namespace Soul.Model.Runtime.Containers
     [Serializable]
     public struct Pair<T, TV>
     {
-        [FormerlySerializedAs("key")] [SerializeField] private T first;
+        [FormerlySerializedAs("key")] [SerializeField]
+        private T first;
 
-        [FormerlySerializedAs("value")] [SerializeField] private TV second;
+        [FormerlySerializedAs("value")] [SerializeField]
+        private TV second;
 
         public Pair(T first, TV second)
         {
@@ -38,23 +40,23 @@ namespace Soul.Model.Runtime.Containers
         public TV Value
         {
             get => second;
-            set => this.second = value;
+            set => second = value;
         }
-        
+
         public TV Multiplier
         {
             get => second;
-            set => this.second = value;
+            set => second = value;
         }
 
         public TV Second
         {
             get => second;
-            set => this.second = value;
+            set => second = value;
         }
 
 
-        private String GetIdentity()
+        private string GetIdentity()
         {
             return "[" + first + " , " + second + "]";
         }
@@ -69,7 +71,14 @@ namespace Soul.Model.Runtime.Containers
             return first.GetHashCode() ^ second.GetHashCode();
         }
 
-        public static implicit operator T(Pair<T, TV> pair) => pair.first;
-        public static implicit operator TV(Pair<T, TV> pair) => pair.second;
+        public static implicit operator T(Pair<T, TV> pair)
+        {
+            return pair.first;
+        }
+
+        public static implicit operator TV(Pair<T, TV> pair)
+        {
+            return pair.second;
+        }
     }
 }

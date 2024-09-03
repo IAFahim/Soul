@@ -2,6 +2,5 @@
 {
     public interface ITag<T>
     {
-        
     }
 }

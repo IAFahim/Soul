@@ -6,6 +6,9 @@ namespace Soul.Model.Runtime.RequiredAndRewards.Requirements
     {
         [SerializeField] protected T[] requirements;
 
-        public T GetRequirement(int index) => requirements[index];
+        public T GetRequirement(int index)
+        {
+            return requirements[index];
+        }
     }
 }

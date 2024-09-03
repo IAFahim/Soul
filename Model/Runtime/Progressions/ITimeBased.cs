@@ -10,7 +10,7 @@ namespace Soul.Model.Runtime.Progressions
         public UnityDateTime EndsAt(UnityTimeSpan fullTime);
         public UnityTimeSpan Remaining(UnityTimeSpan fullTime);
 
-        public float Progress(UnityTimeSpan fullTime);
+        public float ProgressRatio(UnityTimeSpan fullTime);
 
         public bool IsOver(UnityTimeSpan fullTime);
     }

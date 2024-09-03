@@ -10,7 +10,7 @@ namespace Soul.Model.Runtime.Preserves
         public Vector3 position;
         public Quaternion rotation;
         public Vector3 scale;
-        
+
         public Vector3 GetPosition(Transform transform)
         {
             return useLocal ? transform.TransformPoint(position) : position;
@@ -18,7 +18,7 @@ namespace Soul.Model.Runtime.Preserves
 
         protected GameObject SetTransformInfo(GameObject gameObject)
         {
-            Transform transform = gameObject.transform;
+            var transform = gameObject.transform;
             SetTransformInfo(transform);
             return gameObject;
         }
