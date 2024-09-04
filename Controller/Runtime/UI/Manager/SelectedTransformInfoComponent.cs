@@ -1,5 +1,5 @@
 ﻿using Pancake;
-using Soul.Controller.Runtime.UI;
+using Soul.Controller.Runtime.Items;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.UpgradeAndUnlock.Unlocks;
@@ -9,10 +9,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Soul.Presenter.Runtime.UI
+namespace Soul.Controller.Runtime.UI.Manager
 {
     public class SelectedTransformInfoComponent : GameComponent
     {
+        private bool enableCall;
         // --- Events ---
         public Event<Transform> onUpgradeAbleOrUnlockAbleSelected;
 
@@ -26,8 +27,8 @@ namespace Soul.Presenter.Runtime.UI
         [Header("Level Section")] public GameObject levelContainer;
         public TMPFormat levelTextFormat;
 
-        [Header("Unlock/Upgrade Section")] public Button unlockUpgradeToggleButton; // More descriptive name
-        public Button unlockUpgradeActionButton; // More descriptive name
+        [Header("Unlock/Upgrade Section")] public Button unlockUpgradeToggleButton;
+        public Button unlockUpgradeActionButton;
         public TMP_Text unlockUpgradeActionTitle;
         public TMP_Text unlockUpgradeCoinRequirement;
         public TMP_Text unlockUpgradeTimeRequirement;
@@ -35,7 +36,10 @@ namespace Soul.Presenter.Runtime.UI
         public TextMeshProUGUI unlockUpgradeButtonText;
         public TMPFormat unlockOrUpgradeTitleTextFormat;
         public GameObject unlockAndUpgradePanel;
-        public Button closeUnlockUpgradePanelButton; // More descriptive name
+        public Button closeUnlockUpgradePanelButton;
+        
+        //ScriptableObject
+        public EventShowItemRequired eventShowItemRequired;
 
         // --- Sprites & Text ---
         [SerializeField] private Sprite unlockButtonSprite;
@@ -49,34 +53,39 @@ namespace Soul.Presenter.Runtime.UI
         // --- Internal State ---
         private Transform currentSelectedTransform;
 
-
         private void OnEnable()
         {
-            HideUI();
-            HideUnlockUpgradePanel();
+            Hide();
+        }
+
+        private void Hide()
+        {
+            HideCanvas();
+            unlockAndUpgradePanel.SetActive(false);
         }
 
         private void OnDisable()
         {
             RemoveAllButtonListeners();
         }
-        
-        
+
+
         public void OnSelected(Transform selectedTransform)
         {
+            Hide();
             RemoveAllButtonListeners();
             currentSelectedTransform = selectedTransform;
 
             if (selectData.GetDataFrom(selectedTransform) > 0)
             {
-                ShowUI();
-                UpdateTitle(selectData.title);
-                UpdateUnlockUpgradeLevel(selectData.level);
+                ShowCanvas();
+                UpdateTitle(selectData.titleReference);
+                UpdateUnlockUpgradeLevel(selectData.levelReference);
             }
             else
             {
                 onUpgradeAbleOrUnlockAbleSelected.Trigger(null);
-                HideUI();
+                HideCanvas();
             }
         }
 
@@ -89,14 +98,14 @@ namespace Soul.Presenter.Runtime.UI
             closeUnlockUpgradePanelButton.onClick.RemoveAllListeners();
         }
 
-        private void ShowUI()
+        private void ShowCanvas()
         {
             canvasGroup.alpha = 1;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
         }
 
-        private void HideUI()
+        private void HideCanvas()
         {
             canvasGroup.alpha = 0;
             canvasGroup.interactable = false;
@@ -110,12 +119,13 @@ namespace Soul.Presenter.Runtime.UI
             unlockUpgradeToggleButton.onClick.AddListener(HideUnlockUpgradePanel);
             unlockUpgradeButtonImage.sprite = closeButtonSprite;
             unlockAndUpgradePanel.SetActive(true);
+            eventShowItemRequired.Trigger(selectData.ItemsRequirement(selectData.Level));
         }
 
         private void HideUnlockUpgradePanel()
         {
-            unlockAndUpgradePanel.SetActive(false);
             if (currentSelectedTransform) OnSelected(currentSelectedTransform); // Refresh UI
+            eventShowItemRequired.Trigger(null);
         }
 
         private void Unlock()
@@ -181,8 +191,10 @@ namespace Soul.Presenter.Runtime.UI
             unlockUpgradeToggleButton.onClick.AddListener(ShowUnlockUpgradePanel);
             unlockUpgradeButtonImage.sprite = unlockButtonSprite;
             unlockUpgradeButtonText.text = unlockButtonText;
+            unlockUpgradeActionTitle.text = "Unlock";
             levelTextFormat.TMP.text = levelLockedText;
-            if (selectData.title) unlockOrUpgradeTitleTextFormat.TMP.text = "Unlock " + selectData.title;
+            if (selectData.titleReference) unlockOrUpgradeTitleTextFormat.TMP.text = "Unlock " + selectData.titleReference;
+            unlockUpgradeCoinRequirement.text = selectData.CurrencyRequirement(0).Value.ToString();
         }
 
         private void ConfigureForMaxLevelState(Level levelValue)
@@ -193,7 +205,8 @@ namespace Soul.Presenter.Runtime.UI
             unlockUpgradeButtonImage.sprite = upgradeButtonSprite;
             unlockUpgradeButtonText.text = maxLevelText;
             levelTextFormat.SetTextInt(levelValue.Current);
-            if (selectData.title) unlockOrUpgradeTitleTextFormat.TMP.text = selectData.title + " Maxed Level Reached";
+            unlockUpgradeActionTitle.text = "Max";
+            if (selectData.titleReference) unlockOrUpgradeTitleTextFormat.TMP.text = selectData.titleReference + " Maxed Level Reached";
         }
 
         private void ConfigureForUpgradableState(Level levelValue)
@@ -205,16 +218,17 @@ namespace Soul.Presenter.Runtime.UI
             unlockUpgradeToggleButton.onClick.AddListener(ShowUnlockUpgradePanel);
             unlockUpgradeButtonImage.sprite = upgradeButtonSprite;
             unlockUpgradeButtonText.text = upgradeButtonText;
+            unlockUpgradeActionTitle.text = "Upgrade";
             levelTextFormat.SetTextInt(levelValue.Current);
-
+            unlockUpgradeCoinRequirement.text = selectData.CurrencyRequirement(levelValue).Value.ToString();
             // Simplified title formatting
-            if (selectData.title)
+            if (selectData.titleReference)
             {
                 unlockOrUpgradeTitleTextFormat.TMP.text =
-                    string.Format(selectData.title.Value.Title, levelValue.Current);
+                    string.Format(selectData.titleReference.Value.Title, levelValue.Current);
             }
         }
-        
+
         private void DisableLevelContainer()
         {
             levelContainer.SetActive(false);
