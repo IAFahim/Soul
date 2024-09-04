@@ -1,4 +1,5 @@
-﻿using Alchemy.Inspector;
+﻿using System;
+using Alchemy.Inspector;
 using Coffee.UIEffects;
 using LitMotion;
 using LitMotion.Extensions;
@@ -62,7 +63,7 @@ namespace Soul.Controller.Runtime.UI.Components
             if (!hasEnough)
             {
                 _blinkMotionHandle = LMotion.Create(_startingColor, Color.clear, duration / 2)
-                    .WithLoops(2, LoopType.Yoyo)
+                    .WithLoops(-1, LoopType.Yoyo)
                     .WithDelay(duration)
                     .WithEase(ease)
                     .BindToColor(background);
@@ -77,6 +78,12 @@ namespace Soul.Controller.Runtime.UI.Components
                 uIShiny.Play();
             }
             else uIShiny.effectFactor = 0;
+        }
+
+        private void OnDisable()
+        {
+            if (_slideMotionHandle.IsActive()) _slideMotionHandle.Cancel();
+            if (_blinkMotionHandle.IsActive()) _blinkMotionHandle.Cancel();
         }
     }
 }
