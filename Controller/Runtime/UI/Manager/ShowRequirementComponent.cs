@@ -45,7 +45,7 @@ namespace Soul.Controller.Runtime.UI.Manager
                 playerInventoryReference.inventory.TryGetValue(item, out var has);
                 if (itemRequirementDictionary.ContainsKey(itemKeyValuePair.Key))
                 {
-                    itemRequirementDictionary[itemKeyValuePair.Key].SetValues(item.icon, requiredAmount, has);
+                    UpdateContainer(itemKeyValuePair, item, requiredAmount, has);
                 }
                 else
                 {
@@ -55,6 +55,11 @@ namespace Soul.Controller.Runtime.UI.Manager
                     itemRequirementDictionary.Add(itemKeyValuePair.Key, newRequirement);
                 }
             }
+        }
+
+        private void UpdateContainer(Pair<Item, int> itemKeyValuePair, Item item, int requiredAmount, int has)
+        {
+            itemRequirementDictionary[itemKeyValuePair.Key].SetValues(item.icon, requiredAmount, has);
         }
 
         private void Clear()

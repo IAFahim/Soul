@@ -2,6 +2,7 @@
 using Soul.Controller.Runtime.Items;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.UIs;
 using Soul.Model.Runtime.UpgradeAndUnlock.Unlocks;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using Soul.Model.Runtime.Variables;
@@ -11,11 +12,12 @@ using UnityEngine.UI;
 
 namespace Soul.Controller.Runtime.UI.Manager
 {
-    public class SelectedTransformInfoComponent : GameComponent
+    public class SelectedTransformInfoComponent : GameComponent, IHideCallBack
     {
         private bool enableCall;
+
         // --- Events ---
-        public Event<Transform> onUpgradeAbleOrUnlockAbleSelected;
+        public Event<(Transform transform, IHideCallBack hideCallBack)> onUpgradeAbleOrUnlockAbleSelected;
 
         // --- UI Elements ---
         [Header("General")] public CanvasGroup canvasGroup;
@@ -37,7 +39,7 @@ namespace Soul.Controller.Runtime.UI.Manager
         public TMPFormat unlockOrUpgradeTitleTextFormat;
         public GameObject unlockAndUpgradePanel;
         public Button closeUnlockUpgradePanelButton;
-        
+
         //ScriptableObject
         public EventShowItemRequired eventShowItemRequired;
 
@@ -84,7 +86,6 @@ namespace Soul.Controller.Runtime.UI.Manager
             }
             else
             {
-                onUpgradeAbleOrUnlockAbleSelected.Trigger(null);
                 HideCanvas();
             }
         }
@@ -175,7 +176,7 @@ namespace Soul.Controller.Runtime.UI.Manager
             }
             else
             {
-                onUpgradeAbleOrUnlockAbleSelected.Trigger(null);
+                onUpgradeAbleOrUnlockAbleSelected.Trigger((null, this));
                 HideUnlockUpgradePanel();
                 DisableUpgradeButton();
                 DisableLevelContainer();
@@ -186,34 +187,36 @@ namespace Soul.Controller.Runtime.UI.Manager
         {
             unlockUpgradeActionButton.interactable = true;
             unlockUpgradeActionButton.onClick.AddListener(Unlock);
-            onUpgradeAbleOrUnlockAbleSelected.Trigger(currentSelectedTransform);
+            onUpgradeAbleOrUnlockAbleSelected.Trigger((currentSelectedTransform, this));
             unlockUpgradeToggleButton.interactable = true;
             unlockUpgradeToggleButton.onClick.AddListener(ShowUnlockUpgradePanel);
             unlockUpgradeButtonImage.sprite = unlockButtonSprite;
             unlockUpgradeButtonText.text = unlockButtonText;
             unlockUpgradeActionTitle.text = "Unlock";
             levelTextFormat.TMP.text = levelLockedText;
-            if (selectData.titleReference) unlockOrUpgradeTitleTextFormat.TMP.text = "Unlock " + selectData.titleReference;
+            if (selectData.titleReference)
+                unlockOrUpgradeTitleTextFormat.TMP.text = "Unlock " + selectData.titleReference;
             unlockUpgradeCoinRequirement.text = selectData.CurrencyRequirement(0).Value.ToString();
         }
 
         private void ConfigureForMaxLevelState(Level levelValue)
         {
             unlockUpgradeActionButton.interactable = false;
-            onUpgradeAbleOrUnlockAbleSelected.Trigger(null);
+            onUpgradeAbleOrUnlockAbleSelected.Trigger((null, this));
             unlockUpgradeToggleButton.interactable = false;
             unlockUpgradeButtonImage.sprite = upgradeButtonSprite;
             unlockUpgradeButtonText.text = maxLevelText;
             levelTextFormat.SetTextInt(levelValue.Current);
             unlockUpgradeActionTitle.text = "Max";
-            if (selectData.titleReference) unlockOrUpgradeTitleTextFormat.TMP.text = selectData.titleReference + " Maxed Level Reached";
+            if (selectData.titleReference)
+                unlockOrUpgradeTitleTextFormat.TMP.text = selectData.titleReference + " Maxed Level Reached";
         }
 
         private void ConfigureForUpgradableState(Level levelValue)
         {
             unlockUpgradeActionButton.interactable = true;
             unlockUpgradeActionButton.onClick.AddListener(Upgrade);
-            onUpgradeAbleOrUnlockAbleSelected.Trigger(currentSelectedTransform);
+            onUpgradeAbleOrUnlockAbleSelected.Trigger((currentSelectedTransform, this));
             unlockUpgradeToggleButton.interactable = true;
             unlockUpgradeToggleButton.onClick.AddListener(ShowUnlockUpgradePanel);
             unlockUpgradeButtonImage.sprite = upgradeButtonSprite;
@@ -237,6 +240,11 @@ namespace Soul.Controller.Runtime.UI.Manager
         private void DisableUpgradeButton()
         {
             unlockUpgradeToggleButton.gameObject.SetActive(false);
+        }
+
+        public void HideCallBack()
+        {
+            unlockUpgradeToggleButton.onClick.Invoke();
         }
     }
 }

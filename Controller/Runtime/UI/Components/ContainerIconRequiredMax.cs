@@ -1,5 +1,4 @@
-﻿using System;
-using Alchemy.Inspector;
+﻿using Alchemy.Inspector;
 using Coffee.UIEffects;
 using LitMotion;
 using LitMotion.Extensions;
@@ -13,16 +12,17 @@ namespace Soul.Controller.Runtime.UI.Components
     {
         [SerializeField] private RectTransform container;
 
-        [FormerlySerializedAs("image")] [SerializeField]
-        private Image icon;
+        [SerializeField] private Image icon;
 
         [SerializeField] private Image background;
         [SerializeField] private TMPFormat countMaxTMPFormat;
         [SerializeField] private UIShiny uIShiny;
+        [FormerlySerializedAs("clear")] [SerializeField] private Color clearColor = Color.clear;
 
         [SerializeField] private Vector3 startingOffset = new(-350, 0, 0);
         [SerializeField] private Ease ease = Ease.Linear;
         [SerializeField] private float notEnoughDuration = 0.4f;
+        [SerializeField] private float blinkMultiplier = 1f;
         [SerializeField] private float hasEnoughDuration = 0.3f;
 
         private Color _startingColor;
@@ -49,7 +49,7 @@ namespace Soul.Controller.Runtime.UI.Components
             var duration = hasEnough ? hasEnoughDuration : notEnoughDuration;
             icon.sprite = sprite;
             countMaxTMPFormat.TMP.text = string.Format(countMaxTMPFormat, required, has);
-            PlayUIShiny(hasEnough, duration);
+            PlayUIShinyBlink(hasEnough, duration);
             return duration;
         }
 
@@ -58,26 +58,26 @@ namespace Soul.Controller.Runtime.UI.Components
             if (_slideMotionHandle.IsActive()) _slideMotionHandle.Cancel();
             _slideMotionHandle = LMotion.Create(startingOffset, Vector3.zero, duration)
                 .BindToAnchoredPosition3D(container);
-            
-            if (_blinkMotionHandle.IsActive()) _blinkMotionHandle.Cancel();
-            if (!hasEnough)
-            {
-                _blinkMotionHandle = LMotion.Create(_startingColor, Color.clear, duration / 2)
-                    .WithLoops(-1, LoopType.Yoyo)
-                    .WithDelay(duration)
-                    .WithEase(ease)
-                    .BindToColor(background);
-            }
         }
 
-        private void PlayUIShiny(bool hasEnough, float duration)
+        private void PlayUIShinyBlink(bool hasEnough, float duration)
         {
+            if (_blinkMotionHandle.IsActive()) _blinkMotionHandle.Cancel();
+            
             if (hasEnough)
             {
                 uIShiny.effectPlayer.initialPlayDelay = duration;
                 uIShiny.Play();
             }
-            else uIShiny.effectFactor = 0;
+            else
+            {
+                uIShiny.effectFactor = 0;
+                _blinkMotionHandle = LMotion.Create(_startingColor, clearColor, duration * blinkMultiplier)
+                    .WithLoops(-1, LoopType.Yoyo)
+                    .WithDelay(duration)
+                    .WithEase(ease)
+                    .BindToColor(background);
+            }
         }
 
         private void OnDisable()

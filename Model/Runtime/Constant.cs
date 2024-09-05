@@ -26,7 +26,11 @@ namespace Soul.Model.Runtime
 
         public static class Scene
         {
-            public const string PERSISTENT = "persistent";
+            public static readonly string Persistent = "persistent";
+            public static readonly string Menu = "ui_cam";
+            public static readonly string Infrastructure = "farming_infrastructure";
+            public static readonly string Environment = "environment";
+            public static readonly string NPC = "npc";
         }
     }
 }

@@ -7,7 +7,6 @@ using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Limits;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 using UnityProgressBar;
 
@@ -15,7 +14,7 @@ namespace Soul.Presenter.Runtime.UI
 {
     public class RewardNotifier : GameComponent, ILoadComponent
     {
-        [FormerlySerializedAs("countLimitText")] [SerializeField] TMPFormat addedText;
+        [SerializeField] TMPFormat addedText;
         [SerializeField] TMPFormat totalText;
         [SerializeField] Image icon;
         [SerializeField] ProgressBar progressBar;
