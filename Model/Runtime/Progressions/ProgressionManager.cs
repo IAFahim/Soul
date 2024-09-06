@@ -3,7 +3,7 @@ using Pancake.Common;
 using QuickEye.Utility;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.SaveAndLoad;
-using TrackTime;
+using Soul.Model.Runtime.TrackTime;
 
 namespace Soul.Model.Runtime.Progressions
 {
