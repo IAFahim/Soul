@@ -8,12 +8,12 @@ namespace Soul.Model.Runtime.Effects
     {
         public float StatMultiplier { get; set; }
         List<IEffect> ActiveEffects { get; }
-        float GetEffectMultiplier(StringConstant effectName);
-        int HasEffect(StringConstant effectName);
-        bool CanApplyEffectOf(StringConstant effectName);
+        float GetEffectMultiplier(StringConstant effectType);
+        int HasEffect(StringConstant effectType);
+        bool CanApplyEffectOf(StringConstant effectType);
         float ApplyEffect(IEffect effect);
         void RemoveEffect(IEffect effect);
-        void RemoveEffects(StringConstant effectName);
+        void RemoveEffects(StringConstant effectType);
         void RemoveAllEffects();
     }
 }

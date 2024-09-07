@@ -29,18 +29,18 @@ namespace Soul.Controller.Runtime.Effects
 
         public List<IEffect> ActiveEffects { get; private set; }
 
-        public float GetEffectMultiplier(StringConstant effectName)
+        public float GetEffectMultiplier(StringConstant effectType)
         {
-            return effectStrengthMultiplierLookupTable.GetMultiplier(title, effectName) * selfEffectMultiplier;
+            return effectStrengthMultiplierLookupTable.GetMultiplier(title, effectType) * selfEffectMultiplier;
         }
 
-        public int HasEffect(StringConstant effectName)
+        public int HasEffect(StringConstant effectType)
         {
-            return ActiveEffects.Count(effect => effect.EffectType == effectName);
+            return ActiveEffects.Count(effect => effect.EffectType == effectType);
         }
 
-        public bool CanApplyEffectOf(StringConstant effectName) =>
-            !Mathf.Approximately(GetEffectMultiplier(effectName), 0);
+        public bool CanApplyEffectOf(StringConstant effectType) =>
+            !Mathf.Approximately(GetEffectMultiplier(effectType), 0);
 
         public float ApplyEffect(IEffect effect)
         {
@@ -63,11 +63,11 @@ namespace Soul.Controller.Runtime.Effects
         }
 
 
-        public void RemoveEffects(StringConstant effectName)
+        public void RemoveEffects(StringConstant effectType)
         {
             for (var i = ActiveEffects.Count - 1; i >= 0; i--)
             {
-                if (ActiveEffects[i].EffectType == effectName) ActiveEffects.RemoveAt(i);
+                if (ActiveEffects[i].EffectType == effectType) ActiveEffects.RemoveAt(i);
             }
         }
 
