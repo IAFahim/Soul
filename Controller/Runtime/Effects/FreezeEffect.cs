@@ -20,6 +20,7 @@ namespace Soul.Controller.Runtime.Effects
 
         public override void OnComplete()
         {
+            base.OnComplete();
             Debug.Log("Freeze effect completed");
         }
     }

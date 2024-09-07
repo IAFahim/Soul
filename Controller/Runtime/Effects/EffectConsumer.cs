@@ -12,8 +12,7 @@ namespace Soul.Controller.Runtime.Effects
     {
         private void Awake() => ActiveEffects = new List<IEffect>();
 
-        [Title("EffectConsumerComponent")] [Min(0)]
-        public float selfEffectMultiplier = 1;
+        [Min(0)] public float selfEffectMultiplier = 1;
 
         [SerializeField] protected StringConstant title;
         public abstract void EffectAddSuccess(IEffect effect, float multiplier);
@@ -37,7 +36,7 @@ namespace Soul.Controller.Runtime.Effects
 
         public int HasEffect(StringConstant effectName)
         {
-            return ActiveEffects.Count(effect => effect.EffectName == effectName);
+            return ActiveEffects.Count(effect => effect.EffectType == effectName);
         }
 
         public bool CanApplyEffectOf(StringConstant effectName) =>
@@ -45,7 +44,7 @@ namespace Soul.Controller.Runtime.Effects
 
         public float ApplyEffect(IEffect effect)
         {
-            var multiplier = GetEffectMultiplier(effect.EffectName);
+            var multiplier = GetEffectMultiplier(effect.EffectType);
             if (Mathf.Approximately(multiplier, 0))
             {
                 EffectAddFail(effect);
@@ -68,7 +67,7 @@ namespace Soul.Controller.Runtime.Effects
         {
             for (var i = ActiveEffects.Count - 1; i >= 0; i--)
             {
-                if (ActiveEffects[i].EffectName == effectName) ActiveEffects.RemoveAt(i);
+                if (ActiveEffects[i].EffectType == effectName) ActiveEffects.RemoveAt(i);
             }
         }
 

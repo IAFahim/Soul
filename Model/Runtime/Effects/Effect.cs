@@ -12,7 +12,7 @@ namespace Soul.Model.Runtime.Effects
         public float baseDuration;
         private MotionHandle _effectMotionHandle;
         public IEffectConsumer Consumer { get; protected set; }
-        public StringConstant EffectName => effectName;
+        public StringConstant EffectType => effectName;
 
         public MotionHandle EffectMotionHandle
         {
@@ -22,7 +22,7 @@ namespace Soul.Model.Runtime.Effects
 
         public abstract float EffectStrength { get; }
         public abstract float Duration { get; }
-        public bool CanApplyTo(IEffectConsumer effectConsumer) => effectConsumer.CanApplyEffectOf(EffectName);
+        public bool CanApplyTo(IEffectConsumer effectConsumer) => effectConsumer.CanApplyEffectOf(EffectType);
         public abstract void Apply(IEffectConsumer effectConsumer);
 
         public virtual bool TryApply(IEffectConsumer effectConsumer)
@@ -31,10 +31,7 @@ namespace Soul.Model.Runtime.Effects
             if (canApply) Apply(effectConsumer);
             return canApply;
         }
-
-        public virtual void OnUpdate(float progress)
-        {
-        }
+        
 
         public void Cancel()
         {
@@ -42,7 +39,10 @@ namespace Soul.Model.Runtime.Effects
             EffectMotionHandle.Cancel();
         }
 
-        public abstract void OnComplete();
+        public virtual void OnComplete()
+        {
+            Consumer?.RemoveEffect(this);
+        }
 
         public virtual void Dispose() => Cancel();
     }
