@@ -1,43 +1,49 @@
 ﻿using System;
-using Pancake.Common;
+using LitMotion;
+using Pancake;
 using UnityEngine;
 
 namespace Soul.Model.Runtime.Effects
 {
     [Serializable]
-    public abstract class Effect : IEffect
+    public abstract class Effect : IEffect, IDisposable
     {
-        [SerializeField] private float effectStrength = 1;
+        [SerializeField] protected StringConstant effectName;
+        public float baseDuration;
+        private MotionHandle _effectMotionHandle;
+        public IEffectConsumer Consumer { get; protected set; }
+        public StringConstant EffectName => effectName;
 
-        public IEffectTarget EffectTarget { get; private set; }
-
-        public float EffectStrength
+        public MotionHandle EffectMotionHandle
         {
-            get => effectStrength;
-            protected set => effectStrength = value;
+            get => _effectMotionHandle;
+            protected set => _effectMotionHandle = value;
         }
 
-        public abstract EffectType GetEffectType();
+        public abstract float EffectStrength { get; }
+        public abstract float Duration { get; }
+        public bool CanApplyTo(IEffectConsumer effectConsumer) => effectConsumer.CanApplyEffectOf(EffectName);
+        public abstract void Apply(IEffectConsumer effectConsumer);
 
-        public DelayHandle EffectDelayDelayHandle { get; private set; }
-
-        public virtual DelayHandle Apply(IEffectTarget target, float strength, float duration)
+        public virtual bool TryApply(IEffectConsumer effectConsumer)
         {
-            EffectTarget = target;
-            effectStrength = strength;
-            EffectTarget.AddEffect(this);
-            return EffectDelayDelayHandle = App.Delay(duration, OnComplete, OnUpdate);
+            bool canApply = CanApplyTo(Consumer = effectConsumer);
+            if (canApply) Apply(effectConsumer);
+            return canApply;
+        }
+
+        public virtual void OnUpdate(float progress)
+        {
+        }
+
+        public void Cancel()
+        {
+            Consumer?.RemoveEffect(this);
+            EffectMotionHandle.Cancel();
         }
 
         public abstract void OnComplete();
 
-        public virtual void Cancel(IEffectTarget effectTarget)
-        {
-            effectTarget.RemoveEffect(this);
-        }
-
-        public virtual void OnUpdate(float progressTime)
-        {
-        }
+        public virtual void Dispose() => Cancel();
     }
 }

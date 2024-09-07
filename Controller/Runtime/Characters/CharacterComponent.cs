@@ -1,9 +1,8 @@
-﻿using Soul.Controller.Runtime.Effects;
+﻿using Pancake;
 
 namespace Soul.Controller.Runtime.Characters
 {
-    public class CharacterComponent : EffectTargetComponent
+    public class CharacterComponent : GameUnit
     {
-        
     }
 }

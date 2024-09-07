@@ -1,15 +1,18 @@
-using Pancake.Common;
+using LitMotion;
+using Pancake;
 
 namespace Soul.Model.Runtime.Effects
 {
     public interface IEffect
     {
+        StringConstant EffectName { get; }
+        IEffectConsumer Consumer { get; }
+        bool TryApply(IEffectConsumer effectConsumer);
         public float EffectStrength { get; }
-        DelayHandle EffectDelayDelayHandle { get; }
-        public EffectType GetEffectType();
-        DelayHandle Apply(IEffectTarget target, float strength, float duration);
-        void OnComplete();
-        void Cancel(IEffectTarget effectTarget);
-        void OnUpdate(float progressTime);
+        MotionHandle EffectMotionHandle { get; }
+        float Duration { get; }
+        bool CanApplyTo(IEffectConsumer consumer);
+        void OnUpdate(float progress);
+        void Cancel();
     }
 }

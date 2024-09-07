@@ -11,10 +11,10 @@ namespace Soul.Controller.Runtime.Attacks
         [SerializeField] public Transform attacker;
         [SerializeField] public Vector3 direction;
         [SerializeField] public LayerMask layerToEffect;
-        [SerializeField] public Optional<EffectTargetComponent> optionalTarget;
+        [SerializeField] public Optional<EffectConsumer> optionalTarget;
 
         public AttackIntention(Transform attacker, Vector3 direction, LayerMask layerToEffect,
-            Optional<EffectTargetComponent> optionalTarget)
+            Optional<EffectConsumer> optionalTarget)
         {
             this.attacker = attacker;
             this.direction = direction;
@@ -27,7 +27,7 @@ namespace Soul.Controller.Runtime.Attacks
             this.attacker = attacker;
             this.direction = direction;
             this.layerToEffect = layerToEffect;
-            optionalTarget = new Optional<EffectTargetComponent>(false, null);
+            optionalTarget = new Optional<EffectConsumer>(false, null);
         }
     }
 }
