@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using _Root.Scripts.NPC_Ai.Runtime.WayPointGizmoTool;
+using Links.Runtime;
 using UnityEngine;
 
 namespace Soul.Controller.Runtime.Grids
@@ -8,10 +8,10 @@ namespace Soul.Controller.Runtime.Grids
     [Serializable]
     public class GridWayPointLimiter
     {
-        [SerializeField] private WayPoints wayPoints;
+        [SerializeField] private IPositionsAndRotationsProvider wayPoints;
         [SerializeField] private Vector3Int stepOffset = Vector3Int.one;
 
-        public WayPoints WayPoints
+        public IPositionsAndRotationsProvider WayPoints
         {
             set => wayPoints = value;
         }
@@ -110,7 +110,7 @@ namespace Soul.Controller.Runtime.Grids
                             int currentIndex = startIndex + waypointIndex;
 
                             // Add the waypoint's position and rotation to the list
-                            coreSpots.Add((wayPoints.positions[currentIndex], wayPoints.rotations[currentIndex]));
+                            coreSpots.Add((wayPoints.Positions[currentIndex], wayPoints.Rotations[currentIndex]));
                         }
                     }
 
