@@ -2,8 +2,8 @@
 using Pancake.Common;
 using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Containers;
+using Soul.Model.Runtime.Indicators.Popups;
 using Soul.Model.Runtime.Items;
-using Soul.Model.Runtime.PopupIndicators;
 using Soul.Model.Runtime.RequiredAndRewards.Rewards;
 using Soul.Model.Runtime.Tweens;
 using TMPro;
@@ -12,7 +12,7 @@ using UnityEngine.Serialization;
 
 namespace Soul.Controller.Runtime.SpritePopups
 {
-    public class PopupIndicatorIconCount : PopUpIndicator, ILoadComponent
+    public class PopupClickableIconCount : IndicatorPopUpClickable, ILoadComponent
     {
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] protected TMPFormat countText;

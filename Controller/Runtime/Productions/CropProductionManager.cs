@@ -37,11 +37,11 @@ namespace Soul.Controller.Runtime.Productions
         [SerializeField] private Seed queueItem;
         [FormerlySerializedAs("isClaimable")] [SerializeField] private bool canClaim;
         [SerializeField] public MeshPlantPointGridSystem meshPlantPointGridSystem;
-        [SerializeField] private PopupIndicatorIconCount popupIndicator;
+        [FormerlySerializedAs("popupClickableIndicator")] [FormerlySerializedAs("popupIndicator")] [SerializeField] private PopupClickableIconCount popupClickable;
         private Transform _parent;
         private PlayerInventoryReference _playerInventoryReference;
         [SerializeField] protected Optional<AddressableParticleEffect> onCompleteParticleEffect;
-
+        
 
         // Properties
         public Pair<Item, int> ProductionItemValuePair
@@ -184,7 +184,7 @@ namespace Soul.Controller.Runtime.Productions
             if (onCompleteParticleEffect) onCompleteParticleEffect.Value.Load(true, _parent).Forget();
             CanClaim = true;
             var instantiatedRewardPopup =
-                popupIndicator.gameObject.Request(_parent).GetComponent<PopupIndicatorIconCount>();
+                popupClickable.gameObject.Request(_parent).GetComponent<PopupClickableIconCount>();
             instantiatedRewardPopup.Setup(_playerInventoryReference.mainCameraReference.transform, this, this, true);
             meshPlantPointGridSystem.Complete();
         }

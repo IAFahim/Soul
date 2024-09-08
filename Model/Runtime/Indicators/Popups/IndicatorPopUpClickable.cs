@@ -2,9 +2,9 @@
 using Soul.Model.Runtime.Selectors;
 using UnityEngine;
 
-namespace Soul.Model.Runtime.PopupIndicators
+namespace Soul.Model.Runtime.Indicators.Popups
 {
-    public abstract class PopUpIndicator : PoolAbleComponent, ISelectCallBack, IReSelectedCallBack
+    public abstract class IndicatorPopUpClickable : PoolAbleComponent, ISelectCallBack, IReSelectedCallBack
     {
         public virtual void OnReSelected(RaycastHit selfReRaycastHit)
         {

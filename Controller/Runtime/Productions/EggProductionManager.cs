@@ -33,11 +33,11 @@ namespace Soul.Controller.Runtime.Productions
         [SerializeField] private ItemToItemConverter itemToItemConverter;
         [SerializeField] private bool isClaimable;
 
-        [FormerlySerializedAs("popupIndicator")] [SerializeField]
-        private PopupIndicatorIconCount popupIndicatorPrefab;
+        [FormerlySerializedAs("popupClickableIndicatorPrefab")] [FormerlySerializedAs("popupIndicatorPrefab")] [FormerlySerializedAs("popupIndicator")] [SerializeField]
+        private PopupClickableIconCount popupClickablePrefab;
 
         [SerializeField] protected Optional<AddressableParticleEffect> particleEffect;
-        private PopupIndicatorIconCount _popupIndicatorInstance;
+        private PopupClickableIconCount popupClickableInstance;
 
 
         public override UnityTimeSpan FullTimeRequirement =>
@@ -83,17 +83,17 @@ namespace Soul.Controller.Runtime.Productions
             isClaimable = true;
             int currentClamped = Math.Clamp(ProductionItemValuePair.Value + 1, 1, RequiredLimit.weightCapacity);
             ProductionItemValuePair = new Pair<Item, int>(ProductionItemValuePair.Key, currentClamped);
-            if (_popupIndicatorInstance == null)
+            if (popupClickableInstance == null)
             {
-                _popupIndicatorInstance = popupIndicatorPrefab.gameObject.Request(parent)
-                    .GetComponent<PopupIndicatorIconCount>();
-                _popupIndicatorInstance.Setup(playerInventoryReference.mainCameraReference.transform, this, this,
+                popupClickableInstance = popupClickablePrefab.gameObject.Request(parent)
+                    .GetComponent<PopupClickableIconCount>();
+                popupClickableInstance.Setup(playerInventoryReference.mainCameraReference.transform, this, this,
                     false);
             }
             else
             {
-                if (!_popupIndicatorInstance.GameObject.activeSelf) _popupIndicatorInstance.gameObject.SetActive(true);
-                _popupIndicatorInstance.Reload();
+                if (!popupClickableInstance.GameObject.activeSelf) popupClickableInstance.gameObject.SetActive(true);
+                popupClickableInstance.Reload();
             }
 
             TryStartTimer();
@@ -128,7 +128,7 @@ namespace Soul.Controller.Runtime.Productions
         {
             playerInventoryReference.inventory.AddOrIncrease(ProductionItemValuePair.Key,
                 ProductionItemValuePair.Value);
-            _popupIndicatorInstance.gameObject.SetActive(false);
+            popupClickableInstance.gameObject.SetActive(false);
         }
 
 

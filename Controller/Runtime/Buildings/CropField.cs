@@ -26,8 +26,8 @@ namespace Soul.Controller.Runtime.Buildings
         [SerializeField] private AllowedItemLists allowedItemLists;
         [SerializeField] private TweenSettingCurveScriptableObject<Vector3> dropTweenSettings;
         
-        [FormerlySerializedAs("productionBuildingRecord")] [SerializeField] private BuildingAndProductionRecord buildingAndProductionRecord;
-        [FormerlySerializedAs("cropProduction")] [SerializeField] private CropProductionManager cropProductionManager;
+        [SerializeField] private BuildingAndProductionRecord buildingAndProductionRecord;
+        [SerializeField] private CropProductionManager cropProductionManager;
         private MotionHandle _dropMotionHandle;
         private readonly bool _loadDataOnEnable = true;
 
