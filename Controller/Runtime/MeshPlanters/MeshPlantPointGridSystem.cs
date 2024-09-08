@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using _Root.Scripts.NPC_Ai.Runtime.WayPointGizmoTool;
 using Cysharp.Threading.Tasks;
+using Links.Runtime;
 using LitMotion;
 using LitMotion.Extensions;
 using Pancake;
-using Pancake.Common;
 using Pancake.Pools;
 using Soul.Controller.Runtime.Grids;
 using Soul.Controller.Runtime.LookUpTables;
@@ -17,7 +16,7 @@ using DelayType = Cysharp.Threading.Tasks.DelayType;
 namespace Soul.Controller.Runtime.MeshPlanters
 {
     [Serializable]
-    public class MeshPlantPointGridSystem : GameComponent, ILoadComponent
+    public class MeshPlantPointGridSystem : GameComponent
     {
         [SerializeField] private GridWayPointLimiter gridWayPointLimiter;
         [SerializeField] private ItemPoolsLookupTable itemPoolsLookupTable;
@@ -31,6 +30,11 @@ namespace Soul.Controller.Runtime.MeshPlanters
         private int _currentStage = -1;
         private AddressableGameObjectPool[] _stagePools;
         private List<List<GameObject>> _coredInstances;
+
+        private void Awake()
+        {
+            gridWayPointLimiter.WayPoints = transform.GetComponent<IPositionsAndRotationsProvider>();
+        }
 
         public void Setup(int level, Item item, float progress)
         {
@@ -127,14 +131,6 @@ namespace Soul.Controller.Runtime.MeshPlanters
             gridWayPointLimiter.OnDrawGizmosSelected();
         }
 #endif
-        void ILoadComponent.OnLoadComponents()
-        {
-            Reset();
-        }
-
-        private void Reset()
-        {
-            gridWayPointLimiter.WayPoints = transform.GetComponent<WayPoints>();
-        }
+        
     }
 }

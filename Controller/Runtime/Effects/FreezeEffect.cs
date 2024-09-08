@@ -1,7 +1,6 @@
 ﻿using System;
-using Pancake.Common;
+using LitMotion;
 using Soul.Model.Runtime.Effects;
-using Soul.Model.Runtime.Movements;
 using UnityEngine;
 
 namespace Soul.Controller.Runtime.Effects
@@ -9,38 +8,20 @@ namespace Soul.Controller.Runtime.Effects
     [Serializable]
     public class FreezeEffect : Effect
     {
-        [SerializeField] private EffectType effectType = EffectType.Slow;
-        public override EffectType GetEffectType() => effectType;
+        public float damage = 10;
+        public override float EffectStrength => damage;
+        public override float Duration => baseDuration;
 
-        public override DelayHandle Apply(IEffectTarget target, float strength, float duration)
+        public override void Apply(IEffectConsumer effectConsumer)
         {
-            var delayHandle = base.Apply(target, strength, duration);
-            target.GetEffectMultiplier(effectType);
-            Slow(target);
-            return delayHandle;
+            Debug.Log("Freeze effect applied to " + effectConsumer);
+            EffectMotionHandle = LMotion.Create(0, 1, Duration).WithOnCancel(Cancel).WithOnComplete(OnComplete).RunWithoutBinding();
         }
 
         public override void OnComplete()
         {
-            UnSlow(EffectTarget);
-            EffectTarget.RemoveEffect(this);
-        }
-
-        private void Slow(IEffectTarget target)
-        {
-            if (target.Transform.TryGetComponent<ISpeedReference>(out var speedReference))
-            {
-                EffectStrength = Mathf.Min(speedReference.Speed, EffectStrength);
-                speedReference.Speed -= EffectStrength;
-            }
-        }
-
-        private void UnSlow(IEffectTarget target)
-        {
-            if (target.Transform.TryGetComponent<ISpeedReference>(out var speedReference))
-            {
-                speedReference.Speed += EffectStrength;
-            }
+            base.OnComplete();
+            Debug.Log("Freeze effect completed");
         }
     }
 }
