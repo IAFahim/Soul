@@ -1,5 +1,4 @@
-﻿using System;
-using Alchemy.Inspector;
+﻿using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using Soul.Controller.Runtime.Addressables;
@@ -17,8 +16,7 @@ using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-
-namespace Soul.Controller.Runtime.Buildings
+namespace Soul.Controller.Runtime.Infrastructures.Farmings
 {
     [RequireComponent(typeof(BoxCollider))]
     public abstract class FarmingBuilding : UnlockUpgradeAbleBuilding, IReSelectedCallBack, IInfoPanelReference,
@@ -28,7 +26,7 @@ namespace Soul.Controller.Runtime.Buildings
         protected AddressablePoolLifetime addressablePoolLifetime;
 
         [SerializeField] protected PlayerInventoryReference playerInventory;
-        [SerializeField] protected LevelInfrastructureInfo levelInfrastructureInfo;
+        [FormerlySerializedAs("levelInfrastructureInfo")] [SerializeField] protected LevelInfrastructureInfo infrastructureInfo;
 
 
         [SerializeField] protected RequirementForUpgrades requirementForUpgrades;
@@ -44,7 +42,7 @@ namespace Soul.Controller.Runtime.Buildings
 
         #region Title
 
-        public override string Title => levelInfrastructureInfo.Title;
+        public override string Title => infrastructureInfo.Title;
 
         #endregion
 
@@ -127,7 +125,7 @@ namespace Soul.Controller.Runtime.Buildings
         public IInfoPanel InfoPanelPrefab => infoPanelPrefab;
 
         public Vector3 InfoPanelWorldPosition =>
-            transform.TransformPoint(levelInfrastructureInfo.GetInfoPanelPositionOffset(level));
+            transform.TransformPoint(infrastructureInfo.GetInfoPanelPositionOffset(level));
 
         #endregion
 

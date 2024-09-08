@@ -6,13 +6,12 @@ using Soul.Controller.Runtime.Upgrades;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Productions;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Soul.Controller.Runtime.Buildings
+namespace Soul.Controller.Runtime.Infrastructures.Farmings
 {
     public class EggFarm : FarmingBuilding, IProductionRecordReference<RecordProduction>, ILoadComponent
     {
-        [Title("EggFarm")] [FormerlySerializedAs("productionBuildingRecord")] [SerializeField]
+        [Title("EggFarm")] [SerializeField]
         private BuildingAndProductionRecord buildingAndProductionRecord;
 
         [SerializeField] private EggProductionManager eggProductionManager;

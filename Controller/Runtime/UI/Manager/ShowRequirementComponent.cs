@@ -66,7 +66,7 @@ namespace Soul.Controller.Runtime.UI.Manager
         {
             foreach (var itemRequirement in itemRequirementDictionary)
             {
-                itemRequirement.Value.gameObject.Return();
+                itemRequirement.Value.ReturnToPool();
             }
 
             itemRequirementDictionary.Clear();

@@ -15,10 +15,16 @@ namespace Soul.Model.Runtime.Indicators
         [SerializeField] protected int passedDurationCeil;
         protected Coroutine FillRoutine;
         protected readonly WaitForSecondsRealtime SecondTick = new(1);
-
-        private void Awake()
+    
+        protected virtual void Awake()
         {
             bar.Setup();
+        }
+
+        public override void OnRequest()
+        {
+            transform.rotation = Camera.main.transform.rotation;
+            base.OnRequest();
         }
 
         // fill = 0.335 duration = 500
@@ -29,6 +35,7 @@ namespace Soul.Model.Runtime.Indicators
         [Button]
         public void Setup(float fill, float duration, bool onCompleteReturn)
         {
+            onProgressCompleteReturn = onCompleteReturn;
             if (FillRoutine != null) StopCoroutine(FillRoutine);
             var secondFraction = fill * duration;
             passedDurationCeil = (int)Mathf.Ceil(secondFraction);

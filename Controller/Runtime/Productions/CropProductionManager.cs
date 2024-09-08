@@ -5,6 +5,7 @@ using Pancake;
 using Pancake.Pools;
 using QuickEye.Utility;
 using Soul.Controller.Runtime.Converters;
+using Soul.Controller.Runtime.Indicators;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.MeshPlanters;
@@ -13,6 +14,7 @@ using Soul.Controller.Runtime.RequiresAndRewards;
 using Soul.Controller.Runtime.Rewards;
 using Soul.Controller.Runtime.SpritePopups;
 using Soul.Model.Runtime.Containers;
+using Soul.Model.Runtime.Indicators;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.ParticleEffects;
@@ -35,13 +37,18 @@ namespace Soul.Controller.Runtime.Productions
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
         [SerializeField] private Seed queueItem;
-        [FormerlySerializedAs("isClaimable")] [SerializeField] private bool canClaim;
+
+        [SerializeField] private bool canClaim;
         [SerializeField] public MeshPlantPointGridSystem meshPlantPointGridSystem;
-        [FormerlySerializedAs("popupClickableIndicator")] [FormerlySerializedAs("popupIndicator")] [SerializeField] private PopupClickableIconCount popupClickable;
+
+        [SerializeField] private PopupClickableIconCount popupClickable;
+        [SerializeField] private float height = 10;
+        [SerializeField] private IndicatorProgressCapacity indicatorProgressCapacityPrefab;
+
         private Transform _parent;
+        private IndicatorProgressCapacity _indicatorProgressCapacity;
         private PlayerInventoryReference _playerInventoryReference;
         [SerializeField] protected Optional<AddressableParticleEffect> onCompleteParticleEffect;
-        
 
         // Properties
         public Pair<Item, int> ProductionItemValuePair
@@ -71,7 +78,6 @@ namespace Soul.Controller.Runtime.Productions
         public int WeightCapacity => Required.weightCapacity;
         public RewardForProduction RewardForProduction => requiredAndRewardForProductions.GetReward(LevelReference - 1);
 
-        public int PlantCount => ProductionItemValuePair.Value * ((IKgToCount)ProductionItemValuePair.Key).KgToPoint;
 
         public override UnityTimeSpan FullTimeRequirement =>
             itemToItemConverter.Convert(ProductionItemValuePair.Key).RequiredTime * Required.timeMultiplier;
@@ -106,15 +112,29 @@ namespace Soul.Controller.Runtime.Productions
         {
             _parent = parentTransform;
             _playerInventoryReference = inventoryReference;
-            return Setup(recordProduction.ProductionRecord, level, saveAbleReference);
+
+            if (!level.IsLocked)
+            {
+                _indicatorProgressCapacity =
+                    indicatorProgressCapacityPrefab.gameObject.Request<IndicatorProgressCapacity>(
+                        _parent.position + Vector3.up * height, _parent.rotation, _parent
+                    );
+            }
+
+            bool canStart = Setup(recordProduction.ProductionRecord, level, saveAbleReference);
+            if (!canStart)
+            {
+                ShowIndicatorCapacity();
+            }
+
+            return canStart;
         }
 
-        /// <summary>
-        /// Temporarily adds items for preview purposes.
-        /// </summary>
+
         public void Add(Seed seed)
         {
             queueItem = seed;
+            _indicatorProgressCapacity.Change(seed);
             _playerInventoryReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
         }
 
@@ -123,7 +143,14 @@ namespace Soul.Controller.Runtime.Productions
         /// </summary>
         public override bool TryStartProgression()
         {
-            return !recordReference.InProgression && !CanClaim && base.TryStartProgression();
+            var canStart = !recordReference.InProgression && !CanClaim && base.TryStartProgression();
+            if (canStart)
+            {
+                _indicatorProgressCapacity.Setup(ProductionItemValuePair.Value, (float)TimeRemaining.TotalSeconds,
+                    false, ProductionItemValuePair.Value, WeightCapacity, ProductionItemValuePair.Key);
+            }
+
+            return canStart;
         }
 
         /// <summary>
@@ -181,6 +208,7 @@ namespace Soul.Controller.Runtime.Productions
         /// </summary>
         public override void OnComplete()
         {
+            _indicatorProgressCapacity.gameObject.SetActive(false);
             if (onCompleteParticleEffect) onCompleteParticleEffect.Value.Load(true, _parent).Forget();
             CanClaim = true;
             var instantiatedRewardPopup =
@@ -204,9 +232,17 @@ namespace Soul.Controller.Runtime.Productions
         private async UniTaskVoid AddReward()
         {
             await meshPlantPointGridSystem.ClearAsync();
+            ShowIndicatorCapacity();
             ModifyRecordAfterProgression();
             onCompleteParticleEffect.Value.Stop();
             CanClaim = false;
+        }
+
+        private void ShowIndicatorCapacity()
+        {
+            _indicatorProgressCapacity.gameObject.SetActive(true);
+            _indicatorProgressCapacity.Change(0, WeightCapacity);
+            _indicatorProgressCapacity.Change(ProductionItemValuePair.Key);
         }
 
         /// <summary>
@@ -220,7 +256,6 @@ namespace Soul.Controller.Runtime.Productions
             _playerInventoryReference.inventory.AddOrIncrease(singleReward.Key, singleReward.Value);
             _playerInventoryReference.coins.Set(CurrentCurrency + 10);
             recordReference.InProgression = false;
-            ProductionItemValuePair = new Pair<Item, int>(queueItem, WeightCapacity);
             SaveAbleReference.Save();
         }
 

@@ -4,7 +4,7 @@ using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Selectors;
 using UnityEngine;
 
-namespace Soul.Controller.Runtime.Buildings
+namespace Soul.Controller.Runtime.Infrastructures.Farmings
 {
     public abstract class Building : GameComponent, IGuid, ITitle, ISelectCallBack
     {

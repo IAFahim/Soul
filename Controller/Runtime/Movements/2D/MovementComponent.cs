@@ -1,3 +1,4 @@
+#if ENABLE_INPUT_SYSTEM
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -80,3 +81,4 @@ namespace Soul.Controller.Runtime.Movements._2D
         }
     }
 }
+#endif

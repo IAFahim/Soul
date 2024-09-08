@@ -2,13 +2,14 @@
 using Coffee.UIEffects;
 using LitMotion;
 using LitMotion.Extensions;
+using Soul.Model.Runtime.PoolAbles;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Soul.Controller.Runtime.UI.Components
 {
-    public class ContainerIconRequiredMax : MonoBehaviour
+    public class ContainerIconRequiredMax : PoolAbleComponent
     {
         [SerializeField] private RectTransform container;
 
@@ -40,7 +41,7 @@ namespace Soul.Controller.Runtime.UI.Components
         {
             bool hasEnough = has - required >= 0;
             var duration = SetValues(sprite, required, has);
-            PlayAnimation(hasEnough, duration);
+            PlayAnimation(duration);
         }
 
         public float SetValues(Sprite sprite, int required, int has)
@@ -53,7 +54,7 @@ namespace Soul.Controller.Runtime.UI.Components
             return duration;
         }
 
-        private void PlayAnimation(bool hasEnough, float duration)
+        private void PlayAnimation(float duration)
         {
             if (_slideMotionHandle.IsActive()) _slideMotionHandle.Cancel();
             _slideMotionHandle = LMotion.Create(startingOffset, Vector3.zero, duration)
@@ -80,10 +81,11 @@ namespace Soul.Controller.Runtime.UI.Components
             }
         }
 
-        private void OnDisable()
+        public override void OnReturn()
         {
             if (_slideMotionHandle.IsActive()) _slideMotionHandle.Cancel();
             if (_blinkMotionHandle.IsActive()) _blinkMotionHandle.Cancel();
+            container.anchoredPosition3D = startingOffset;
         }
     }
 }

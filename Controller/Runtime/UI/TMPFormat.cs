@@ -23,12 +23,19 @@ namespace Soul.Controller.Runtime.UI
 
         public void StoreFormat() => format = TMP.text;
 
-        public void SetTextFloat(float value) => TMP.text = string.Format(format, value.ToString(CultureInfo.InvariantCulture));
-        public void SetTextInt(int value) => TMP.text = string.Format(format, value.ToString(CultureInfo.InvariantCulture));
+        public void SetTextFloat(float value) =>
+            TMP.text = string.Format(format, value.ToString(CultureInfo.InvariantCulture));
+
+        public void SetTextFloat(float first, float second) => TMP.text = string.Format(format,
+            first.ToString(CultureInfo.InvariantCulture), second.ToString(CultureInfo.InvariantCulture));
+
+        public void SetTextInt(int value) =>
+            TMP.text = string.Format(format, value.ToString(CultureInfo.InvariantCulture));
+
         public static implicit operator string(TMPFormat tmpFormat) =>
             tmpFormat.format;
 
-        public static implicit operator TMP_Text(TMPFormat tmpFormat) => 
+        public static implicit operator TMP_Text(TMPFormat tmpFormat) =>
             tmpFormat.TMP;
     }
 }

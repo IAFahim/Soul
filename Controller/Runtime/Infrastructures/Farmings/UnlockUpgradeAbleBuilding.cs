@@ -6,7 +6,7 @@ using Soul.Model.Runtime.UpgradeAndUnlock.Unlocks;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using UnityEngine;
 
-namespace Soul.Controller.Runtime.Buildings
+namespace Soul.Controller.Runtime.Infrastructures.Farmings
 {
     public abstract class UnlockUpgradeAbleBuilding : Building, ICurrentLevelReference<int>, ISaveAble,
         ISaveAbleReference, IUpgrade, ILocked, IUnlock

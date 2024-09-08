@@ -78,10 +78,10 @@ namespace Soul.Model.Runtime.Progressions
                 return;
             }
 
+            OnTimerStart(CompleteRatio);
             var delay = startsNow ? (float)DiscountedTime.TotalSeconds : (float)TimeRemaining.TotalSeconds;
             DelayHandle = App.Delay(delay, OnComplete, useRealTime: true);
             Track.Start(ToString(), delay);
-            OnTimerStart(CompleteRatio);
         }
 
 

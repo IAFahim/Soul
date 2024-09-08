@@ -1,4 +1,6 @@
-﻿using Soul.Model.Runtime.DragAndDrops;
+﻿using System;
+using Soul.Controller.Runtime.UI;
+using Soul.Model.Runtime.DragAndDrops;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,7 +13,12 @@ namespace Soul.Presenter.Runtime.DragAndDrops
     {
         [SerializeField] private Image icon;
         [SerializeField] private ProgressBar inventoryProgressBar;
+        [SerializeField] private TMPFormat currentMaxText;
 
+        private void Awake()
+        {
+            currentMaxText.StoreFormat();
+        }
 
         public void Setup(Camera mainCamera, Item selectedData, float current, float max)
         {
@@ -23,6 +30,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         public void UpdateCount(float current, float max)
         {
             inventoryProgressBar.Value = current / max;
+            currentMaxText.SetTextFloat(current, max);
         }
 
         protected override void CanDrop()

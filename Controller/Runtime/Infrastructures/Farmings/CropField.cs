@@ -15,25 +15,24 @@ using Soul.Model.Runtime.Productions;
 using Soul.Model.Runtime.Tweens;
 using Soul.Model.Runtime.Tweens.Scriptable;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Soul.Controller.Runtime.Buildings
+namespace Soul.Controller.Runtime.Infrastructures.Farmings
 {
     public class CropField : FarmingBuilding, IProductionRecordReference<RecordProduction>, ILoadComponent,
         IAllowedToDropReference<Item>, IDropAble<Item>
     {
-        [Title("CropField")]
-        [SerializeField] private AllowedItemLists allowedItemLists;
+        [Title("CropField")] [SerializeField] private AllowedItemLists allowedItemLists;
         [SerializeField] private TweenSettingCurveScriptableObject<Vector3> dropTweenSettings;
-        
         [SerializeField] private BuildingAndProductionRecord buildingAndProductionRecord;
+
         [SerializeField] private CropProductionManager cropProductionManager;
+
         private MotionHandle _dropMotionHandle;
         private readonly bool _loadDataOnEnable = true;
 
         #region Title
 
-        public override string Title => levelInfrastructureInfo.Title;
+        public override string Title => infrastructureInfo.Title;
 
         #endregion
 
@@ -76,8 +75,14 @@ namespace Soul.Controller.Runtime.Buildings
         protected override async UniTask SetUp(Level currentLevel)
         {
             await base.SetUp(currentLevel);
-            cropProductionManager.Setup(unlockAndUpgrade.unlockManagerComponent.transform, playerInventory, this, currentLevel,
-                this);
+            SetupProduction(currentLevel);
+        }
+
+        private void SetupProduction(Level currentLevel)
+        {
+            cropProductionManager.Setup(
+                unlockAndUpgrade.unlockManagerComponent.transform, playerInventory, this, currentLevel, this
+            );
         }
 
         #region ISaveAble
@@ -108,8 +113,9 @@ namespace Soul.Controller.Runtime.Buildings
         {
         }
 
-        public override void OnUnlockUpgradeComplete(int obj)
+        public override void OnUnlockUpgradeComplete(int _)
         {
+            SetupProduction(level);
         }
 
 
