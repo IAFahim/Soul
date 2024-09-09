@@ -4,14 +4,8 @@ using UnityEngine;
 namespace Soul.Controller.Runtime.Items
 {
     [CreateAssetMenu(fileName = "seed", menuName = "Soul/Item/Create Seed")]
-    public class Seed : Item, IKgToCount
+    public class Seed : Item
     {
-        [SerializeField] private int pointToWeight = 20;
-
-        public int KgToPoint
-        {
-            get => pointToWeight;
-            set => pointToWeight = value;
-        }
+        
     }
 }

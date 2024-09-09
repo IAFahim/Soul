@@ -1,10 +1,11 @@
 ﻿using Soul.Controller.Runtime.UI;
+using Soul.Model.Runtime.PoolAbles;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Soul.Presenter.Runtime.Containers
 {
-    public class BuyComponent : MonoBehaviour
+    public class BuyComponent : PoolAbleComponent
     {
         public Image backgroundImage;
         public Image iconImage;

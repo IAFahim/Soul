@@ -2,7 +2,9 @@
 using Pancake.Pools;
 using Soul.Controller.Runtime.Lists;
 using Soul.Controller.Runtime.LookUpTables;
+using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
+using Soul.Model.Runtime.PoolAbles;
 using TMPro;
 using UnityEngine;
 
@@ -10,10 +12,9 @@ namespace Soul.Presenter.Runtime.Containers
 {
     public class SeasonalItemShop : MonoBehaviour
     {
-        [SerializeField] private AllowedItemLists allowedItemLists;
         [SerializeField] private TMP_Text seasonTitlePrefab;
         [SerializeField] private PriceLookUpTable priceLookUpTable;
-        
+
         [SerializeField] private List<GameObject> instanceComponents;
 
         [SerializeField] private float itemHeight = 199;
@@ -28,21 +29,20 @@ namespace Soul.Presenter.Runtime.Containers
 
         [SerializeField] private string text = "{0} Season";
 
-        public void Setup(bool isBuy)
+        public void Setup(bool isBuy, AllowedItemLists allowedItemLists)
         {
             var title = seasonTitlePrefab.gameObject.Request<TMP_Text>(rectTransform.parent);
+
             title.text = string.Format(text, allowedItemLists.CurrentList.Title);
-            
             float columns = Mathf.Ceil(allowedItemLists.CurrentList.Count / itemColumns);
             rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, itemHeight * columns);
             if (isBuy) BuySetup(allowedItemLists.CurrentList);
             else SellSetup(allowedItemLists.CurrentList);
-            
+
             title.transform.SetAsFirstSibling();
-            
+
             // Clear(buyComponents);
             // Clear(sellComponents);
-            
         }
 
         private void BuySetup(IList<Item> items)
@@ -51,7 +51,7 @@ namespace Soul.Presenter.Runtime.Containers
             {
                 var instance = buyComponentPrefab.gameObject.Request(transform);
                 instanceComponents.Add(instance);
-                
+
                 priceLookUpTable.TryGetValue(item, out var price);
                 var buyComponent = instance.GetComponent<BuyComponent>();
                 buyComponent.Setup(item.icon, price, buyBackground);
@@ -59,10 +59,10 @@ namespace Soul.Presenter.Runtime.Containers
         }
 
 
-        private void Clear<T>(IList<T> components) where T : Component
+        private void Clear<T>(IList<T> components) where T : PoolAbleComponent
         {
             if (components.Count == 0) return;
-            foreach (var component in components) component.gameObject.Return();
+            foreach (var component in components) component.ReturnToPool();
         }
 
         private void SellSetup(IList<Item> items)
