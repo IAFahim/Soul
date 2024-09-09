@@ -26,13 +26,14 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
         protected AddressablePoolLifetime addressablePoolLifetime;
 
         [SerializeField] protected PlayerInventoryReference playerInventory;
-        [FormerlySerializedAs("levelInfrastructureInfo")] [SerializeField] protected LevelInfrastructureInfo infrastructureInfo;
+
+        [FormerlySerializedAs("levelInfrastructureInfo")] [SerializeField]
+        protected LevelInfrastructureInfo infrastructureInfo;
 
 
         [SerializeField] protected RequirementForUpgrades requirementForUpgrades;
 
-        [SerializeField]
-        protected UnlockAndUpgrade unlockAndUpgrade;
+        [SerializeField] protected UnlockAndUpgrade unlockAndUpgrade;
 
 
         [SerializeField] protected InfoPanel infoPanelPrefab;
@@ -159,7 +160,7 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
         protected virtual void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.white;
-            Gizmos.DrawWireSphere(InfoPanelWorldPosition, 1f);
+            if (infrastructureInfo) Gizmos.DrawWireSphere(InfoPanelWorldPosition, 1f);
         }
 
         protected virtual void Reset()
