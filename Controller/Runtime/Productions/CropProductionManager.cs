@@ -45,6 +45,7 @@ namespace Soul.Controller.Runtime.Productions
         [SerializeField] private float height = 10;
         [SerializeField] private IndicatorProgressCapacity indicatorProgressCapacityPrefab;
 
+        private bool _isLoaded;
         private Transform _parent;
         private IndicatorProgressCapacity _indicatorProgressCapacity;
         private PlayerInventoryReference _playerInventoryReference;
@@ -110,10 +111,11 @@ namespace Soul.Controller.Runtime.Productions
             IProductionRecordReference<RecordProduction> recordProduction, Level level,
             ISaveAbleReference saveAbleReference)
         {
+            _isLoaded = true;
             _parent = parentTransform;
             _playerInventoryReference = inventoryReference;
 
-            if (!level.IsLocked)
+            if (_indicatorProgressCapacity == null)
             {
                 _indicatorProgressCapacity =
                     indicatorProgressCapacityPrefab.gameObject.Request<IndicatorProgressCapacity>(
@@ -122,10 +124,7 @@ namespace Soul.Controller.Runtime.Productions
             }
 
             bool canStart = Setup(recordProduction.ProductionRecord, level, saveAbleReference);
-            if (!canStart)
-            {
-                ShowIndicatorCapacity();
-            }
+            ShowIndicatorCapacity();
 
             return canStart;
         }
@@ -167,6 +166,8 @@ namespace Soul.Controller.Runtime.Productions
             get => canClaim;
             set => canClaim = value;
         }
+
+        public bool IsLoaded => _isLoaded;
 
 
         /// <summary>
@@ -242,7 +243,8 @@ namespace Soul.Controller.Runtime.Productions
         {
             _indicatorProgressCapacity.gameObject.SetActive(true);
             _indicatorProgressCapacity.Change(0, WeightCapacity);
-            _indicatorProgressCapacity.Change(ProductionItemValuePair.Key);
+            if (recordReference.InProgression) _indicatorProgressCapacity.Change(ProductionItemValuePair.Key);
+            else _indicatorProgressCapacity.ShowDefaultSprite();
         }
 
         /// <summary>

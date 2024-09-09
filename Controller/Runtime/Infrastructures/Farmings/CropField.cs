@@ -75,7 +75,7 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
         protected override async UniTask SetUp(Level currentLevel)
         {
             await base.SetUp(currentLevel);
-            SetupProduction(currentLevel);
+            if (currentLevel > 0) SetupProduction(currentLevel);
         }
 
         private void SetupProduction(Level currentLevel)
@@ -115,7 +115,7 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
 
         public override void OnUnlockUpgradeComplete(int _)
         {
-            SetupProduction(level);
+            if(!cropProductionManager.IsLoaded) SetupProduction(level);
         }
 
 

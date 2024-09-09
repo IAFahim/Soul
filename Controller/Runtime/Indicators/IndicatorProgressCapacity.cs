@@ -4,10 +4,11 @@ using UnityEngine;
 
 namespace Soul.Controller.Runtime.Indicators
 {
-    public class IndicatorProgressCapacity : IndicatorProgress 
+    public class IndicatorProgressCapacity : IndicatorProgress
     {
         [SerializeField] private TMPFormat currentCapacity;
         [SerializeField] private SpriteRenderer icon;
+        [SerializeField] private Sprite defaultSprite;
 
         protected override void Awake()
         {
@@ -21,15 +22,20 @@ namespace Soul.Controller.Runtime.Indicators
             Change(sprite);
             base.Setup(fill, duration, onCompleteReturn);
         }
-        
+
         public void Change(float current, float max)
         {
             currentCapacity.SetTextFloat(current, max);
         }
-        
+
         public void Change(Sprite sprite)
         {
             icon.sprite = sprite;
+        }
+
+        public void ShowDefaultSprite()
+        {
+            Change(defaultSprite);
         }
     }
 }
