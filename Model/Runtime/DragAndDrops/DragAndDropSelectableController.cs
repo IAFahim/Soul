@@ -54,6 +54,7 @@ namespace Soul.Model.Runtime.DragAndDrops
             if (isHit)
             {
                 if (rayCast.transform == _lastTransform) return;
+                if (_dropAble != null) _dropAble.OnDragCancel();
                 InvokeDropCheck(rayCast.transform);
             }
             else if (_dropAble != null)

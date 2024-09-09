@@ -5,6 +5,7 @@ using Pancake.Pools;
 using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Limits;
+using Soul.Model.Runtime.PoolAbles;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +13,7 @@ using UnityProgressBar;
 
 namespace Soul.Presenter.Runtime.UI
 {
-    public class RewardNotifier : GameComponent, ILoadComponent
+    public class RewardNotifier : PoolAbleComponent, ILoadComponent
     {
         [SerializeField] TMPFormat addedText;
         [SerializeField] TMPFormat totalText;
@@ -42,7 +43,6 @@ namespace Soul.Presenter.Runtime.UI
 
         private void OnComplete()
         {
-            GameObject.Return();
             _removeCallBack.RemoveSelf(itemReference);
         }
 
