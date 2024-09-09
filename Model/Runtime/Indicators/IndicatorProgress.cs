@@ -38,8 +38,9 @@ namespace Soul.Model.Runtime.Indicators
             _wasWaiting = true;
         }
 
-        private void OnCameraChange(GameObject obj)
+        private void OnCameraChange(GameObject mainCamera)
         {
+            _mainCamera = mainCamera;
             transform.rotation = _mainCamera.transform.rotation;
         }
 
