@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using Alchemy.Inspector;
+using Links.Runtime;
 using Pancake.Common;
 using Soul.Model.Runtime.Bars;
 using Soul.Model.Runtime.PoolAbles;
@@ -15,17 +15,40 @@ namespace Soul.Model.Runtime.Indicators
         [SerializeField] protected int passedDurationCeil;
         protected Coroutine FillRoutine;
         protected readonly WaitForSecondsRealtime SecondTick = new(1);
-    
+        
+        [SerializeField] private ScriptableEventGetGameObject getCameraEvent;
+        private GameObject _mainCamera;
+        private bool _wasWaiting;
+
         protected virtual void Awake()
         {
             bar.Setup();
         }
 
-        public override void OnRequest()
+        private void OnEnable()
         {
-            transform.rotation = Camera.main.transform.rotation;
-            base.OnRequest();
+            if (_mainCamera == null)
+            {
+                _mainCamera = getCameraEvent.Get();
+                if (_mainCamera != null) OnCameraChange(_mainCamera);
+            }
+
+            if (_mainCamera != null) return;
+            getCameraEvent.OnValueChange += OnCameraChange;
+            _wasWaiting = true;
         }
+
+        private void OnCameraChange(GameObject obj)
+        {
+            transform.rotation = _mainCamera.transform.rotation;
+        }
+
+
+        private void OnDisable()
+        {
+            if (_wasWaiting) getCameraEvent.OnValueChange -= OnCameraChange;
+        }
+
 
         // fill = 0.335 duration = 500
         // secondFraction = 0.335 * 500 = 177.5
@@ -41,11 +64,19 @@ namespace Soul.Model.Runtime.Indicators
             passedDurationCeil = (int)Mathf.Ceil(secondFraction);
             var secondCompleteTime = passedDurationCeil - secondFraction;
             float fractionProgress = passedDurationCeil / duration;
-            App.Delay(secondCompleteTime, () =>
+            if (passedDurationCeil < duration)
             {
-                bar.UpdateParams(fractionProgress);
-                FillRoutine = StartCoroutine(TickFill((int)duration));
-            }, useRealTime: true);
+                App.Delay(secondCompleteTime, () =>
+                {
+                    bar.UpdateParams(fractionProgress);
+                    FillRoutine = StartCoroutine(TickFill((int)duration));
+                }, useRealTime: true);   
+            }
+            else
+            {
+                bar.UpdateParams(1);
+                if (onProgressCompleteReturn) ReturnToPool();
+            }
         }
 
         private IEnumerator TickFill(float duration)

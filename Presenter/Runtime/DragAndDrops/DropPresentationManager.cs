@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Links.Runtime;
 using Pancake;
 using Pancake.Pools;
 using Soul.Controller.Runtime.Inventories;
@@ -18,13 +19,26 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         public GameObject dragAndDropPrefab;
 
         private Dictionary<Item, DragAndDropItem> _instantiateItemAndContainers = new();
-
+        [SerializeField] private ScriptableEventGetGameObject getCameraEvent;
+        private GameObject _mainCamera;
+        private bool _wasWaiting;
 
         private void OnEnable()
         {
             containerCanvasGroup.alpha = 0;
             playerInventoryReference.inventory.OnItemChanged += InventoryOnOnItemChanged;
+            if (_mainCamera == null)
+            {
+                _mainCamera = getCameraEvent.Get();
+                if (_mainCamera != null) OnCameraChange(_mainCamera);
+            }
+
+            if (_mainCamera != null) return;
+            getCameraEvent.OnValueChange += OnCameraChange;
+            _wasWaiting = true;
         }
+
+        private void OnCameraChange(GameObject mainCamera) => _mainCamera = mainCamera;
 
         private void OnDisable()
         {
@@ -70,7 +84,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             foreach (var (instance, item, count) in gameObjectWithCount)
             {
                 var dragAndDrop = instance.GetComponent<DragAndDropItem>();
-                dragAndDrop.Setup(playerInventoryReference.mainCameraReference, item, count,
+                dragAndDrop.Setup(_mainCamera.GetComponent<Camera>(), item, count,
                     GetInventoryItemLimit(item)
                 );
                 _instantiateItemAndContainers.Add(item, dragAndDrop);

@@ -25,6 +25,7 @@ using Soul.Model.Runtime.RequiredAndRewards.Rewards;
 using Soul.Model.Runtime.SaveAndLoad;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Quaternion = System.Numerics.Quaternion;
 
 namespace Soul.Controller.Runtime.Productions
 {
@@ -119,13 +120,13 @@ namespace Soul.Controller.Runtime.Productions
             {
                 _indicatorProgressCapacity =
                     indicatorProgressCapacityPrefab.gameObject.Request<IndicatorProgressCapacity>(
-                        _parent.position + Vector3.up * height, _parent.rotation, _parent
+                        _parent.position + Vector3.up * height, UnityEngine.Quaternion.Euler(0, 0, 0),
+                        _parent
                     );
             }
 
             bool canStart = Setup(recordProduction.ProductionRecord, level, saveAbleReference);
-            ShowIndicatorCapacity();
-
+            if (!canStart) ShowIndicatorCapacity();
             return canStart;
         }
 
@@ -145,9 +146,11 @@ namespace Soul.Controller.Runtime.Productions
             var canStart = !recordReference.InProgression && !CanClaim && base.TryStartProgression();
             if (canStart)
             {
-                _indicatorProgressCapacity.Setup(ProductionItemValuePair.Value, (float)TimeRemaining.TotalSeconds,
+                _indicatorProgressCapacity.Setup(0, (float)TimeRemaining.TotalSeconds,
                     false, ProductionItemValuePair.Value, WeightCapacity, ProductionItemValuePair.Key);
+                _indicatorProgressCapacity.gameObject.SetActive(true);
             }
+            else ShowIndicatorCapacity();
 
             return canStart;
         }
@@ -214,7 +217,7 @@ namespace Soul.Controller.Runtime.Productions
             CanClaim = true;
             var instantiatedRewardPopup =
                 popupClickable.gameObject.Request(_parent).GetComponent<PopupClickableIconCount>();
-            instantiatedRewardPopup.Setup(_playerInventoryReference.mainCameraReference.transform, this, this, true);
+            instantiatedRewardPopup.Setup(this, this, true);
             meshPlantPointGridSystem.Complete();
         }
 

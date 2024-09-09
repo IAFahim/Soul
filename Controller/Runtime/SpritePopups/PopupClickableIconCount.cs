@@ -1,4 +1,5 @@
-﻿using LitMotion;
+﻿using Links.Runtime;
+using LitMotion;
 using Pancake.Common;
 using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Containers;
@@ -21,19 +22,46 @@ namespace Soul.Controller.Runtime.SpritePopups
         [SerializeField] private float jumpOutHeight = 20f;
         [SerializeField] private Ease jumpEase;
         private MotionHandle _jumpOutMotionHandle;
-
+        
         [FormerlySerializedAs("onCollectReturnToPool")] [SerializeField]
         private bool onClickReturnToPool = true;
 
         private IRewardClaim _rewardClaimReference;
         private IReward<Pair<Item, int>> _rewardReference;
+        
+        [SerializeField] private ScriptableEventGetGameObject getCameraEvent;
+        private GameObject _mainCamera;
+        private bool _wasWaiting;
+
+        private void OnEnable()
+        {
+            if (_mainCamera == null)
+            {
+                _mainCamera = getCameraEvent.Get();
+                if (_mainCamera != null) OnCameraChange(_mainCamera);
+            }
+
+            if (_mainCamera != null) return;
+            getCameraEvent.OnValueChange += OnCameraChange;
+            _wasWaiting = true;
+        }
+
+        private void OnCameraChange(GameObject mainCamera)
+        {
+            transform.rotation = mainCamera.transform.rotation;
+        }
+        
+        private void OnDisable()
+        {
+            if (_wasWaiting) getCameraEvent.OnValueChange -= OnCameraChange;
+        }
+
 
         public Pair<Item, int> Reward => _rewardReference.Reward;
 
-        public void Setup(Transform mainCamera, IRewardClaim rewardClaim, IReward<Pair<Item, int>> reward,
+        public void Setup(IRewardClaim rewardClaim, IReward<Pair<Item, int>> reward,
             bool clickReturnToPool)
         {
-            transform.rotation = mainCamera.rotation;
             _rewardClaimReference = rewardClaim;
             _rewardReference = reward;
             onClickReturnToPool = clickReturnToPool;

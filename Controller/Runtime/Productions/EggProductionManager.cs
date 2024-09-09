@@ -32,7 +32,7 @@ namespace Soul.Controller.Runtime.Productions
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
         [SerializeField] private bool isClaimable;
-
+        
         [FormerlySerializedAs("popupClickableIndicatorPrefab")] [FormerlySerializedAs("popupIndicatorPrefab")] [FormerlySerializedAs("popupIndicator")] [SerializeField]
         private PopupClickableIconCount popupClickablePrefab;
 
@@ -87,7 +87,7 @@ namespace Soul.Controller.Runtime.Productions
             {
                 popupClickableInstance = popupClickablePrefab.gameObject.Request(parent)
                     .GetComponent<PopupClickableIconCount>();
-                popupClickableInstance.Setup(playerInventoryReference.mainCameraReference.transform, this, this,
+                popupClickableInstance.Setup(this, this,
                     false);
             }
             else

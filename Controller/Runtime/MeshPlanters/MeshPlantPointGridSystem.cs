@@ -27,7 +27,7 @@ namespace Soul.Controller.Runtime.MeshPlanters
 
         private Item _currentItem;
         private int _levelReference;
-        private int _currentStage = -1;
+        private AddressableGameObjectPool _currentPool;
         private AddressableGameObjectPool[] _stagePools;
         private List<List<GameObject>> _coredInstances;
 
@@ -41,26 +41,16 @@ namespace Soul.Controller.Runtime.MeshPlanters
             if (_currentItem != item) itemPoolsLookupTable.TryGetValue(item, out _stagePools);
             _currentItem = item;
             _levelReference = level;
-            if (Mathf.Approximately(progress, 0))
-            {
-                Clear();
-                Plant(_stagePools[_currentStage = 0]);
-            }
-            else if (Mathf.Approximately(progress, 1))
-            {
-                Clear();
-                Plant(_stagePools[_currentStage = _stagePools.Length - 1]);
-            }
-            else
-            {
-                Clear();
-                Plant(_stagePools[_currentStage = Mathf.FloorToInt(progress * _stagePools.Length)]);
-            }
+            if (Mathf.Approximately(progress, 0)) Plant(_stagePools[0]);
+            else if (Mathf.Approximately(progress, 1) || progress > 1) Plant(_stagePools[^1]);
+            else Plant(_stagePools[Mathf.FloorToInt(progress * _stagePools.Length)]);
         }
 
 
         private void Plant(AddressableGameObjectPool stage)
         {
+            Clear();
+            _currentPool = stage;
             _coredInstances = new List<List<GameObject>>();
             var pointGrid = gridWayPointLimiter.CoredPoints(_levelReference);
             foreach (var point in pointGrid)
@@ -78,8 +68,8 @@ namespace Soul.Controller.Runtime.MeshPlanters
 
         public void Clear()
         {
-            if (_currentStage == -1) return;
-            var pool = _stagePools[_currentStage];
+            if (_currentPool == null) return;
+            var pool = _currentPool;
             foreach (var coredInstance in _coredInstances)
             {
                 foreach (var o in coredInstance)
@@ -91,14 +81,14 @@ namespace Soul.Controller.Runtime.MeshPlanters
 
         public void Complete()
         {
-            if (_currentStage == _stagePools.Length - 1) return;
+            if (_currentPool == _stagePools[^1]) return;
             Clear();
-            Plant(_stagePools[_currentStage = _stagePools.Length - 1]);
+            Plant(_stagePools[^1]);
         }
 
         public async UniTask ClearAsync()
         {
-            var pool = _stagePools[_currentStage];
+            var pool = _currentPool;
             for (var i = 0; i < _coredInstances.Count; i++)
             {
                 await ClearCoreAsync(pool, i);
@@ -131,6 +121,5 @@ namespace Soul.Controller.Runtime.MeshPlanters
             gridWayPointLimiter.OnDrawGizmosSelected();
         }
 #endif
-        
     }
 }
