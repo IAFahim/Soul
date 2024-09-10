@@ -8,15 +8,15 @@ using Soul.Model.Runtime.Variables;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace Soul.Controller.Runtime.UI.Manager
+namespace Soul.Presenter.Runtime.Manager
 {
     [Serializable]
     public class SelectData
     {
         public int foundCount;
-        [FormerlySerializedAs("title")] public InterfaceFinder<ITitle> titleReference;
-        [FormerlySerializedAs("level")] public InterfaceFinder<ILevel> levelReference;
-        [FormerlySerializedAs("requirementForUpgrade")] public InterfaceFinder<IRequirementForUpgradeScriptableReference> requirementForUpgradeReference;
+        public InterfaceFinder<ITitle> titleReference;
+        public InterfaceFinder<ILevel> levelReference;
+        public InterfaceFinder<IRequirementForUpgradeScriptableReference> requirementForUpgradeReference;
 
         public int Level => levelReference.Value.Level;
         

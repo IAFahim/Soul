@@ -7,7 +7,7 @@ using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
 
-namespace Soul.Controller.Runtime.UI.Manager
+namespace Soul.Presenter.Runtime.Manager
 {
     public class ShowRequirementComponent : MonoBehaviour
     {

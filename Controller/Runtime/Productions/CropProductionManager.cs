@@ -14,7 +14,6 @@ using Soul.Controller.Runtime.RequiresAndRewards;
 using Soul.Controller.Runtime.Rewards;
 using Soul.Controller.Runtime.SpritePopups;
 using Soul.Model.Runtime.Containers;
-using Soul.Model.Runtime.Indicators;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.ParticleEffects;
@@ -24,8 +23,6 @@ using Soul.Model.Runtime.Progressions;
 using Soul.Model.Runtime.RequiredAndRewards.Rewards;
 using Soul.Model.Runtime.SaveAndLoad;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Quaternion = System.Numerics.Quaternion;
 
 namespace Soul.Controller.Runtime.Productions
 {
@@ -204,7 +201,9 @@ namespace Soul.Controller.Runtime.Productions
         /// </summary>
         public override void OnTimerStart(float progressRatio)
         {
-            meshPlantPointGridSystem.Setup(LevelReference, Reward.Key, progressRatio);
+            meshPlantPointGridSystem.Setup(
+                LevelReference, Reward.Key, progressRatio, (float)FullTimeRequirement.TotalSeconds
+            );
         }
 
         /// <summary>

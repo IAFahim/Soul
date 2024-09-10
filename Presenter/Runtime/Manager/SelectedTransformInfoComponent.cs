@@ -1,5 +1,6 @@
 ﻿using Pancake;
 using Soul.Controller.Runtime.Items;
+using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.UIs;
@@ -11,7 +12,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-namespace Soul.Controller.Runtime.UI.Manager
+namespace Soul.Presenter.Runtime.Manager
 {
     public class SelectedTransformInfoComponent : GameComponent, IHideCallBack
     {

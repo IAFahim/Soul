@@ -9,9 +9,11 @@ using Pancake.Pools;
 using Soul.Controller.Runtime.Grids;
 using Soul.Controller.Runtime.LookUpTables;
 using Soul.Model.Runtime.Items;
+using Soul.Model.Runtime.Times;
 using Soul.Model.Runtime.Tweens.Scriptable;
 using UnityEngine;
 using DelayType = Cysharp.Threading.Tasks.DelayType;
+using Random = UnityEngine.Random;
 
 namespace Soul.Controller.Runtime.MeshPlanters
 {
@@ -23,6 +25,7 @@ namespace Soul.Controller.Runtime.MeshPlanters
 
         [SerializeField] private float height = 10;
         [SerializeField] private TweenSettingBaseScriptableObject tweenSetting;
+        [SerializeField] private RangedTimer rangedTimer;
 
 
         private Item _currentItem;
@@ -34,16 +37,20 @@ namespace Soul.Controller.Runtime.MeshPlanters
         private void Awake()
         {
             gridWayPointLimiter.WayPoints = transform.GetComponent<IPositionsAndRotationsProvider>();
+            rangedTimer = new RangedTimer(this);
         }
 
-        public void Setup(int level, Item item, float progress)
+        public void Setup(int level, Item item, float progress, float fullDuration)
         {
             if (_currentItem != item) itemPoolsLookupTable.TryGetValue(item, out _stagePools);
             _currentItem = item;
             _levelReference = level;
-            if (Mathf.Approximately(progress, 0)) Plant(_stagePools[0]);
-            else if (Mathf.Approximately(progress, 1) || progress > 1) Plant(_stagePools[^1]);
-            else Plant(_stagePools[Mathf.FloorToInt(progress * _stagePools.Length)]);
+            rangedTimer.Start(progress, fullDuration, _stagePools.Length, Plant);
+        }
+
+        private void Plant(int stage)
+        {
+            Plant(_stagePools[stage]);
         }
 
 

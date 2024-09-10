@@ -1,10 +1,10 @@
-﻿using System.Collections;
-using Alchemy.Inspector;
+﻿using Alchemy.Inspector;
 using Links.Runtime;
-using Pancake.Common;
 using Soul.Model.Runtime.Bars;
 using Soul.Model.Runtime.PoolAbles;
+using Soul.Model.Runtime.Times;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Model.Runtime.Indicators
 {
@@ -12,18 +12,22 @@ namespace Soul.Model.Runtime.Indicators
     {
         [SerializeField] protected Bar bar;
         [SerializeField] protected bool onProgressCompleteReturn;
-        [SerializeField] protected int passedDurationCeil;
-        protected Coroutine FillRoutine;
-        protected readonly WaitForSecondsRealtime SecondTick = new(1);
-        
+
         [SerializeField] private ScriptableEventGetGameObject getCameraEvent;
         private GameObject _mainCamera;
         private bool _wasWaiting;
 
+        [SerializeField] protected RealTimeIntervalTicker realTimeIntervalTicker;
+        [FormerlySerializedAs("rangedStagedTicker")] [FormerlySerializedAs("stagedTicker")] [SerializeField] protected RangedTimer rangedTicker;
+
         protected virtual void Awake()
         {
             bar.Setup();
+            realTimeIntervalTicker = new RealTimeIntervalTicker(this);
+            rangedTicker = new RangedTimer(this);
         }
+
+        
 
         private void OnEnable()
         {
@@ -48,49 +52,37 @@ namespace Soul.Model.Runtime.Indicators
         private void OnDisable()
         {
             if (_wasWaiting) getCameraEvent.OnValueChange -= OnCameraChange;
+            _wasWaiting = false;
+            realTimeIntervalTicker.Stop();
+            // StopCoroutine(FillRoutine);
         }
 
-
-        // fill = 0.335 duration = 500
-        // secondFraction = 0.335 * 500 = 177.5
-        // passedDurationCeil = 178
-        // secondCompleteTime = 178 - 177.5 = 0.5
-        // fractionProgress = 178 / 500 = 0.356
+        
         [Button]
         public void Setup(float fill, float duration, bool onCompleteReturn)
         {
             onProgressCompleteReturn = onCompleteReturn;
-            if (FillRoutine != null) StopCoroutine(FillRoutine);
-            var secondFraction = fill * duration;
-            passedDurationCeil = (int)Mathf.Ceil(secondFraction);
-            var secondCompleteTime = passedDurationCeil - secondFraction;
-            float fractionProgress = passedDurationCeil / duration;
-            if (passedDurationCeil < duration)
-            {
-                App.Delay(secondCompleteTime, () =>
-                {
-                    bar.UpdateParams(fractionProgress);
-                    FillRoutine = StartCoroutine(TickFill((int)duration));
-                }, useRealTime: true);   
-            }
-            else
-            {
-                bar.UpdateParams(1);
-                if (onProgressCompleteReturn) ReturnToPool();
-            }
+            realTimeIntervalTicker.Start(fill, duration, AfterSecondProgress, OnProgressCompleted);
         }
 
-        private IEnumerator TickFill(float duration)
+        [Button]
+        public void TestStage(float fill, float duration, int totalStages)
         {
-            while (passedDurationCeil < duration)
-            {
-                var progress = passedDurationCeil / duration;
-                bar.UpdateParams(progress);
-                yield return SecondTick;
-                passedDurationCeil++;
-            }
+            rangedTicker.Start(fill, duration, totalStages, AfterSecondProgress);
+        }
 
-            bar.UpdateParams(1);
+        private void AfterSecondProgress(int obj)
+        {
+            Debug.Log(obj);
+        }
+
+        private void AfterSecondProgress(float fraction)
+        {
+            bar.UpdateParams(fraction);
+        }
+        
+        private void OnProgressCompleted()
+        {
             if (onProgressCompleteReturn) ReturnToPool();
         }
     }
