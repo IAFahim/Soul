@@ -9,7 +9,7 @@ using ProgressBar = UnityProgressBar.ProgressBar;
 
 namespace Soul.Presenter.Runtime.Panels
 {
-    public class UpgradePanels : MonoBehaviour
+    public class UpgradeUnlockPanel : MonoBehaviour
     {
         public TMP_Text upgradeTitle;
         public Color upgradeHighlightColor = new Color(0.01f, 0.63f, 0.02f, 1);
@@ -29,6 +29,7 @@ namespace Soul.Presenter.Runtime.Panels
 
         private Action _onStartButtonPressed;
         private Action _onCancelButtonPressed;
+        
 
         public void Show(RectTransform rectTransform, Transform currentSelectedTransform, Level levelReference,
             Action onStartButtonPressed, Action onCancelButtonPressed)
