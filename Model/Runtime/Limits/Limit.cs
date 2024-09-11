@@ -1,16 +1,21 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Model.Runtime.Limits
 {
     [Serializable]
     public class Limit
     {
-        [FormerlySerializedAs("vector2Int")] [BarAttribute.Bar]
-        public Vector2Int currentAndMax;
+        [BarAttribute.Bar] [SerializeField] protected Vector2Int currentAndMax;
+        
+        public Vector2Int SetWithoutNotify(int current, int max)
+        {
+            currentAndMax.x = current;
+            currentAndMax.y = max;
+            return currentAndMax;
+        }
 
-        public int Current
+        public virtual int Current
         {
             get => currentAndMax.x;
             set => currentAndMax.x = value;

@@ -10,11 +10,13 @@ namespace Soul.Model.Runtime.Times
     [Serializable]
     public class RangedTimer
     {
-        private readonly MonoBehaviour coroutineRunner;
-        private Coroutine timerCoroutine;
+        private readonly MonoBehaviour _coroutineRunner;
+        private Coroutine _timerCoroutine;
 
 #if UNITY_EDITOR
+#pragma warning disable CS0414 // Field is assigned but its value is never used
         [SerializeField] private bool isRunning;
+#pragma warning restore CS0414 // Field is assigned but its value is never used
         [SerializeField] private float duration;
         [SerializeField] private int totalStages;
         [SerializeField] private int currentStage;
@@ -22,7 +24,7 @@ namespace Soul.Model.Runtime.Times
 
         public RangedTimer(MonoBehaviour coroutineRunner)
         {
-            this.coroutineRunner = coroutineRunner;
+            _coroutineRunner = coroutineRunner;
         }
 
         /// <summary>
@@ -35,8 +37,7 @@ namespace Soul.Model.Runtime.Times
         /// <param name="minInclusive">The start index</param>
         public void Start(float initialProgress, float fullDuration, int maxExclusive, Action<int> onStageChanged, int minInclusive = 0)
         {
-            if (timerCoroutine != null)
-                coroutineRunner.StopCoroutine(timerCoroutine);
+            if (_timerCoroutine != null) _coroutineRunner.StopCoroutine(_timerCoroutine);
 
             if (initialProgress >= 1 || maxExclusive <= 0)
             {
@@ -44,16 +45,16 @@ namespace Soul.Model.Runtime.Times
                 return;
             }
 
-            timerCoroutine = coroutineRunner.StartCoroutine(
+            _timerCoroutine = _coroutineRunner.StartCoroutine(
                 TimerRoutine(initialProgress, fullDuration, minInclusive, maxExclusive, onStageChanged)
             );
         }
 
         public void Stop()
         {
-            if (timerCoroutine == null) return;
-            coroutineRunner.StopCoroutine(timerCoroutine);
-            timerCoroutine = null;
+            if (_timerCoroutine == null) return;
+            _coroutineRunner.StopCoroutine(_timerCoroutine);
+            _timerCoroutine = null;
         }
 
 

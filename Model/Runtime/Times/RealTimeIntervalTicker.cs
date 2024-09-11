@@ -10,21 +10,24 @@ namespace Soul.Model.Runtime.Times
     [Serializable]
     public class RealTimeIntervalTicker
     {
-        private readonly WaitForSecondsRealtime tickDelay;
-
-        private readonly MonoBehaviour coroutineRunner;
-        private Coroutine timerCoroutine;
+        private readonly WaitForSecondsRealtime _tickDelay;
+        private readonly MonoBehaviour _coroutineRunner;
+        private Coroutine _timerCoroutine;
 
 #if UNITY_EDITOR
+#pragma warning disable CS0414 // Field is assigned but its value is never used
         [SerializeField] private bool isRunning;
+#pragma warning restore CS0414 // Field is assigned but its value is never used
+        // ReSharper disable once NotAccessedField.Local
         [SerializeField] private float duration;
+        // ReSharper disable once NotAccessedField.Local
         [SerializeField] private float progress;
 #endif
 
         public RealTimeIntervalTicker(MonoBehaviour coroutineRunner, float tickInterval = 1)
         {
-            tickDelay = new WaitForSecondsRealtime(tickInterval);
-            this.coroutineRunner = coroutineRunner;
+            _tickDelay = new WaitForSecondsRealtime(tickInterval);
+            this._coroutineRunner = coroutineRunner;
         }
 
         /// <summary>
@@ -36,8 +39,8 @@ namespace Soul.Model.Runtime.Times
         /// <param name="onTickCompleted">Callback invoked when the timer completes.</param>
         public void Start(float initialProgress, float fullDuration, Action<float> onTickProgress, Action onTickCompleted)
         {
-            if (timerCoroutine != null)
-                coroutineRunner.StopCoroutine(timerCoroutine);
+            if (_timerCoroutine != null)
+                _coroutineRunner.StopCoroutine(_timerCoroutine);
 
             if (initialProgress >= 1)
             {
@@ -46,16 +49,16 @@ namespace Soul.Model.Runtime.Times
                 return;
             }
 
-            timerCoroutine = coroutineRunner.StartCoroutine(
+            _timerCoroutine = _coroutineRunner.StartCoroutine(
                 TimerRoutine(initialProgress, fullDuration, onTickProgress, onTickCompleted)
             );
         }
 
         public void Stop()
         {
-            if (timerCoroutine == null) return;
-            coroutineRunner.StopCoroutine(timerCoroutine);
-            timerCoroutine = null;
+            if (_timerCoroutine == null) return;
+            _coroutineRunner.StopCoroutine(_timerCoroutine);
+            _timerCoroutine = null;
         }
 
         private IEnumerator TimerRoutine(float initialProgress, float fullDuration, Action<float> onTickProgress,
@@ -86,8 +89,8 @@ namespace Soul.Model.Runtime.Times
 
             while (elapsedTime < fullDuration)
             {
-                yield return tickDelay;
-                elapsedTime += tickDelay.waitTime; // Increment elapsedTime by the actual tick duration
+                yield return _tickDelay;
+                elapsedTime += _tickDelay.waitTime; // Increment elapsedTime by the actual tick duration
                 onTickProgress?.Invoke(elapsedTime / fullDuration);
 
 #if UNITY_EDITOR

@@ -1,5 +1,8 @@
 ﻿using System;
+using Pancake.Common;
+using Soul.Controller.Runtime.RequiresAndRewards;
 using Soul.Controller.Runtime.UI;
+using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using TMPro;
@@ -14,8 +17,8 @@ namespace Soul.Presenter.Runtime.Panels
         public TMP_Text upgradeTitle;
         public Color upgradeHighlightColor = new Color(0.01f, 0.63f, 0.02f, 1);
         public string upgradeTitleFormat = "Upgrade {0} To <color={1}>Level {2}</color>";
-        public string unlockTitleFormat = "Unlock {0}";
-        public string maxLevelTitleFormat = "{0} is already at max level";
+        public string unlockTitleFormat = "Unlock <color={0}>{1}</color>";
+        public string maxLevelTitleFormat = "{0} at {1} level is already at max";
 
         public ProgressBar upgradeLevelProgressBar;
         public TMP_Text upgradeTimeTitle;
@@ -28,45 +31,88 @@ namespace Soul.Presenter.Runtime.Panels
         public Button closeButton;
 
         private Action _onStartButtonPressed;
-        private Action _onCancelButtonPressed;
-        
+        private ILevel _levelReference;
+        private IRequirementForUpgradeScriptableReference _requirementForUpgrade;
+        private IUpgrade _upgradeReference;
 
-        public void Show(RectTransform rectTransform, Transform currentSelectedTransform, Level levelReference,
-            Action onStartButtonPressed, Action onCancelButtonPressed)
+        public void Show(RectTransform parentRect, Transform currentSelectedTransform,
+            ITitle titleReference, ILevel levelReference,
+            IRequirementForUpgradeScriptableReference requirementForUpgrade,
+            Action onStartButtonPressed
+        )
         {
             startButton.onClick.RemoveAllListeners();
-            gameObject.SetActive(true);
-            transform.SetParent(rectTransform, false);
             _onStartButtonPressed = onStartButtonPressed;
-            _onCancelButtonPressed = onCancelButtonPressed;
+            _levelReference = levelReference;
+            _requirementForUpgrade = requirementForUpgrade;
+
             closeButton.onClick.AddListener(OnCancelButtonPressed);
-            if (levelReference.IsLocked) UnlockPrompt(currentSelectedTransform, onStartButtonPressed);
-            else if (levelReference.IsMax) MaxLevelPrompt(onStartButtonPressed);
-            else UpgradePrompt(currentSelectedTransform, onStartButtonPressed);
+            SetParent(parentRect);
+            SetTitle(titleReference, levelReference);
+            SetPanelButtonInfo(parentRect, currentSelectedTransform, levelReference, onStartButtonPressed);
         }
 
-        private void OnCancelButtonPressed()
+        private void SetPanelButtonInfo(RectTransform parentRect, Transform currentSelectedTransform,
+            ILevel levelReference,
+            Action onStartButtonPressed)
         {
-            Hide();
-            _onCancelButtonPressed?.Invoke();
+            if (levelReference.Level.IsLocked) UnlockPrompt(currentSelectedTransform, onStartButtonPressed);
+            else if (levelReference.Level.IsMax) MaxLevelPrompt(onStartButtonPressed);
+            else UpgradePrompt(parentRect, currentSelectedTransform, onStartButtonPressed);
         }
 
-        private void UpgradePrompt(Transform currentSelectedTransform, Action onStartButtonPressed)
+        private void SetParent(RectTransform parentRect)
         {
-            // Implement the logic to show the upgrade prompt
-            var upgradeRef = currentSelectedTransform.GetComponent<IUpgrade>();
-            if (upgradeRef.IsUpgrading)
+            gameObject.SetActive(true);
+            transform.SetParent(parentRect);
+        }
+
+        private void SetTitle(ITitle titleReference, ILevel levelReference)
+        {
+            if (levelReference.Level.IsMax)
             {
-                startButton.interactable = false;
+                upgradeTitle.text = string.Format(maxLevelTitleFormat, titleReference.Title, levelReference.Level);
+            }
+            else if (levelReference.Level.IsLocked)
+            {
+                upgradeTitle.text = string.Format(unlockTitleFormat, upgradeHighlightColor.ToHtmlStringRGB(),
+                    titleReference.Title);
             }
             else
             {
-                startButton.interactable = true;
-                startButtonTitle.text = "Upgrade";
-                startButton.onClick.AddListener(onStartButtonPressed.Invoke);
+                upgradeTitle.text = string.Format(upgradeTitleFormat,
+                    titleReference, upgradeHighlightColor.ToHtmlStringRGB(), levelReference.Level.Current + 1
+                );
             }
         }
-        
+
+        private void UpgradePrompt(RectTransform parentRect, Transform currentSelectedTransform,
+            Action onStartButtonPressed)
+        {
+            _upgradeReference = currentSelectedTransform.GetComponent<IUpgrade>();
+            if (_upgradeReference != null)
+            {
+                if (_upgradeReference.IsUpgrading)
+                {
+                    startButton.interactable = false;
+                }
+                else
+                {
+                    startButton.interactable = true;
+                    startButtonTitle.text = "Upgrade";
+                    startButton.onClick.AddListener(Upgrade);
+                }
+            }
+            else Hide();
+        }
+
+        private void Upgrade()
+        {
+            _upgradeReference.Upgrade();
+            _onStartButtonPressed?.Invoke();
+        }
+
+
         public void TimerSetup(float time)
         {
             // Implement the logic to setup the timer
@@ -81,7 +127,12 @@ namespace Soul.Presenter.Runtime.Panels
         {
             // Implement the logic to show the unlock prompt
         }
-        
+
+
+        private void OnCancelButtonPressed()
+        {
+            Hide();
+        }
 
         public void Hide()
         {

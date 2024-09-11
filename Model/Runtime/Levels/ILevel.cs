@@ -1,4 +1,6 @@
-﻿namespace Soul.Model.Runtime.Levels
+﻿using System;
+
+namespace Soul.Model.Runtime.Levels
 {
     public interface ILevel
     {

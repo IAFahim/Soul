@@ -1,4 +1,5 @@
-﻿using Alchemy.Inspector;
+﻿using System;
+using Alchemy.Inspector;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.SaveAndLoad;
@@ -39,6 +40,7 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
 
         [SerializeField] protected Level level;
         public Level Level => level;
+        public event Action<int> OnLevelChanged;
 
         #endregion
 

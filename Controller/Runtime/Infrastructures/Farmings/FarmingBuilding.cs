@@ -92,7 +92,7 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
 
         public override void Load(string key)
         {
-            level.currentAndMax.Set(CurrentLevel, level.Max);
+            level.SetWithoutNotify(CurrentLevel, level.Max);
         }
 
         #region IUpgrade

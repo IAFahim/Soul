@@ -4,47 +4,47 @@ using UnityEngine;
 namespace Soul.Model.Runtime.Variables
 {
     [Serializable]
-    public struct InterfaceFinder<T>
+    public struct ComponentFinder<T>
     {
         [SerializeField] private bool isFound;
 
         public bool IsFound => isFound;
         public T Value { get; }
 
-        public InterfaceFinder(T value) : this()
+        public ComponentFinder(T value) : this()
         {
             isFound = true;
             Value = value;
         }
 
-        public InterfaceFinder(bool found, T value)
+        public ComponentFinder(bool found, T value)
         {
             isFound = found;
             Value = value;
         }
 
-        public bool TryGet<T>(Transform transform, ref InterfaceFinder<T> interfaceFinder)
+        public bool TryGet<TComponent>(Transform transform, ref ComponentFinder<TComponent> componentFinder)
         {
-            if (transform.TryGetComponent(out T iInterface))
+            if (transform.TryGetComponent(out TComponent iInterface))
             {
-                interfaceFinder = new InterfaceFinder<T>(iInterface);
+                componentFinder = new ComponentFinder<TComponent>(iInterface);
                 return true;
             }
 
             return false;
         }
 
-        public static implicit operator InterfaceFinder<T>(T v)
+        public static implicit operator ComponentFinder<T>(T v)
         {
-            return new InterfaceFinder<T>(v);
+            return new ComponentFinder<T>(v);
         }
 
-        public static implicit operator T(InterfaceFinder<T> o)
+        public static implicit operator T(ComponentFinder<T> o)
         {
             return o.Value;
         }
 
-        public static implicit operator bool(InterfaceFinder<T> o)
+        public static implicit operator bool(ComponentFinder<T> o)
         {
             return o.IsFound;
         }

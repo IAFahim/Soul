@@ -6,7 +6,6 @@ using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Variables;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.Manager
 {
@@ -14,9 +13,9 @@ namespace Soul.Presenter.Runtime.Manager
     public class SelectData
     {
         public int foundCount;
-        public InterfaceFinder<ITitle> titleReference;
-        public InterfaceFinder<ILevel> levelReference;
-        public InterfaceFinder<IRequirementForUpgradeScriptableReference> requirementForUpgradeReference;
+        public ComponentFinder<ITitle> titleReference;
+        public ComponentFinder<ILevel> levelReference;
+        public ComponentFinder<IRequirementForUpgradeScriptableReference> requirementForUpgradeReference;
 
         public int Level => levelReference.Value.Level;
         
