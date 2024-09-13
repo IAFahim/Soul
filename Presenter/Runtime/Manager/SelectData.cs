@@ -15,15 +15,10 @@ namespace Soul.Presenter.Runtime.Manager
         public int foundCount;
         public ComponentFinder<ITitle> titleReference;
         public ComponentFinder<ILevel> levelReference;
-        public ComponentFinder<IRequirementForUpgradeScriptableReference> requirementForUpgradeReference;
-
+        
         public int Level => levelReference.Value.Level;
         
-        public Pair<Currency, int> CurrencyRequirement(int index) =>
-            requirementForUpgradeReference.Value.RequirementForUpgrades.GetRequirement(index).currency;
-
-        public Pair<Item, int>[] ItemsRequirement(int index) =>
-            requirementForUpgradeReference.Value.RequirementForUpgrades.GetRequirement(index).items;
+        
 
 
         public int GetDataFrom(Transform transform)
@@ -31,7 +26,6 @@ namespace Soul.Presenter.Runtime.Manager
             foundCount = 0;
             if (titleReference.TryGet(transform, ref titleReference)) foundCount++;
             if (levelReference.TryGet(transform, ref levelReference)) foundCount++;
-            if (requirementForUpgradeReference.TryGet(transform, ref requirementForUpgradeReference)) foundCount++;
             return foundCount;
         }
     }

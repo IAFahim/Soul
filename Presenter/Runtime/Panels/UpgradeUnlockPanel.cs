@@ -1,8 +1,14 @@
 ﻿using System;
+using LitMotion;
+using LitMotion.Extensions;
 using Pancake.Common;
+using Soul.Controller.Runtime.Inventories;
+using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.RequiresAndRewards;
 using Soul.Controller.Runtime.UI;
+using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Interfaces;
+using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using TMPro;
@@ -14,6 +20,17 @@ namespace Soul.Presenter.Runtime.Panels
 {
     public class UpgradeUnlockPanel : MonoBehaviour
     {
+        public RectTransform selfRectTransform;
+        public float duration = 0.5f;
+        public Ease ease = Ease.OutQuad;
+        public Vector3 anchorStartPosition = new(-600, 0, 0);
+        public Vector3 anchorEndPosition = new(-500, 0, 0);
+        public MotionHandle anchorMotionHandle;
+
+        public Vector3 scaleStart = new(0.1f, 0.1f, 0.1f);
+        public Vector3 scaleEnd = new(1, 1, 1);
+        public MotionHandle scaleMotionHandle;
+
         public TMP_Text upgradeTitle;
         public Color upgradeHighlightColor = new Color(0.01f, 0.63f, 0.02f, 1);
         public string upgradeTitleFormat = "Upgrade {0} To <color={1}>Level {2}</color>";
@@ -30,25 +47,39 @@ namespace Soul.Presenter.Runtime.Panels
         public Button startButton;
         public Button closeButton;
 
+        private PlayerInventoryReference _playerInventoryReference;
+        private EventShowItemRequired _eventShowItemRequired;
         private Action _onStartButtonPressed;
         private ILevel _levelReference;
-        private IRequirementForUpgradeScriptableReference _requirementForUpgrade;
+        private IRequirementForUpgradeScriptableReference _requirementForUpgradeReference;
         private IUpgrade _upgradeReference;
 
+        public Pair<Currency, int> CurrencyRequirement(int level) =>
+            _requirementForUpgradeReference.RequirementForUpgrades.GetRequirement(level).currency;
+
+        public Pair<Item, int>[] ItemsRequirement(int level) =>
+            _requirementForUpgradeReference.RequirementForUpgrades.GetRequirement(level).items;
+
         public void Show(RectTransform parentRect, Transform currentSelectedTransform,
+            PlayerInventoryReference playerInventoryReference, EventShowItemRequired eventShowItemRequired,
             ITitle titleReference, ILevel levelReference,
-            IRequirementForUpgradeScriptableReference requirementForUpgrade,
-            Action onStartButtonPressed
-        )
+            Action onStartButtonPressed)
         {
-            startButton.onClick.RemoveAllListeners();
             _onStartButtonPressed = onStartButtonPressed;
             _levelReference = levelReference;
-            _requirementForUpgrade = requirementForUpgrade;
+            _playerInventoryReference = playerInventoryReference;
+            _eventShowItemRequired = eventShowItemRequired;
+            SetPanel(parentRect, currentSelectedTransform, titleReference, levelReference, onStartButtonPressed);
+        }
 
+        private void SetPanel(RectTransform parentRect, Transform currentSelectedTransform, ITitle titleReference,
+            ILevel levelReference, Action onStartButtonPressed)
+        {
+            startButton.onClick.RemoveAllListeners();
             closeButton.onClick.AddListener(OnCancelButtonPressed);
             SetParent(parentRect);
             SetTitle(titleReference, levelReference);
+            SetProgressBar(levelReference.Level);
             SetPanelButtonInfo(parentRect, currentSelectedTransform, levelReference, onStartButtonPressed);
         }
 
@@ -56,15 +87,23 @@ namespace Soul.Presenter.Runtime.Panels
             ILevel levelReference,
             Action onStartButtonPressed)
         {
-            if (levelReference.Level.IsLocked) UnlockPrompt(currentSelectedTransform, onStartButtonPressed);
-            else if (levelReference.Level.IsMax) MaxLevelPrompt(onStartButtonPressed);
-            else UpgradePrompt(parentRect, currentSelectedTransform, onStartButtonPressed);
+            if (levelReference.Level.IsMax) MaxLevelPrompt(onStartButtonPressed);
+            else if (levelReference.Level.IsLocked) UnlockPrompt(currentSelectedTransform, onStartButtonPressed);
+            else UpgradePrompt(currentSelectedTransform, levelReference.Level);
         }
 
-        private void SetParent(RectTransform parentRect)
+        private void SetParent(RectTransform parentRect, bool playAnimation = true)
         {
+            selfRectTransform.SetParent(parentRect);
+
+            if (anchorMotionHandle.IsActive()) anchorMotionHandle.Complete();
+            anchorMotionHandle = LMotion.Create(anchorStartPosition, anchorEndPosition, duration).WithEase(ease)
+                .BindToAnchoredPosition3D(selfRectTransform);
+
+            if (scaleMotionHandle.IsActive()) scaleMotionHandle.Complete();
+            scaleMotionHandle = LMotion.Create(scaleStart, scaleEnd, duration).WithEase(ease)
+                .BindToLocalScale(selfRectTransform);
             gameObject.SetActive(true);
-            transform.SetParent(parentRect);
         }
 
         private void SetTitle(ITitle titleReference, ILevel levelReference)
@@ -86,10 +125,10 @@ namespace Soul.Presenter.Runtime.Panels
             }
         }
 
-        private void UpgradePrompt(RectTransform parentRect, Transform currentSelectedTransform,
-            Action onStartButtonPressed)
+        private void UpgradePrompt(Transform currentSelectedTransform, Level level)
         {
             _upgradeReference = currentSelectedTransform.GetComponent<IUpgrade>();
+            SetItemRequirement(currentSelectedTransform, level);
             if (_upgradeReference != null)
             {
                 if (_upgradeReference.IsUpgrading)
@@ -104,6 +143,13 @@ namespace Soul.Presenter.Runtime.Panels
                 }
             }
             else Hide();
+        }
+
+        private void SetItemRequirement(Transform currentSelectedTransform, Level level)
+        {
+            _requirementForUpgradeReference =
+                currentSelectedTransform.GetComponent<IRequirementForUpgradeScriptableReference>();
+            _eventShowItemRequired.Trigger(ItemsRequirement(level));
         }
 
         private void Upgrade()
@@ -128,9 +174,15 @@ namespace Soul.Presenter.Runtime.Panels
             // Implement the logic to show the unlock prompt
         }
 
+        private void SetProgressBar(Level level)
+        {
+            upgradeLevelProgressBar.Value = (level.Current / (float)level.Max);
+        }
+
 
         private void OnCancelButtonPressed()
         {
+            _eventShowItemRequired.Trigger(null);
             Hide();
         }
 

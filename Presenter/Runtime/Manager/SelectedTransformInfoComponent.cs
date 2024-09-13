@@ -1,5 +1,6 @@
 ﻿using Pancake;
-using Soul.Controller.Runtime.RequiresAndRewards;
+using Soul.Controller.Runtime.Inventories;
+using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Interfaces;
@@ -16,6 +17,8 @@ namespace Soul.Presenter.Runtime.Manager
     public class SelectedTransformInfoComponent : GameComponent, IHideCallBack
     {
         private bool enableCall;
+        public PlayerInventoryReference playerInventoryReference;
+        public EventShowItemRequired eventShowItemRequired;
 
         // --- Events ---
         public Event<(Transform transform, IHideCallBack hideCallBack)> onUpgradeAbleOrUnlockAbleSelected;
@@ -46,6 +49,11 @@ namespace Soul.Presenter.Runtime.Manager
 
         // --- Internal State ---
         private Transform _currentSelectedTransform;
+
+        public SelectedTransformInfoComponent(bool enableCall)
+        {
+            this.enableCall = enableCall;
+        }
 
         private void OnEnable() => Hide();
 
@@ -150,9 +158,8 @@ namespace Soul.Presenter.Runtime.Manager
             {
                 upgradeUnlockPanel.Show(
                     upgradeUnlockPanelParent, _currentSelectedTransform,
-                    selectData.titleReference.Value,
-                    selectData.levelReference.Value,
-                    selectData.requirementForUpgradeReference.Value,
+                    playerInventoryReference, eventShowItemRequired,
+                    selectData.titleReference.Value, selectData.levelReference.Value,
                     OnUpgradeUnlockStartButtonPressed
                 );
             }
