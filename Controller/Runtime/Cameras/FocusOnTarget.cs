@@ -1,4 +1,5 @@
-﻿using Soul.Model.Runtime.Events;
+﻿using Soul.Controller.Runtime.Events;
+using Soul.Model.Runtime.Pivots;
 using Soul.Model.Runtime.UIs;
 using UnityEngine;
 
@@ -11,20 +12,22 @@ namespace Soul.Controller.Runtime.Cameras
         public Vector3 offset = new(20, 35, -10);
 
         private Vector3 _velocity = Vector3.zero;
-        public EventTransformCallBackHide onTargetSet;
+        public EventTransformFocus onTargetSet;
         public float range = 0.2f;
         public bool reached;
-        private (Transform transform, IHideCallBack hideCallBack) _eventCallBack;
-        
-        private void OnTargetInvoke((Transform transform, IHideCallBack hideCallBack) eventCallBack)
-        {
-            _eventCallBack = eventCallBack;
-            SetTarget(eventCallBack.transform);
-        }
+        private (Transform target, EPivotMode pivotMode, IFocusCallBack FocusCallBackOrgin) _eventData;
+
 
         private void OnEnable()
         {
             onTargetSet.AddListener(OnTargetInvoke);
+        }
+
+        private void OnTargetInvoke(
+            (Transform target, EPivotMode pivotMode, IFocusCallBack FocusCallBackOrgin) eventData)
+        {
+            _eventData = eventData;
+            SetTarget(_eventData.target);
         }
 
         private void OnDisable()
@@ -35,30 +38,35 @@ namespace Soul.Controller.Runtime.Cameras
         public void SetTarget(Transform newTarget)
         {
             reached = false;
-            _eventCallBack.transform = newTarget;
+            _eventData.target = newTarget;
             offset.x = 10f * ((float)Screen.width / Screen.height) + 2.6f;
         }
 
 
         private void LateUpdate()
         {
-            if (_eventCallBack.transform == null) return;
-            var targetPosition = _eventCallBack.transform.position;
+            if (_eventData.target == null) return;
+            var targetPosition = _eventData.target.position;
             var targetPositionWithOffset = targetPosition + offset;
             mainCamera.position =
                 Vector3.SmoothDamp(mainCamera.position, targetPositionWithOffset, ref _velocity, smoothTime);
-            
+
             if (Vector3.Distance(mainCamera.position, targetPositionWithOffset) < range)
             {
                 if (!reached)
                 {
                     reached = true;
+                    _eventData.FocusCallBackOrgin.OnFocus();
                 }
             }
             else
             {
-                reached = false;
-                // _eventCallBack.hideCallBack.HideCallBack();
+                if (reached)
+                {
+                    _eventData.FocusCallBackOrgin.OnOutOfFocus();
+                    _eventData.target = null;
+                    reached = false;
+                }
             }
         }
     }

@@ -1,8 +1,5 @@
 ﻿using System;
-using Soul.Controller.Runtime.RequiresAndRewards;
-using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Interfaces;
-using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Variables;
 using UnityEngine;

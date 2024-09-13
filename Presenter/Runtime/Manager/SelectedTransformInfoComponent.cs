@@ -5,6 +5,7 @@ using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.Pivots;
 using Soul.Model.Runtime.UIs;
 using Soul.Model.Runtime.Variables;
 using Soul.Presenter.Runtime.Panels;
@@ -14,14 +15,15 @@ using UnityEngine.UI;
 
 namespace Soul.Presenter.Runtime.Manager
 {
-    public class SelectedTransformInfoComponent : GameComponent, IHideCallBack
+    public class SelectedTransformInfoComponent : GameComponent, IFocusCallBack
     {
         private bool enableCall;
         public PlayerInventoryReference playerInventoryReference;
         public EventShowItemRequired eventShowItemRequired;
 
         // --- Events ---
-        public Event<(Transform transform, IHideCallBack hideCallBack)> onUpgradeAbleOrUnlockAbleSelected;
+        public Event<(Transform target, EPivotMode pivotMode, IFocusCallBack hideCallBack)>
+            onUpgradeAbleOrUnlockAbleSelected;
 
         // --- UI Elements ---
         [Header("General")] public CanvasGroup canvasGroup;
@@ -35,6 +37,7 @@ namespace Soul.Presenter.Runtime.Manager
 
         [Header("Upgrade Unlock Section")] [SerializeField]
         Pair<string, Sprite> maxButtonInfo = new("Max", null);
+
         [SerializeField] Pair<string, Sprite> unlockButtonInfo = new("Unlock", null);
         [SerializeField] Pair<string, Sprite> upgradeButtonInfo = new("Upgrade", null);
 
@@ -70,9 +73,7 @@ namespace Soul.Presenter.Runtime.Manager
 
             if (selectData.GetDataFrom(selectedTransform) > 0)
             {
-                ShowCanvas();
-                SetClip(selectData.titleReference, selectData.levelReference);
-                UpdateUnlockButton(selectData.levelReference);
+                onUpgradeAbleOrUnlockAbleSelected.Trigger((_currentSelectedTransform, EPivotMode.MiddleLeft, this));
             }
             else
             {
@@ -80,12 +81,20 @@ namespace Soul.Presenter.Runtime.Manager
             }
         }
 
-        private void SetClip(ComponentFinder<ITitle> selectDataTitleReference, ComponentFinder<ILevel> selectDataLevelReference)
+        private void SetCanvas()
+        {
+            ShowCanvas();
+            SetClip(selectData.titleReference, selectData.levelReference);
+            UpdateUnlockButton(selectData.levelReference);
+        }
+
+        private void SetClip(ComponentFinder<ITitle> selectDataTitleReference,
+            ComponentFinder<ILevel> selectDataLevelReference)
         {
             UpdateTitle(selectDataTitleReference);
             ShowLevel(selectDataLevelReference);
         }
-        
+
         private void UpdateTitle(ComponentFinder<ITitle> titleData)
         {
             titleContainer.SetActive(titleData);
@@ -96,7 +105,7 @@ namespace Soul.Presenter.Runtime.Manager
         {
             if (!levelData) return;
             Level levelValue = levelData.Value.Level;
-            if (levelValue.IsMax) levelTextFormat.TMP.text = maxButtonInfo.Key; 
+            if (levelValue.IsMax) levelTextFormat.TMP.text = maxButtonInfo.Key;
             else if (levelValue.IsLocked) levelTextFormat.TMP.text = unlockButtonInfo.Key;
             else levelTextFormat.SetTextInt(levelValue.Current);
         }
@@ -150,7 +159,6 @@ namespace Soul.Presenter.Runtime.Manager
             canvasGroup.blocksRaycasts = false;
         }
 
-       
 
         private void ShowUpdateUnlockPanel()
         {
@@ -174,7 +182,12 @@ namespace Soul.Presenter.Runtime.Manager
             levelContainer.SetActive(false);
         }
 
-        public void HideCallBack()
+        public void OnFocus()
+        {
+            SetCanvas();
+        }
+
+        public void OnOutOfFocus()
         {
             Hide();
         }
