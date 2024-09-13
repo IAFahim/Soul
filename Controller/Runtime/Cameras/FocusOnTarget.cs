@@ -1,4 +1,5 @@
-﻿using Soul.Controller.Runtime.Events;
+﻿using System;
+using Soul.Controller.Runtime.Events;
 using Soul.Model.Runtime.Pivots;
 using Soul.Model.Runtime.UIs;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace Soul.Controller.Runtime.Cameras
         public EventTransformFocus onTargetSet;
         public float range = 0.2f;
         public bool reached;
-        private (Transform target, EPivotMode pivotMode, IFocusCallBack FocusCallBackOrgin) _eventData;
+        private (Transform target, HorizontalRegion pivotMode, IFocusCallBack FocusCallBackOrgin) _eventData;
 
 
         private void OnEnable()
@@ -24,10 +25,11 @@ namespace Soul.Controller.Runtime.Cameras
         }
 
         private void OnTargetInvoke(
-            (Transform target, EPivotMode pivotMode, IFocusCallBack FocusCallBackOrgin) eventData)
+            (Transform target, HorizontalRegion pivotMode, IFocusCallBack FocusCallBackOrgin) eventData)
         {
             _eventData = eventData;
             SetTarget(_eventData.target);
+            SetOffset(eventData.pivotMode);
         }
 
         private void OnDisable()
@@ -39,7 +41,17 @@ namespace Soul.Controller.Runtime.Cameras
         {
             reached = false;
             _eventData.target = newTarget;
-            offset.x = 10f * ((float)Screen.width / Screen.height) + 2.6f;
+        }
+
+        private void SetOffset(HorizontalRegion eventDataPivotMode)
+        {
+            offset.x = eventDataPivotMode switch
+            {
+                HorizontalRegion.Center => 0,
+                HorizontalRegion.Left => 10f * ((float)Screen.width / Screen.height) + 2.6f,
+                HorizontalRegion.Right => -10f * ((float)Screen.width / Screen.height) - 2.6f,
+                _ => offset.x
+            };
         }
 
 

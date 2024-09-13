@@ -123,13 +123,14 @@ namespace Soul.Controller.Runtime.Productions
             }
 
             bool canStart = Setup(recordProduction.ProductionRecord, level, saveAbleReference);
-            if (!canStart) ShowIndicatorCapacity();
+            if (!canStart) ShowZeroIndicatorCapacity();
             return canStart;
         }
 
 
         public void Add(Seed seed)
         {
+            RewardClaim();
             queueItem = seed;
             _indicatorProgressCapacity.Change(seed);
             _playerInventoryReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
@@ -143,11 +144,9 @@ namespace Soul.Controller.Runtime.Productions
             var canStart = !recordReference.InProgression && !CanClaim && base.TryStartProgression();
             if (canStart)
             {
-                _indicatorProgressCapacity.Setup(0, (float)TimeRemaining.TotalSeconds,
-                    false, ProductionItemValuePair.Value, WeightCapacity, ProductionItemValuePair.Key);
-                _indicatorProgressCapacity.gameObject.SetActive(true);
+                ShowIndicatorCapacity();
             }
-            else ShowIndicatorCapacity();
+            else ShowZeroIndicatorCapacity();
 
             return canStart;
         }
@@ -204,6 +203,7 @@ namespace Soul.Controller.Runtime.Productions
             meshPlantPointGridSystem.Setup(
                 LevelReference, Reward.Key, progressRatio, (float)FullTimeRequirement.TotalSeconds
             );
+            ShowIndicatorCapacity();
         }
 
         /// <summary>
@@ -235,13 +235,20 @@ namespace Soul.Controller.Runtime.Productions
         private async UniTaskVoid AddReward()
         {
             await meshPlantPointGridSystem.ClearAsync();
-            ShowIndicatorCapacity();
+            ShowZeroIndicatorCapacity();
             ModifyRecordAfterProgression();
             onCompleteParticleEffect.Value.Stop();
             CanClaim = false;
         }
 
         private void ShowIndicatorCapacity()
+        {
+            _indicatorProgressCapacity.gameObject.SetActive(true);
+            _indicatorProgressCapacity.Setup(ProgressRatio, (float)TimeRemaining.TotalSeconds, false, ProductionItemValuePair.Value,
+                WeightCapacity, ProductionItemValuePair.Key);
+        }
+        
+        private void ShowZeroIndicatorCapacity()
         {
             _indicatorProgressCapacity.gameObject.SetActive(true);
             _indicatorProgressCapacity.Change(0, WeightCapacity);

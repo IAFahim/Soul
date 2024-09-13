@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Soul.Controller.Runtime.Events
 {
     [CreateAssetMenu(fileName = "EventTransformRemoveCallBack", menuName = "Soul/Events/EventTransformRemoveCallBack")]
-    public class EventTransformFocus : Event<(Transform target, EPivotMode pivotMode, IFocusCallBack hideCallBack)>
+    public class EventTransformFocus : Event<(Transform target, HorizontalRegion pivotMode, IFocusCallBack hideCallBack)>
     {
     }
 }

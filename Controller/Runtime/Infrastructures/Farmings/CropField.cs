@@ -127,7 +127,7 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
 
         #region IDropAble<Seed>
 
-        public bool CanDropNow => !IsLocked && !IsUpgrading;
+        public bool CanDropNow => !IsLocked && !IsUpgrading && !ProductionRecord.InProgression;
 
         public bool OnDrag(Item drop)
         {
@@ -166,6 +166,8 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
             base.Reset();
             cropProductionManager.meshPlantPointGridSystem = GetComponentInChildren<MeshPlantPointGridSystem>();
         }
+
+        public override bool IsBusy => ProductionRecord.InProgression;
 
         void ILoadComponent.OnLoadComponents()
         {

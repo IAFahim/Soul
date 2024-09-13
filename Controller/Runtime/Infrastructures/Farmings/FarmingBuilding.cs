@@ -19,7 +19,7 @@ using UnityEngine.Serialization;
 namespace Soul.Controller.Runtime.Infrastructures.Farmings
 {
     [RequireComponent(typeof(BoxCollider))]
-    public abstract class FarmingBuilding : UnlockUpgradeAbleBuilding, IReSelectedCallBack, IInfoPanelReference,
+    public abstract class FarmingBuilding : UnlockUpgradeAbleBuilding,IBusy, IReSelectedCallBack, IInfoPanelReference,
         IUpgradeRecordReference<RecordUpgrade>, IRequirementForUpgradeScriptableReference
     {
         [Title("FarmingBuilding")] [SerializeField]
@@ -97,7 +97,7 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
 
         #region IUpgrade
 
-        public override bool CanUpgrade => !UpgradeRecord.InProgression && !level.IsMax &&
+        public override bool CanUpgrade => !IsBusy && !UpgradeRecord.InProgression && !level.IsMax &&
                                            unlockAndUpgrade.HasEnough();
 
         public override bool IsUpgrading => UpgradeRecord.InProgression;
@@ -169,5 +169,12 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
             addressablePoolLifetime = FindObjectOfType<AddressablePoolLifetime>();
             unlockAndUpgrade.unlockManagerComponent = GetComponentInChildren<UnlockManagerComponent>();
         }
+
+        public abstract bool IsBusy { get; }
+    }
+
+    public interface IBusy 
+    {
+        bool IsBusy { get; }
     }
 }

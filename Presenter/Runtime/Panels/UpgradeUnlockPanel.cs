@@ -10,6 +10,7 @@ using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.UpgradeAndUnlock.Unlocks;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using TMPro;
 using UnityEngine;
@@ -53,6 +54,7 @@ namespace Soul.Presenter.Runtime.Panels
         private ILevel _levelReference;
         private IRequirementForUpgradeScriptableReference _requirementForUpgradeReference;
         private IUpgrade _upgradeReference;
+        private IUnlock _unlockReference;
 
         public Pair<Currency, int> CurrencyRequirement(int level) =>
             _requirementForUpgradeReference.RequirementForUpgrades.GetRequirement(level).currency;
@@ -75,21 +77,22 @@ namespace Soul.Presenter.Runtime.Panels
         private void SetPanel(RectTransform parentRect, Transform currentSelectedTransform, ITitle titleReference,
             ILevel levelReference, Action onStartButtonPressed)
         {
+            bool canSet = TrySetPanelInfo(parentRect, currentSelectedTransform, levelReference, onStartButtonPressed);
+            if (!canSet) return;
             startButton.onClick.RemoveAllListeners();
             closeButton.onClick.AddListener(OnCancelButtonPressed);
             SetParent(parentRect);
             SetTitle(titleReference, levelReference);
             SetProgressBar(levelReference.Level);
-            SetPanelButtonInfo(parentRect, currentSelectedTransform, levelReference, onStartButtonPressed);
         }
 
-        private void SetPanelButtonInfo(RectTransform parentRect, Transform currentSelectedTransform,
+        private bool TrySetPanelInfo(RectTransform parentRect, Transform currentSelectedTransform,
             ILevel levelReference,
             Action onStartButtonPressed)
         {
-            if (levelReference.Level.IsMax) MaxLevelPrompt(onStartButtonPressed);
-            else if (levelReference.Level.IsLocked) UnlockPrompt(currentSelectedTransform, onStartButtonPressed);
-            else UpgradePrompt(currentSelectedTransform, levelReference.Level);
+            if (levelReference.Level.IsMax) return MaxLevelPrompt(onStartButtonPressed);
+            if (levelReference.Level.IsLocked) return UnlockPrompt(currentSelectedTransform, onStartButtonPressed);
+            return UpgradePrompt(currentSelectedTransform, levelReference.Level);
         }
 
         private void SetParent(RectTransform parentRect, bool playAnimation = true)
@@ -125,12 +128,12 @@ namespace Soul.Presenter.Runtime.Panels
             }
         }
 
-        private void UpgradePrompt(Transform currentSelectedTransform, Level level)
+        private bool UpgradePrompt(Transform currentSelectedTransform, Level level)
         {
             _upgradeReference = currentSelectedTransform.GetComponent<IUpgrade>();
-            SetItemRequirement(currentSelectedTransform, level);
             if (_upgradeReference != null)
             {
+                SetItemRequirement(currentSelectedTransform, level);
                 if (_upgradeReference.IsUpgrading)
                 {
                     startButton.interactable = false;
@@ -141,14 +144,17 @@ namespace Soul.Presenter.Runtime.Panels
                     startButtonTitle.text = "Upgrade";
                     startButton.onClick.AddListener(Upgrade);
                 }
+
+                return true;
             }
-            else Hide();
+
+            Hide();
+            return false;
         }
 
         private void SetItemRequirement(Transform currentSelectedTransform, Level level)
         {
-            _requirementForUpgradeReference =
-                currentSelectedTransform.GetComponent<IRequirementForUpgradeScriptableReference>();
+            _requirementForUpgradeReference = currentSelectedTransform.GetComponent<IRequirementForUpgradeScriptableReference>();
             _eventShowItemRequired.Trigger(ItemsRequirement(level));
         }
 
@@ -164,14 +170,39 @@ namespace Soul.Presenter.Runtime.Panels
             // Implement the logic to setup the timer
         }
 
-        private void MaxLevelPrompt(Action onStartButtonPressed)
+        private bool MaxLevelPrompt(Action onStartButtonPressed)
         {
+            return true;
             // Implement the logic to show the max level prompt
         }
 
-        private void UnlockPrompt(Transform currentSelectedTransform, Action onStartButtonPressed)
+        private bool UnlockPrompt(Transform currentSelectedTransform, Action onStartButtonPressed)
         {
-            // Implement the logic to show the unlock prompt
+            var unlockReference = currentSelectedTransform.GetComponent<IUnlock>();
+            if (unlockReference != null)
+            {
+                SetItemRequirement(currentSelectedTransform, _levelReference.Level);
+                if (unlockReference.IsUnlocking)
+                {
+                    startButton.interactable = false;
+                }
+                else
+                {
+                    startButton.interactable = true;
+                    startButtonTitle.text = "Unlock";
+                    startButton.onClick.AddListener(Unlock);
+                }
+
+                return true;
+            }
+            return true;
+            
+        }
+
+        private void Unlock()
+        {
+            _unlockReference.Unlock();
+            _onStartButtonPressed?.Invoke();
         }
 
         private void SetProgressBar(Level level)
@@ -183,6 +214,7 @@ namespace Soul.Presenter.Runtime.Panels
         private void OnCancelButtonPressed()
         {
             _eventShowItemRequired.Trigger(null);
+            _onStartButtonPressed?.Invoke();
             Hide();
         }
 

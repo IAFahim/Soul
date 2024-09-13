@@ -30,5 +30,7 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
             get => buildingAndProductionRecord.recordUpgrade;
             set => buildingAndProductionRecord.recordUpgrade = value;
         }
+
+        public override bool IsBusy => false;
     }
 }

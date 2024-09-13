@@ -70,10 +70,8 @@ namespace Soul.Model.Runtime.DragAndDrops
         {
             if (isHit && _dropAble != null)
             {
-                if (_dropAble.OnDrop(data))
-                    OnSuccessfulDrop();
-                else
-                    OnDropFailed();
+                if (_dropAble.OnDrop(data)) OnSuccessfulDrop();
+                else OnDropFailed();
             }
             else
             {

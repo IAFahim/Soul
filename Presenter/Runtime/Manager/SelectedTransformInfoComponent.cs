@@ -22,7 +22,7 @@ namespace Soul.Presenter.Runtime.Manager
         public EventShowItemRequired eventShowItemRequired;
 
         // --- Events ---
-        public Event<(Transform target, EPivotMode pivotMode, IFocusCallBack hideCallBack)>
+        public Event<(Transform target, HorizontalRegion pivotMode, IFocusCallBack hideCallBack)>
             onUpgradeAbleOrUnlockAbleSelected;
 
         // --- UI Elements ---
@@ -73,7 +73,8 @@ namespace Soul.Presenter.Runtime.Manager
 
             if (selectData.GetDataFrom(selectedTransform) > 0)
             {
-                onUpgradeAbleOrUnlockAbleSelected.Trigger((_currentSelectedTransform, EPivotMode.MiddleLeft, this));
+                onUpgradeAbleOrUnlockAbleSelected.Trigger((_currentSelectedTransform, HorizontalRegion.Center, this));
+                SetCanvas();
             }
             else
             {
@@ -85,7 +86,6 @@ namespace Soul.Presenter.Runtime.Manager
         {
             ShowCanvas();
             SetClip(selectData.titleReference, selectData.levelReference);
-            UpdateUnlockButton(selectData.levelReference);
         }
 
         private void SetClip(ComponentFinder<ITitle> selectDataTitleReference,
@@ -164,6 +164,7 @@ namespace Soul.Presenter.Runtime.Manager
         {
             if (selectData.levelReference)
             {
+                onUpgradeAbleOrUnlockAbleSelected.Trigger((_currentSelectedTransform, HorizontalRegion.Left, this));
                 upgradeUnlockPanel.Show(
                     upgradeUnlockPanelParent, _currentSelectedTransform,
                     playerInventoryReference, eventShowItemRequired,
@@ -175,6 +176,7 @@ namespace Soul.Presenter.Runtime.Manager
 
         private void OnUpgradeUnlockStartButtonPressed()
         {
+            onUpgradeAbleOrUnlockAbleSelected.Trigger((_currentSelectedTransform, HorizontalRegion.Center, this));
         }
 
         private void DisableLevelContainer()
@@ -184,7 +186,7 @@ namespace Soul.Presenter.Runtime.Manager
 
         public void OnFocus()
         {
-            SetCanvas();
+            UpdateUnlockButton(selectData.levelReference);
         }
 
         public void OnOutOfFocus()

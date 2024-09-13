@@ -125,7 +125,6 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             {
                 itemAndGameObject.Value.GameObject.Return();
             }
-
             _instantiateItemAndContainers.Clear();
         }
     }

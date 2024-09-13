@@ -55,6 +55,8 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
             base.Load(key);
         }
 
+        public override bool IsBusy => false;
+
         public override void OnUnlockUpgradeStart()
         {
             eggProductionManager.Cancel();

@@ -5,15 +5,17 @@ using Soul.Controller.Runtime.Productions;
 using Soul.Controller.Runtime.Upgrades;
 using Soul.Model.Runtime.DragAndDrops;
 using Soul.Model.Runtime.Items;
+using Soul.Model.Runtime.Productions;
 using UnityEngine;
 
 namespace Soul.Controller.Runtime.Infrastructures.Farmings
 {
-    public class FishingPond : FarmingBuilding, IAllowedToDropReference<Item>, IDropAble<Item>
+    public class FishingPond : FarmingBuilding, IProductionRecordReference<RecordProduction>,
+        IAllowedToDropReference<Item>, IDropAble<Item>
     {
         [SerializeField] private AllowedItemLists allowedItemLists;
         [SerializeField] private BuildingAndProductionRecord buildingAndProductionRecord;
-        
+
         public override int CurrentLevel
         {
             get => buildingAndProductionRecord.level;
@@ -31,6 +33,7 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
         }
 
         public override RecordUpgrade UpgradeRecord { get; set; }
+        public override bool IsBusy => ProductionRecord.InProgression;
         public IList<Item> ListOfAllowedToDrop => allowedItemLists.CurrentList;
         public bool CanDropNow => !IsLocked && !IsUpgrading;
 
@@ -47,6 +50,12 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
         public void OnDragCancel()
         {
             throw new System.NotImplementedException();
+        }
+
+        public RecordProduction ProductionRecord
+        {
+            get => buildingAndProductionRecord.recordProduction;
+            set => buildingAndProductionRecord.recordProduction = value;
         }
     }
 }

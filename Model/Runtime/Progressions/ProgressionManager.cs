@@ -21,7 +21,7 @@ namespace Soul.Model.Runtime.Progressions
         public UnityTimeSpan DiscountedTime => recordReference.Time.GetTimeAfterDiscount(FullTimeRequirement);
         public UnityDateTime EndsAt => recordReference.Time.EndsAt(FullTimeRequirement);
         public UnityTimeSpan TimeRemaining => recordReference.Time.Remaining(FullTimeRequirement);
-        public float CompleteRatio => recordReference.Time.ProgressRatio(FullTimeRequirement);
+        public float ProgressRatio => recordReference.Time.ProgressRatio(FullTimeRequirement);
         public bool IsComplete => recordReference.InProgression && recordReference.Time.IsOver(FullTimeRequirement);
 
 
@@ -78,7 +78,7 @@ namespace Soul.Model.Runtime.Progressions
                 return;
             }
 
-            OnTimerStart(CompleteRatio);
+            OnTimerStart(ProgressRatio);
             var delay = startsNow ? (float)DiscountedTime.TotalSeconds : (float)TimeRemaining.TotalSeconds;
             DelayHandle = App.Delay(delay, OnComplete, useRealTime: true);
             Track.Start(ToString(), delay);
