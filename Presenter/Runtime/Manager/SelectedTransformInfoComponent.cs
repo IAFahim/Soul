@@ -21,7 +21,7 @@ namespace Soul.Presenter.Runtime.Manager
     public class SelectedTransformInfoComponent : GameComponent, IFocusCallBack
     {
         private bool enableCall;
-        public PlayerInventoryReference playerInventoryReference;
+        [FormerlySerializedAs("playerInventoryReference")] public PlayerFarmReference playerFarmReference;
         public EventShowItemRequired eventShowItemRequired;
 
         // --- Events ---
@@ -200,7 +200,7 @@ namespace Soul.Presenter.Runtime.Manager
                 onUpgradeAbleOrUnlockAbleSelected.Trigger((_currentSelectedTransform, HorizontalRegion.Left, this));
                 upgradeUnlockPanel.Show(
                     upgradeUnlockPanelParent, _currentSelectedTransform,
-                    playerInventoryReference, eventShowItemRequired,
+                    playerFarmReference, eventShowItemRequired,
                     selectData.titleReference.Value, selectData.levelReference.Value,
                     OnUpgradeUnlockStartButtonPressed, OnUnlockUpgradeCancelButtonPressed
                 );

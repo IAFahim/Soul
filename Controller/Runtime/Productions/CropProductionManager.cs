@@ -46,7 +46,7 @@ namespace Soul.Controller.Runtime.Productions
         private bool _isLoaded;
         private Transform _parent;
         private IndicatorProgressCapacity _indicatorProgressCapacity;
-        private PlayerInventoryReference _playerInventoryReference;
+        private PlayerFarmReference playerFarmReference;
         [SerializeField] protected Optional<AddressableParticleEffect> onCompleteParticleEffect;
 
         // Properties
@@ -81,37 +81,37 @@ namespace Soul.Controller.Runtime.Productions
         public override UnityTimeSpan FullTimeRequirement =>
             itemToItemConverter.Convert(ProductionItemValuePair.Key).RequiredTime * Required.timeMultiplier;
 
-        public int CurrentCurrency => _playerInventoryReference.coins.Value;
+        public int CurrentCurrency => playerFarmReference.coins.Value;
 
-        public Pair<Item, int> Reward
+        #region Rewrad
+
+        public Pair<Item, int> Reward => GetReward(itemToItemConverter.Convert(ProductionItemValuePair.Key));
+
+        private Pair<Item, int> GetReward(ConvertTimedInfo<Item, int> convertInfo)
         {
-            get
-            {
-                if (itemToItemConverter.TryConvert(ProductionItemValuePair, out var convertedItem))
-                {
-                    int productionAmount = (int)(convertedItem.ratio * recordReference.productionItemValuePair.Value *
-                                                 RewardForProduction.productionMultiplier
-                        );
-                    return new Pair<Item, int>(convertedItem.data, productionAmount);
-                }
-
-                return new Pair<Item, int>();
-            }
+            int productionAmount = (int)(convertInfo.ratio * recordReference.productionItemValuePair.Value *
+                                         RewardForProduction.productionMultiplier
+                );
+            return new Pair<Item, int>(convertInfo.data, productionAmount);
         }
 
+        public ConvertTimedInfo<Item, int> ConvertInfo => itemToItemConverter.Convert(ProductionItemValuePair.Key);
+        public float XpTotal => itemToItemConverter.Convert(ProductionItemValuePair.Key).GetXpFrom(WeightCapacity);
+
+        #endregion
 
         // Public Methods
 
         /// <summary>
         /// Initializes the CropProductionManager with the given parameters.
         /// </summary>
-        public bool Setup(Transform parentTransform, PlayerInventoryReference inventoryReference,
+        public bool Setup(Transform parentTransform, PlayerFarmReference farmReference,
             IProductionRecordReference<RecordProduction> recordProduction, Level level,
             ISaveAbleReference saveAbleReference)
         {
             _isLoaded = true;
             _parent = parentTransform;
-            _playerInventoryReference = inventoryReference;
+            playerFarmReference = farmReference;
 
             if (_indicatorProgressCapacity == null)
             {
@@ -133,7 +133,7 @@ namespace Soul.Controller.Runtime.Productions
             RewardClaim();
             queueItem = seed;
             _indicatorProgressCapacity.Change(seed);
-            _playerInventoryReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
+            playerFarmReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace Soul.Controller.Runtime.Productions
         /// Checks if there are enough resources to start the progression.
         /// </summary>
         public override bool HasEnough() =>
-            _playerInventoryReference.inventory.HasEnough(ProductionItemValuePair, WeightCapacity);
+            playerFarmReference.inventory.HasEnough(ProductionItemValuePair, WeightCapacity);
 
         /// <summary>
         /// Checks if the reward can be claimed.
@@ -189,7 +189,7 @@ namespace Soul.Controller.Runtime.Productions
         {
             var requiredWorker = Required.workerCount;
             recordReference.worker.typeAndCount = new Pair<WorkerType, int>(basicWorkerType, requiredWorker);
-            _playerInventoryReference.workerInventory.TryDecrease(basicWorkerType, requiredWorker);
+            playerFarmReference.workerInventory.TryDecrease(basicWorkerType, requiredWorker);
             ProductionItemValuePair = new Pair<Item, int>(queueItem, WeightCapacity);
             recordReference.Time.Discount = new UnityTimeSpan();
             base.ModifyRecordBeforeProgression();
@@ -226,7 +226,7 @@ namespace Soul.Controller.Runtime.Productions
         protected override void TakeRequirement()
         {
             var seed = ProductionItemValuePair;
-            _playerInventoryReference.inventory.TryDecrease(seed, ProductionItemValuePair.Value);
+            playerFarmReference.inventory.TryDecrease(seed, ProductionItemValuePair.Value);
         }
 
         /// <summary>
@@ -244,10 +244,11 @@ namespace Soul.Controller.Runtime.Productions
         private void ShowIndicatorCapacity()
         {
             _indicatorProgressCapacity.gameObject.SetActive(true);
-            _indicatorProgressCapacity.Setup(ProgressRatio, (float)TimeRemaining.TotalSeconds, false, ProductionItemValuePair.Value,
+            _indicatorProgressCapacity.Setup(ProgressRatio, (float)TimeRemaining.TotalSeconds, false,
+                ProductionItemValuePair.Value,
                 WeightCapacity, ProductionItemValuePair.Key);
         }
-        
+
         private void ShowZeroIndicatorCapacity()
         {
             _indicatorProgressCapacity.gameObject.SetActive(true);
@@ -261,11 +262,13 @@ namespace Soul.Controller.Runtime.Productions
         /// </summary>
         private void ModifyRecordAfterProgression()
         {
-            var singleReward = Reward;
+            var convertInfo = ConvertInfo;
+            var reward = GetReward(convertInfo);
             var takenWorker = recordReference.worker.typeAndCount;
-            _playerInventoryReference.workerInventory.AddOrIncrease(takenWorker.Key, takenWorker.Value);
-            _playerInventoryReference.inventory.AddOrIncrease(singleReward.Key, singleReward.Value);
-            _playerInventoryReference.coins.Set(CurrentCurrency + 10);
+            playerFarmReference.workerInventory.AddOrIncrease(takenWorker.Key, takenWorker.Value);
+            playerFarmReference.inventory.AddOrIncrease(reward.Key, reward.Value);
+            playerFarmReference.levelXp.AddXp((int)XpTotal);
+            playerFarmReference.coins.Value += 10;
             recordReference.InProgression = false;
             SaveAbleReference.Save();
         }

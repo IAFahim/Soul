@@ -8,6 +8,7 @@ using Soul.Model.Runtime.DragAndDrops;
 using Soul.Model.Runtime.Inventories;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.DragAndDrops
 {
@@ -15,7 +16,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
     {
         [SerializeField] public Transform containerTransform;
         [SerializeField] private CanvasGroup containerCanvasGroup;
-        public PlayerInventoryReference playerInventoryReference;
+        [FormerlySerializedAs("playerInventoryReference")] public PlayerFarmReference playerFarmReference;
         public GameObject dragAndDropPrefab;
 
         private Dictionary<Item, DragAndDropItem> _instantiateItemAndContainers = new();
@@ -26,7 +27,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
         private void OnEnable()
         {
             containerCanvasGroup.alpha = 0;
-            playerInventoryReference.inventory.OnItemChanged += InventoryOnOnItemChanged;
+            playerFarmReference.inventory.OnItemChanged += InventoryOnOnItemChanged;
             if (_mainCamera == null)
             {
                 _mainCamera = getCameraEvent.Get();
@@ -42,7 +43,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
 
         private void OnDisable()
         {
-            playerInventoryReference.inventory.OnItemChanged -= InventoryOnOnItemChanged;
+            playerFarmReference.inventory.OnItemChanged -= InventoryOnOnItemChanged;
         }
 
         private void InventoryOnOnItemChanged(InventoryChangeEventArgs<Item, int> changeEventArgs)
@@ -65,7 +66,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             if (selectedTransform.TryGetComponent<IAllowedToDropReference<Item>>(out var allowedToDropReference))
             {
                 var gameObjectWithCount = GetGameObjectForInventory(
-                    dragAndDropPrefab, playerInventoryReference.inventory,
+                    dragAndDropPrefab, playerFarmReference.inventory,
                     allowedToDropReference.ListOfAllowedToDrop
                 );
 
@@ -93,7 +94,7 @@ namespace Soul.Presenter.Runtime.DragAndDrops
             return _instantiateItemAndContainers;
         }
 
-        private int GetInventoryItemLimit(Item item) => playerInventoryReference.inventory.GetLimitValueOrDefault(item);
+        private int GetInventoryItemLimit(Item item) => playerFarmReference.inventory.GetLimitValueOrDefault(item);
 
 
         private List<(GameObject, T, TV)> GetGameObjectForInventory<T, TV>(GameObject prefab,

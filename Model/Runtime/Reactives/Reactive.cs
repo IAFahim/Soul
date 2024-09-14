@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Soul.Model.Runtime.Reactives
 {
     [Serializable]
-    public struct Reactive<T>
+    public class Reactive<T>
     {
         [SerializeField] private T value;
         public event Action<T, T> OnChange;

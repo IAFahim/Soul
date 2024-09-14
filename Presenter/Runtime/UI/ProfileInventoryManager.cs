@@ -8,12 +8,16 @@ using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Limits;
 using Soul.Model.Runtime.Peoples.Workers;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.UI
 {
     public class ProfileInventoryManager : GameComponent, ILoadComponent
     {
-        public PlayerInventoryReference playerInventoryReference;
+        [FormerlySerializedAs("playerInventoryReference")]
+        public PlayerFarmReference playerFarmReference;
+
+        [SerializeField] public LevelXpDayViewUI levelXpDayViewUI;
 
         [Header("Coin")] public Currency coin;
         public TMPFormat coinText;
@@ -49,12 +53,13 @@ namespace Soul.Presenter.Runtime.UI
         public void OnEnable()
         {
             CalculateTotalWeightInInventoryAndShow();
-            playerInventoryReference.inventory.OnItemChanged += InventoryOnItemChanged;
-            playerInventoryReference.workerInventory.OnItemChanged += WorkerInventoryOnOnItemChanged;
-            playerInventoryReference.weight.OnChange += WeightOnOnChange;
+            levelXpDayViewUI.Setup(playerFarmReference.levelXp, playerFarmReference.xpPreview);
+            // playerFarmReference.inventory.OnItemChanged += InventoryOnItemChanged;
+            // playerFarmReference.workerInventory.OnItemChanged += WorkerInventoryOnOnItemChanged;
+            // playerFarmReference.weight.OnChange += WeightOnOnChange;
             // playerInventoryReference.inventoryPreview.OnAddedOrIncreased += OnTempAddedOrIncreased;
             // playerInventoryReference.inventory.OnDecreased += OnDecreased;
-            SetAllAlpha(0);
+            // SetAllAlpha(0);
         }
 
         private void WorkerInventoryOnOnItemChanged(InventoryChangeEventArgs<WorkerType, int> workerType)
@@ -84,9 +89,10 @@ namespace Soul.Presenter.Runtime.UI
 
         public void OnDisable()
         {
-            playerInventoryReference.inventory.OnItemChanged -= InventoryOnItemChanged;
-            playerInventoryReference.weight.OnChange -= WeightOnOnChange;
-            playerInventoryReference.workerInventory.OnItemChanged -= WorkerInventoryOnOnItemChanged;
+            levelXpDayViewUI.Dispose();
+            // playerFarmReference.inventory.OnItemChanged -= InventoryOnItemChanged;
+            // playerFarmReference.weight.OnChange -= WeightOnOnChange;
+            // playerFarmReference.workerInventory.OnItemChanged -= WorkerInventoryOnOnItemChanged;
             // playerInventoryReference.inventory.OnAddedOrIncreased -= OnAddedOrIncreased;
             // playerInventoryReference.inventoryPreview.OnAddedOrIncreased -= OnTempAddedOrIncreased;
             // playerInventoryReference.inventory.OnDecreased -= OnDecreased;
@@ -94,12 +100,12 @@ namespace Soul.Presenter.Runtime.UI
 
         private void Start()
         {
-            coinText.SetTextInt(playerInventoryReference.coins);
-            gemText.SetTextInt(playerInventoryReference.gems);
-            workerText.SetTextInt(worker);
-            weightText.SetTextInt(playerInventoryReference.weight.Value.Current);
-            maxWeightText.SetTextInt(playerInventoryReference.weight.Value.Max);
-            levelText.SetTextInt(level);
+            // coinText.SetTextInt(playerFarmReference.coins);
+            // gemText.SetTextInt(playerFarmReference.gems);
+            // workerText.SetTextInt(worker);
+            // weightText.SetTextInt(playerFarmReference.weight.Value.Current);
+            // maxWeightText.SetTextInt(playerFarmReference.weight.Value.Max);
+            // levelText.SetTextInt(level);
         }
 
         private void OnAddedOrIncreased(Item item, int newAmount, int changeAmount)
@@ -107,7 +113,7 @@ namespace Soul.Presenter.Runtime.UI
             if (item is IWeight weightedItem)
             {
                 int itemWeight = weightedItem.Weight * changeAmount;
-                playerInventoryReference.weight.Value += itemWeight;
+                playerFarmReference.weight.Value += itemWeight;
             }
         }
 
@@ -116,14 +122,14 @@ namespace Soul.Presenter.Runtime.UI
             if (item is IWeight weightedItem)
             {
                 int itemWeight = weightedItem.Weight * changeAmount;
-                playerInventoryReference.weight.Value -= itemWeight;
+                playerFarmReference.weight.Value -= itemWeight;
             }
         }
 
         public void CalculateTotalWeightInInventoryAndShow()
         {
             int weight = 0;
-            foreach (var item in playerInventoryReference.inventory.GetAll())
+            foreach (var item in playerFarmReference.inventory.GetAll())
             {
                 if (item.Key is IWeight weightedItem)
                 {
@@ -131,8 +137,8 @@ namespace Soul.Presenter.Runtime.UI
                 }
             }
 
-            int maxWeight = playerInventoryReference.weight.Value.Max;
-            playerInventoryReference.weight.Value = new LimitIntStruct(weight, maxWeight);
+            int maxWeight = playerFarmReference.weight.Value.Max;
+            playerFarmReference.weight.Value = new LimitIntStruct(weight, maxWeight);
             weightText.SetTextFloat(weight);
         }
 
@@ -174,7 +180,8 @@ namespace Soul.Presenter.Runtime.UI
 
         void ILoadComponent.OnLoadComponents()
         {
-            StoreFormat();
+            levelXpDayViewUI.LoadComponents(gameObject);
+            // StoreFormat();
         }
     }
 }

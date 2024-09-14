@@ -1,6 +1,7 @@
 ﻿using System;
 using Pancake.Common;
 using Pancake.Localization;
+using QuickEye.Utility;
 using UnityEngine;
 
 namespace Soul.Model.Runtime
@@ -8,6 +9,10 @@ namespace Soul.Model.Runtime
     public static class UserData
     {
         public static string UserId => Data.Load(Constant.User.KEY_ID, Guid.NewGuid().ToString("N")[..16]);
+        
+        public static UnityDateOnly FirstInstallDate => Data.Load(Constant.User.KEY_FIRST_INSTALL_DATE, UnityDateOnly.FromDateTime(DateTime.UtcNow));
+        
+        public static int DaySinceInstall => (DateTime.UtcNow.Day - FirstInstallDate.Day);
 
         public static string GetCurrentLanguage()
         {

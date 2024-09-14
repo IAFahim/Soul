@@ -7,13 +7,14 @@ using Soul.Model.Runtime.Buildings;
 using Soul.Model.Runtime.Tweens;
 using Soul.Model.Runtime.Tweens.Scriptable;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.Vehicles
 {
     public class Vehicle : BaseSelectableComponent
     {
-        [Title("Vehicle")]
-        public PlayerInventoryReference playerInventoryReference;
+        [FormerlySerializedAs("playerInventoryReference")] [Title("Vehicle")]
+        public PlayerFarmReference playerFarmReference;
         [SerializeField] protected LevelInfrastructureInfo infrastructureInfo;
         public InfoPanel infoPanel;
         

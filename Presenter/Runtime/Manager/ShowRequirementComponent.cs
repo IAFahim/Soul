@@ -6,6 +6,7 @@ using Soul.Controller.Runtime.UI.Components;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Items;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.Manager
 {
@@ -15,7 +16,7 @@ namespace Soul.Presenter.Runtime.Manager
         public ContainerIconRequiredMax requirementPrefab;
 
         public EventShowItemRequired eventShowItemRequired;
-        public PlayerInventoryReference playerInventoryReference;
+        [FormerlySerializedAs("playerInventoryReference")] public PlayerFarmReference playerFarmReference;
 
         public UnityDictionary<Item, ContainerIconRequiredMax> itemRequirementDictionary;
 
@@ -42,7 +43,7 @@ namespace Soul.Presenter.Runtime.Manager
             {
                 var item = itemKeyValuePair.Key;
                 var requiredAmount = itemKeyValuePair.Value;
-                playerInventoryReference.inventory.TryGetValue(item, out var has);
+                playerFarmReference.inventory.TryGetValue(item, out var has);
                 if (itemRequirementDictionary.ContainsKey(itemKeyValuePair.Key))
                 {
                     UpdateContainer(itemKeyValuePair, item, requiredAmount, has);

@@ -6,6 +6,7 @@ namespace Soul.Model.Runtime
     {
         public static class User
         {
+            public static readonly string KEY_FIRST_INSTALL_DATE = "user_first_install_date";
             public const string KEY_LANGUAGE = "user_lang";
             public const string KEY_QUALITY = "user_quality";
             public const string KEY_MUSIC = "user_music";

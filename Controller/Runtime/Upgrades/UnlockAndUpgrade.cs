@@ -24,7 +24,7 @@ namespace Soul.Controller.Runtime.Upgrades
 
         private RequirementForUpgrades _requirementForUpgrades;
         private AddressablePoolLifetime _addressablePoolLifetime;
-        private PlayerInventoryReference _playerInventory;
+        private PlayerFarmReference playerFarm;
 
         #region Enclosure
 
@@ -41,13 +41,13 @@ namespace Soul.Controller.Runtime.Upgrades
 
 
         public async UniTask<bool> Setup(AddressablePoolLifetime addressablePoolLifetime,
-            RequirementForUpgrades requirementForUpgrades, PlayerInventoryReference inventoryReference,
+            RequirementForUpgrades requirementForUpgrades, PlayerFarmReference farmReference,
             UnlockAndUpgradeSetupInfo unlockAndUpgradeSetupInfo
         )
         {
             _addressablePoolLifetime = addressablePoolLifetime;
             _requirementForUpgrades = requirementForUpgrades;
-            _playerInventory = inventoryReference;
+            playerFarm = farmReference;
             info = unlockAndUpgradeSetupInfo;
             unlockManagerComponent.Setup(_addressablePoolLifetime);
             return await ValidateStart();
@@ -87,14 +87,14 @@ namespace Soul.Controller.Runtime.Upgrades
 
         public override bool HasEnough()
         {
-            var currentCoin = _playerInventory.coins;
+            var currentCoin = playerFarm.coins;
             if (currentCoin.Key != Required.currency.Key) return false;
             return currentCoin >= Required.currency.Value;
         }
 
         protected override void TakeRequirement()
         {
-            _playerInventory.coins.Set(_playerInventory.coins - Required.currency.Value);
+            playerFarm.coins.Value -= Required.currency.Value;
         }
 
         protected override void ModifyRecordBeforeProgression()

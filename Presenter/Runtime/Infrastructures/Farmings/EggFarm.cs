@@ -27,7 +27,7 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
         {
             await base.SetUp(currentLevel);
             eggProductionManager.Setup(
-                transform, playerInventory, buildingAndProductionRecord.recordProduction, currentLevel, this
+                transform, playerFarm, buildingAndProductionRecord.recordProduction, currentLevel, this
             );
         }
 

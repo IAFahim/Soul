@@ -8,12 +8,13 @@ using Soul.Model.Runtime.Inventories;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Limits;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.UI
 {
     public class RewardNotifierManager : GameComponent, IRemoveCallBack<Item>
     {
-        public PlayerInventoryReference playerInventoryReference;
+        [FormerlySerializedAs("playerInventoryReference")] public PlayerFarmReference playerFarmReference;
         public Transform spawnPoint;
         public RewardNotifier prefab;
         private Dictionary<Item, PairClass<RewardNotifier, int>> _instantiatedRewardNotifiers;
@@ -21,7 +22,7 @@ namespace Soul.Presenter.Runtime.UI
         private void OnEnable()
         {
             _instantiatedRewardNotifiers = new Dictionary<Item, PairClass<RewardNotifier, int>>();
-            playerInventoryReference.inventory.OnItemChanged += OnAddedOrIncreased;
+            playerFarmReference.inventory.OnItemChanged += OnAddedOrIncreased;
         }
 
         private void OnAddedOrIncreased(InventoryChangeEventArgs<Item, int> inventoryChangeEventArgs)
@@ -51,7 +52,7 @@ namespace Soul.Presenter.Runtime.UI
 
             rewardNotifier.Value++;
             await UniTask.WaitForEndOfFrame(this);
-            LimitIntStruct weightLimitInt = playerInventoryReference.weight;
+            LimitIntStruct weightLimitInt = playerFarmReference.weight;
             rewardNotifier.Key.Setup(item, newAmount, changeAmount, weightLimitInt, this);
         }
 
@@ -68,7 +69,7 @@ namespace Soul.Presenter.Runtime.UI
 
         private void OnDisable()
         {
-            playerInventoryReference.inventory.OnItemChanged -= OnAddedOrIncreased;
+            playerFarmReference.inventory.OnItemChanged -= OnAddedOrIncreased;
             _instantiatedRewardNotifiers.Clear();
         }
     }

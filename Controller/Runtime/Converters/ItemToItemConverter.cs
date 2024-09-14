@@ -1,5 +1,4 @@
 ﻿using System;
-using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Converters;
 using Soul.Model.Runtime.Items;
 using UnityEngine;

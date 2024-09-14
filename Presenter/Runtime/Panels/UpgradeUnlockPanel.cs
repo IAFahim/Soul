@@ -48,7 +48,7 @@ namespace Soul.Presenter.Runtime.Panels
         public Button startButton;
         public Button closeButton;
 
-        private PlayerInventoryReference _playerInventoryReference;
+        private PlayerFarmReference playerFarmReference;
         private EventShowItemRequired _eventShowItemRequired;
         private Action<bool> _onStartButtonPressed;
         private Action _onCancelButtonPressed;
@@ -64,14 +64,14 @@ namespace Soul.Presenter.Runtime.Panels
             _requirementForUpgradeReference.RequirementForUpgrades.GetRequirement(level).items;
 
         public void Show(RectTransform parentRect, Transform currentSelectedTransform,
-            PlayerInventoryReference playerInventoryReference, EventShowItemRequired eventShowItemRequired,
+            PlayerFarmReference playerFarmReference, EventShowItemRequired eventShowItemRequired,
             ITitle titleReference, ILevel levelReference,
             Action<bool> onStartButtonPressed, Action onCancelButtonPressed)
         {
             _onStartButtonPressed = onStartButtonPressed;
             _onCancelButtonPressed = onCancelButtonPressed;
             _levelReference = levelReference;
-            _playerInventoryReference = playerInventoryReference;
+            this.playerFarmReference = playerFarmReference;
             _eventShowItemRequired = eventShowItemRequired;
             SetPanel(parentRect, currentSelectedTransform, titleReference, levelReference, onStartButtonPressed);
         }

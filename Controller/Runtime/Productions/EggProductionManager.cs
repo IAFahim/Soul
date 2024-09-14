@@ -27,7 +27,7 @@ namespace Soul.Controller.Runtime.Productions
         IReward<Pair<Item, int>>
     {
         [SerializeField] private Transform parent;
-        [SerializeField] private PlayerInventoryReference playerInventoryReference;
+        [FormerlySerializedAs("playerInventoryReference")] [SerializeField] private PlayerFarmReference playerFarmReference;
         [SerializeField] private RequiredAndRewardForProductions requiredAndRewardForProductions;
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
@@ -43,12 +43,12 @@ namespace Soul.Controller.Runtime.Productions
         public override UnityTimeSpan FullTimeRequirement =>
             itemToItemConverter.Convert(ProductionItemValuePair.Key).timeRequired;
 
-        public bool Setup(Transform parentTransform, PlayerInventoryReference inventoryReference,
+        public bool Setup(Transform parentTransform, PlayerFarmReference farmReference,
             RecordProduction record, Level level,
             ISaveAbleReference saveAbleReference)
         {
             parent = parentTransform;
-            playerInventoryReference = inventoryReference;
+            playerFarmReference = farmReference;
             record.InProgression = true;
             bool canStart = base.Setup(record, level, saveAbleReference);
             if (!canStart) return false;
@@ -126,7 +126,7 @@ namespace Soul.Controller.Runtime.Productions
 
         private void AddReward()
         {
-            playerInventoryReference.inventory.AddOrIncrease(ProductionItemValuePair.Key,
+            playerFarmReference.inventory.AddOrIncrease(ProductionItemValuePair.Key,
                 ProductionItemValuePair.Value);
             popupClickableInstance.gameObject.SetActive(false);
         }

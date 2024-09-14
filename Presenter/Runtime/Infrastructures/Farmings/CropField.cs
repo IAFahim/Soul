@@ -18,7 +18,8 @@ using UnityEngine;
 
 namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
-    public class CropField : FarmingBaseSelectableComponent, IProductionRecordReference<RecordProduction>, ILoadComponent,
+    public class CropField : FarmingBaseSelectableComponent, IProductionRecordReference<RecordProduction>,
+        ILoadComponent,
         IAllowedToDropReference<Item>, IDropAble<Item>
     {
         [Title("CropField")] [SerializeField] private AllowedItemLists allowedItemLists;
@@ -81,7 +82,7 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
         private void SetupProduction(Level currentLevel)
         {
             cropProductionManager.Setup(
-                unlockAndUpgrade.unlockManagerComponent.transform, playerInventory, this, currentLevel, this
+                unlockAndUpgrade.unlockManagerComponent.transform, playerFarm, this, currentLevel, this
             );
         }
 
@@ -115,7 +116,7 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 
         public override void OnUnlockUpgradeComplete(int _)
         {
-            if(!cropProductionManager.IsLoaded) SetupProduction(level);
+            if (!cropProductionManager.IsLoaded) SetupProduction(level);
         }
 
 
@@ -127,6 +128,21 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 
         #region IDropAble<Seed>
 
+        private bool TryDropAdd(Item drop)
+        {
+            if (!CanDropNow) return false;
+            if (drop is Seed seed) cropProductionManager.Add(seed);
+            playerFarm.xpPreview.Value = cropProductionManager.XpTotal;
+            return ListOfAllowedToDrop.Contains(drop);
+        }
+
+        private void DropCleanUp()
+        {
+            if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
+            unlockAndUpgrade.unlockManagerComponent.transform.localScale = dropTweenSettings.start;
+            playerFarm.xpPreview.Value = 0;
+        }
+
         public bool CanDropNow => !IsLocked && !IsUpgrading && !ProductionRecord.InProgression;
 
         public bool OnDrag(Item drop)
@@ -136,26 +152,22 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
             return TryDropAdd(drop);
         }
 
-        private bool TryDropAdd(Item drop)
-        {
-            if (!CanDropNow) return false;
-            if (drop is Seed seed) cropProductionManager.Add(seed);
-            return ListOfAllowedToDrop.Contains(drop);
-        }
-
         public bool OnDrop(Item dropPackage)
         {
-            if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
-            unlockAndUpgrade.unlockManagerComponent.transform.localScale = dropTweenSettings.start;
-            if (!TryDropAdd(dropPackage)) return false;
-            if (cropProductionManager.TryStartProgression()) Save(Guid);
-            return true;
+            if (TryDropAdd(dropPackage))
+            {
+                if (cropProductionManager.TryStartProgression()) Save(Guid);
+                DropCleanUp();
+                return true;
+            }
+
+            DropCleanUp();
+            return false;
         }
 
         public void OnDragCancel()
         {
-            if (_dropMotionHandle.IsActive()) _dropMotionHandle.Complete();
-            unlockAndUpgrade.unlockManagerComponent.transform.localScale = dropTweenSettings.start;
+            DropCleanUp();
         }
 
         #endregion

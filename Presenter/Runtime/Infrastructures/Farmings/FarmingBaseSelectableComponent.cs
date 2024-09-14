@@ -24,7 +24,7 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
         [Title("FarmingBuilding")] [SerializeField]
         protected AddressablePoolLifetime addressablePoolLifetime;
 
-        [SerializeField] protected PlayerInventoryReference playerInventory;
+        [FormerlySerializedAs("playerInventory")] [SerializeField] protected PlayerFarmReference playerFarm;
 
         [FormerlySerializedAs("levelInfrastructureInfo")] [SerializeField]
         protected LevelInfrastructureInfo infrastructureInfo;
@@ -64,7 +64,7 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
                 onUnlockUpgradeStart = OnUnlockUpgradeStart,
                 onUnlockUpgradeComplete = OnUnlockUpgradeComplete
             };
-            await unlockAndUpgrade.Setup(addressablePoolLifetime, requirementForUpgrades, playerInventory, info);
+            await unlockAndUpgrade.Setup(addressablePoolLifetime, requirementForUpgrades, playerFarm, info);
         }
 
 
