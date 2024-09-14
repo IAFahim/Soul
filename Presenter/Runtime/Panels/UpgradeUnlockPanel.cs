@@ -90,9 +90,11 @@ namespace Soul.Presenter.Runtime.Panels
             ILevel levelReference,
             Action onStartButtonPressed)
         {
-            if (levelReference.Level.IsMax) return MaxLevelPrompt(onStartButtonPressed);
-            if (levelReference.Level.IsLocked) return UnlockPrompt(currentSelectedTransform, onStartButtonPressed);
-            return UpgradePrompt(currentSelectedTransform, levelReference.Level);
+            if (levelReference.Level.IsMax && MaxLevelPrompt(onStartButtonPressed)) return true;
+            if (levelReference.Level.IsLocked && UnlockPrompt(currentSelectedTransform, onStartButtonPressed))
+                return true;
+            if (UpgradePrompt(currentSelectedTransform, levelReference.Level)) return true;
+            return false;
         }
 
         private void SetParent(RectTransform parentRect, bool playAnimation = true)
@@ -154,7 +156,8 @@ namespace Soul.Presenter.Runtime.Panels
 
         private void SetItemRequirement(Transform currentSelectedTransform, Level level)
         {
-            _requirementForUpgradeReference = currentSelectedTransform.GetComponent<IRequirementForUpgradeScriptableReference>();
+            _requirementForUpgradeReference =
+                currentSelectedTransform.GetComponent<IRequirementForUpgradeScriptableReference>();
             _eventShowItemRequired.Trigger(ItemsRequirement(level));
         }
 
@@ -195,8 +198,8 @@ namespace Soul.Presenter.Runtime.Panels
 
                 return true;
             }
+
             return true;
-            
         }
 
         private void Unlock()

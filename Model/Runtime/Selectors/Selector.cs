@@ -16,6 +16,7 @@ namespace Soul.Model.Runtime.Selectors
         [SerializeField] private Transform currentTransform;
         [SerializeField] private bool canSelect = true;
         [SerializeField] private UnityEvent<Transform> onSelected;
+        [SerializeField] private UnityEvent<Transform> onReSelected;
         public bool selectProcessRunning;
         private EventSystem _eventSystem;
         private CancellationToken _token;
@@ -102,9 +103,9 @@ namespace Soul.Model.Runtime.Selectors
             EditorGUIUtility.PingObject(hitTransform.gameObject);
 #endif
             currentTransform = hitTransform;
-            onSelected.Invoke(currentTransform);
             var selectedCallBacks = currentTransform.GetComponents<ISelectCallBack>();
             foreach (var receiver in selectedCallBacks) receiver.OnSelected(raycastHit);
+            onSelected.Invoke(currentTransform);
         }
 
         private void DeSelectInvoke(RaycastHit raycastHit)
@@ -114,10 +115,11 @@ namespace Soul.Model.Runtime.Selectors
             currentTransform = null;
         }
 
-        private static void ReSelectedInvoke(Transform hitTransform, RaycastHit raycastHit)
+        private void ReSelectedInvoke(Transform hitTransform, RaycastHit raycastHit)
         {
             var reSelectedCallBacks = hitTransform.GetComponents<IReSelectedCallBack>();
             foreach (var receiver in reSelectedCallBacks) receiver.OnReSelected(raycastHit);
+            onReSelected.Invoke(hitTransform);
         }
     }
 }

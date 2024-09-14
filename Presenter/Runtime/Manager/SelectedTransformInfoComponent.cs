@@ -1,4 +1,6 @@
-﻿using Pancake;
+﻿using LitMotion;
+using LitMotion.Extensions;
+using Pancake;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.UI;
@@ -11,6 +13,7 @@ using Soul.Model.Runtime.Variables;
 using Soul.Presenter.Runtime.Panels;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Soul.Presenter.Runtime.Manager
@@ -40,10 +43,20 @@ namespace Soul.Presenter.Runtime.Manager
 
         [SerializeField] Pair<string, Sprite> unlockButtonInfo = new("Unlock", null);
         [SerializeField] Pair<string, Sprite> upgradeButtonInfo = new("Upgrade", null);
+        [SerializeField] Pair<string, Sprite> closeButtonInfo = new("Close", null);
 
+        [SerializeField] private CanvasGroup unlockAndUpgradeCanvasGroup;
+        [SerializeField] private RectTransform toggleButtonRectTransform;
         [SerializeField] private Image unlockUpgradeToggleButtonImage;
         [SerializeField] private TMP_Text unlockUpgradeButtonText;
-        [SerializeField] private Button unlockUpgradeActionButton;
+
+        [FormerlySerializedAs("unlockUpgradeActionButton")] [SerializeField]
+        private Button unlockUpgradeToogleButton;
+
+        [SerializeField] private float unlockUpgradeButtonToggleDuration = 0.2f;
+        [SerializeField] private Vector3 toggleButtonStartAnchoredPosition = new Vector3(84, 74, 0);
+        [SerializeField] private Vector3 toggleButtonEndAnchoredPosition = new Vector3(-84, 74, 0);
+        private MotionHandle _toggleButtonMotionHandle;
 
         [Header("Upgrade Unlock Panel")] [SerializeField]
         private RectTransform upgradeUnlockPanelParent;
@@ -58,11 +71,14 @@ namespace Soul.Presenter.Runtime.Manager
             this.enableCall = enableCall;
         }
 
-        private void OnEnable() => Hide();
+        private void OnEnable()
+        {
+            Hide();
+        }
 
         private void Hide()
         {
-            upgradeUnlockPanel.Hide();
+            HideUnlockUpgradeButtonAndPanel();
             HideCanvas();
         }
 
@@ -75,6 +91,7 @@ namespace Soul.Presenter.Runtime.Manager
             {
                 onUpgradeAbleOrUnlockAbleSelected.Trigger((_currentSelectedTransform, HorizontalRegion.Center, this));
                 SetCanvas();
+                UpdateUnlockButton(selectData.levelReference);
             }
             else
             {
@@ -112,36 +129,52 @@ namespace Soul.Presenter.Runtime.Manager
 
         private void UpdateUnlockButton(ComponentFinder<ILevel> selectDataLevelReference)
         {
-            unlockUpgradeActionButton.onClick.RemoveAllListeners();
             if (selectDataLevelReference)
             {
-                unlockUpgradeActionButton.gameObject.SetActive(true);
-                unlockUpgradeActionButton.onClick.AddListener(ShowUpdateUnlockPanel);
+                ShowUnlockAndUpgradeButtonToggle();
                 var level = selectDataLevelReference.Value.Level;
                 if (level.IsMax)
                 {
                     unlockUpgradeButtonText.text = maxButtonInfo.Key;
                     unlockUpgradeToggleButtonImage.sprite = maxButtonInfo.Value;
-                    unlockUpgradeActionButton.interactable = false;
+                    unlockUpgradeToogleButton.interactable = false;
                 }
                 else if (level.IsLocked)
                 {
                     unlockUpgradeButtonText.text = unlockButtonInfo.Key;
                     unlockUpgradeToggleButtonImage.sprite = unlockButtonInfo.Value;
-                    unlockUpgradeActionButton.interactable = true;
+                    unlockUpgradeToogleButton.interactable = true;
                 }
                 else
                 {
                     unlockUpgradeButtonText.text = upgradeButtonInfo.Key;
                     unlockUpgradeToggleButtonImage.sprite = upgradeButtonInfo.Value;
-                    unlockUpgradeActionButton.interactable = true;
+                    unlockUpgradeToogleButton.interactable = true;
                 }
             }
             else
             {
-                unlockUpgradeActionButton.gameObject.SetActive(false);
-                upgradeUnlockPanel.Hide();
+                HideUnlockUpgradeButtonAndPanel();
             }
+        }
+
+        private void ShowUnlockAndUpgradeButtonToggle()
+        {
+            unlockUpgradeToogleButton.onClick.RemoveAllListeners();
+            unlockAndUpgradeCanvasGroup.alpha = 1;
+            unlockUpgradeToogleButton.onClick.AddListener(ShowUpdateUnlockPanel);
+        }
+
+        private void HideUnlockUpgradeButtonAndPanel()
+        {
+            HideUnlockUpgradeButton();
+            upgradeUnlockPanel.Hide();
+        }
+
+        private void HideUnlockUpgradeButton()
+        {
+            toggleButtonRectTransform.anchoredPosition = toggleButtonStartAnchoredPosition;
+            unlockAndUpgradeCanvasGroup.alpha = 0;
         }
 
 
@@ -186,7 +219,21 @@ namespace Soul.Presenter.Runtime.Manager
 
         public void OnFocus()
         {
-            UpdateUnlockButton(selectData.levelReference);
+            if (_toggleButtonMotionHandle.IsActive()){ _toggleButtonMotionHandle.Complete();}
+
+            if (upgradeUnlockPanel.gameObject.activeSelf)
+            {
+                HideUnlockUpgradeButton();
+                return;
+            }
+            toggleButtonRectTransform.anchoredPosition = toggleButtonStartAnchoredPosition;
+            _toggleButtonMotionHandle = LMotion
+                .Create(
+                    toggleButtonStartAnchoredPosition,
+                    toggleButtonEndAnchoredPosition,
+                    unlockUpgradeButtonToggleDuration
+                ).WithOnComplete(ShowUnlockAndUpgradeButtonToggle)
+                .BindToAnchoredPosition3D(toggleButtonRectTransform);
         }
 
         public void OnOutOfFocus()
