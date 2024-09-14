@@ -43,7 +43,7 @@ namespace Soul.Presenter.Runtime.UI
 
         private void Awake()
         {
-            StoreFormat();
+            // StoreFormat();
         }
 
         public void OnEnable()

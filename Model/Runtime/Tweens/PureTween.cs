@@ -1,9 +1,11 @@
-﻿using LitMotion;
+﻿using System.Numerics;
+using LitMotion;
 using LitMotion.Extensions;
 using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Tweens.Scriptable;
 using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Soul.Model.Runtime.Tweens
 {
@@ -98,10 +100,12 @@ namespace Soul.Model.Runtime.Tweens
                 settings.loopCount, settings.loopType, settings.animationCurve);
         }
 
-        public static MotionHandle TweenHeight(Transform targetTransform, float height, float duration, Ease ease)
+        public static MotionHandle TweenHeight(Transform targetTransform, float start, float height, float duration,
+            Ease ease)
         {
             var position = targetTransform.position;
-            return LMotion.Create(position, new Vector3(position.x, height, position.z), duration)
+            return LMotion.Create(position + new Vector3(0, start, 0), new Vector3(position.x, height, position.z),
+                    duration)
                 .WithEase(ease)
                 .BindToPosition(targetTransform);
         }

@@ -4,9 +4,9 @@ using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Selectors;
 using UnityEngine;
 
-namespace Soul.Controller.Runtime.Infrastructures.Farmings
+namespace Soul.Controller.Runtime.SelectableComponents
 {
-    public abstract class Building : GameComponent, IGuid, ITitle, ISelectCallBack
+    public abstract class BaseSelectableComponent : GameComponent, IGuid, ITitle, ISelectCallBack
     {
         [Title("Building")]
         [SerializeField, Guid] protected string guid;

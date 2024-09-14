@@ -7,9 +7,9 @@ using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Productions;
 using UnityEngine;
 
-namespace Soul.Controller.Runtime.Infrastructures.Farmings
+namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
-    public class EggFarm : FarmingBuilding, IProductionRecordReference<RecordProduction>, ILoadComponent
+    public class EggFarm : FarmingBaseSelectableComponent, IProductionRecordReference<RecordProduction>, ILoadComponent
     {
         [Title("EggFarm")] [SerializeField]
         private BuildingAndProductionRecord buildingAndProductionRecord;

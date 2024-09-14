@@ -202,14 +202,25 @@ namespace Soul.Presenter.Runtime.Manager
                     upgradeUnlockPanelParent, _currentSelectedTransform,
                     playerInventoryReference, eventShowItemRequired,
                     selectData.titleReference.Value, selectData.levelReference.Value,
-                    OnUpgradeUnlockStartButtonPressed
+                    OnUpgradeUnlockStartButtonPressed, OnUnlockUpgradeCancelButtonPressed
                 );
             }
         }
 
-        private void OnUpgradeUnlockStartButtonPressed()
+        private void OnUnlockUpgradeCancelButtonPressed()
         {
-            onUpgradeAbleOrUnlockAbleSelected.Trigger((_currentSelectedTransform, HorizontalRegion.Center, this));
+            OnSelected(_currentSelectedTransform);
+        }
+
+        private void OnUpgradeUnlockStartButtonPressed(bool success)
+        {
+            if (success)
+            {
+                onUpgradeAbleOrUnlockAbleSelected.Trigger((_currentSelectedTransform, HorizontalRegion.Center, this));
+                UpdateUnlockButton(selectData.levelReference);
+                eventShowItemRequired.Trigger(null);
+                OnSelected(_currentSelectedTransform);
+            }
         }
 
         private void DisableLevelContainer()

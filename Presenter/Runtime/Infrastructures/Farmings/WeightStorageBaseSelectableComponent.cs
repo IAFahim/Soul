@@ -3,9 +3,9 @@ using Soul.Controller.Runtime.Productions;
 using Soul.Controller.Runtime.Upgrades;
 using UnityEngine;
 
-namespace Soul.Controller.Runtime.Infrastructures.Farmings
+namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
-    public class WeightStorageBuilding : FarmingBuilding
+    public class WeightStorageBaseSelectableComponent : FarmingBaseSelectableComponent
     {
         [Title("WeightStorageBuilding")] [SerializeField]
         private BuildingAndProductionRecord buildingAndProductionRecord;

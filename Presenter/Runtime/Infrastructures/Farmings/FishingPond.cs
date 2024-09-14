@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Soul.Controller.Runtime.Lists;
 using Soul.Controller.Runtime.Productions;
 using Soul.Controller.Runtime.Upgrades;
@@ -8,9 +7,9 @@ using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Productions;
 using UnityEngine;
 
-namespace Soul.Controller.Runtime.Infrastructures.Farmings
+namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
-    public class FishingPond : FarmingBuilding, IProductionRecordReference<RecordProduction>,
+    public class FishingPond : FarmingBaseSelectableComponent, IProductionRecordReference<RecordProduction>,
         IAllowedToDropReference<Item>, IDropAble<Item>
     {
         [SerializeField] private AllowedItemLists allowedItemLists;

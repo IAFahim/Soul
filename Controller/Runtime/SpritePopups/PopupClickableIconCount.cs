@@ -19,6 +19,7 @@ namespace Soul.Controller.Runtime.SpritePopups
         [SerializeField] protected TMPFormat countText;
 
         [SerializeField] private float jumpOutDuration = 0.5f;
+        [SerializeField] private float jumpOutStartHeight = 10f;
         [SerializeField] private float jumpOutHeight = 20f;
         [SerializeField] private Ease jumpEase;
         private MotionHandle _jumpOutMotionHandle;
@@ -83,7 +84,7 @@ namespace Soul.Controller.Runtime.SpritePopups
         protected virtual void StartTween()
         {
             if (_jumpOutMotionHandle.IsActive()) _jumpOutMotionHandle.Cancel();
-            _jumpOutMotionHandle = PureTween.TweenHeight(transform, jumpOutHeight, jumpOutDuration, jumpEase);
+            _jumpOutMotionHandle = PureTween.TweenHeight(transform, jumpOutStartHeight,jumpOutHeight, jumpOutDuration, jumpEase);
         }
 
         public override void OnSelected(RaycastHit selfRayCastHit)

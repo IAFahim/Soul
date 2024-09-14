@@ -9,17 +9,16 @@ using Soul.Controller.Runtime.RequiresAndRewards;
 using Soul.Controller.Runtime.Upgrades;
 using Soul.Model.Runtime.Buildings;
 using Soul.Model.Runtime.Levels;
-using Soul.Model.Runtime.Selectors;
 using Soul.Model.Runtime.Tweens;
 using Soul.Model.Runtime.Tweens.Scriptable;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace Soul.Controller.Runtime.Infrastructures.Farmings
+namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
     [RequireComponent(typeof(BoxCollider))]
-    public abstract class FarmingBuilding : UnlockUpgradeAbleBuilding,IBusy, IReSelectedCallBack, IInfoPanelReference,
+    public abstract class FarmingBaseSelectableComponent : UnlockUpgradeAbleBaseSelectableComponent,IBusy, IInfoPanelReference,
         IUpgradeRecordReference<RecordUpgrade>, IRequirementForUpgradeScriptableReference
     {
         [Title("FarmingBuilding")] [SerializeField]
@@ -146,13 +145,6 @@ namespace Soul.Controller.Runtime.Infrastructures.Farmings
         public override void OnSelected(RaycastHit selfRayCastHit)
         {
             PlayDualSquishAndStretch();
-            Debug.Log("Selected");
-        }
-
-        public virtual void OnReSelected(RaycastHit selfReRaycastHit)
-        {
-            PlayDualSquishAndStretch();
-            Debug.Log("ReSelected");
         }
 
         #endregion

@@ -16,9 +16,9 @@ using Soul.Model.Runtime.Tweens;
 using Soul.Model.Runtime.Tweens.Scriptable;
 using UnityEngine;
 
-namespace Soul.Controller.Runtime.Infrastructures.Farmings
+namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
-    public class CropField : FarmingBuilding, IProductionRecordReference<RecordProduction>, ILoadComponent,
+    public class CropField : FarmingBaseSelectableComponent, IProductionRecordReference<RecordProduction>, ILoadComponent,
         IAllowedToDropReference<Item>, IDropAble<Item>
     {
         [Title("CropField")] [SerializeField] private AllowedItemLists allowedItemLists;

@@ -50,7 +50,8 @@ namespace Soul.Presenter.Runtime.Panels
 
         private PlayerInventoryReference _playerInventoryReference;
         private EventShowItemRequired _eventShowItemRequired;
-        private Action _onStartButtonPressed;
+        private Action<bool> _onStartButtonPressed;
+        private Action _onCancelButtonPressed;
         private ILevel _levelReference;
         private IRequirementForUpgradeScriptableReference _requirementForUpgradeReference;
         private IUpgrade _upgradeReference;
@@ -65,9 +66,10 @@ namespace Soul.Presenter.Runtime.Panels
         public void Show(RectTransform parentRect, Transform currentSelectedTransform,
             PlayerInventoryReference playerInventoryReference, EventShowItemRequired eventShowItemRequired,
             ITitle titleReference, ILevel levelReference,
-            Action onStartButtonPressed)
+            Action<bool> onStartButtonPressed, Action onCancelButtonPressed)
         {
             _onStartButtonPressed = onStartButtonPressed;
+            _onCancelButtonPressed = onCancelButtonPressed;
             _levelReference = levelReference;
             _playerInventoryReference = playerInventoryReference;
             _eventShowItemRequired = eventShowItemRequired;
@@ -75,11 +77,11 @@ namespace Soul.Presenter.Runtime.Panels
         }
 
         private void SetPanel(RectTransform parentRect, Transform currentSelectedTransform, ITitle titleReference,
-            ILevel levelReference, Action onStartButtonPressed)
+            ILevel levelReference, Action<bool> onStartButtonPressed)
         {
+            startButton.onClick.RemoveAllListeners();
             bool canSet = TrySetPanelInfo(parentRect, currentSelectedTransform, levelReference, onStartButtonPressed);
             if (!canSet) return;
-            startButton.onClick.RemoveAllListeners();
             closeButton.onClick.AddListener(OnCancelButtonPressed);
             SetParent(parentRect);
             SetTitle(titleReference, levelReference);
@@ -88,7 +90,7 @@ namespace Soul.Presenter.Runtime.Panels
 
         private bool TrySetPanelInfo(RectTransform parentRect, Transform currentSelectedTransform,
             ILevel levelReference,
-            Action onStartButtonPressed)
+            Action<bool> onStartButtonPressed)
         {
             if (levelReference.Level.IsMax && MaxLevelPrompt(onStartButtonPressed)) return true;
             if (levelReference.Level.IsLocked && UnlockPrompt(currentSelectedTransform, onStartButtonPressed))
@@ -163,8 +165,9 @@ namespace Soul.Presenter.Runtime.Panels
 
         private void Upgrade()
         {
-            _upgradeReference.Upgrade();
-            _onStartButtonPressed?.Invoke();
+            var canUpgrade = _upgradeReference.CanUpgrade;
+            if (canUpgrade) _upgradeReference.Upgrade();
+            _onStartButtonPressed?.Invoke(canUpgrade);
         }
 
 
@@ -173,19 +176,19 @@ namespace Soul.Presenter.Runtime.Panels
             // Implement the logic to setup the timer
         }
 
-        private bool MaxLevelPrompt(Action onStartButtonPressed)
+        private bool MaxLevelPrompt(Action<bool> onStartButtonPressed)
         {
             return true;
             // Implement the logic to show the max level prompt
         }
 
-        private bool UnlockPrompt(Transform currentSelectedTransform, Action onStartButtonPressed)
+        private bool UnlockPrompt(Transform currentSelectedTransform, Action<bool> onStartButtonPressed)
         {
-            var unlockReference = currentSelectedTransform.GetComponent<IUnlock>();
-            if (unlockReference != null)
+            _unlockReference = currentSelectedTransform.GetComponent<IUnlock>();
+            if (_unlockReference != null)
             {
                 SetItemRequirement(currentSelectedTransform, _levelReference.Level);
-                if (unlockReference.IsUnlocking)
+                if (_unlockReference.IsUnlocking)
                 {
                     startButton.interactable = false;
                 }
@@ -204,8 +207,13 @@ namespace Soul.Presenter.Runtime.Panels
 
         private void Unlock()
         {
-            _unlockReference.Unlock();
-            _onStartButtonPressed?.Invoke();
+            var canUnlock = _unlockReference.CanUnlock;
+            if (canUnlock)
+            {
+                _unlockReference.Unlock();
+            }
+
+            _onStartButtonPressed?.Invoke(canUnlock);
         }
 
         private void SetProgressBar(Level level)
@@ -217,8 +225,7 @@ namespace Soul.Presenter.Runtime.Panels
         private void OnCancelButtonPressed()
         {
             _eventShowItemRequired.Trigger(null);
-            _onStartButtonPressed?.Invoke();
-            Hide();
+            _onCancelButtonPressed?.Invoke();
         }
 
         public void Hide()
