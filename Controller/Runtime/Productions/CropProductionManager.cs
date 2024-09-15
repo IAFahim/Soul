@@ -67,12 +67,7 @@ namespace Soul.Controller.Runtime.Productions
 
         public RequirementForProduction Required => requiredAndRewardForProductions.GetRequirement(LevelReference - 1);
         public Pair<Currency, int> CurrencyRequirement => Required.currency;
-
-        public int WorkerUsed
-        {
-            get => recordReference.worker.typeAndCount;
-            set => recordReference.worker.typeAndCount.Value = value;
-        }
+        
 
         public int WeightCapacity => Required.weightCapacity;
         public RewardForProduction RewardForProduction => requiredAndRewardForProductions.GetReward(LevelReference - 1);
@@ -188,7 +183,7 @@ namespace Soul.Controller.Runtime.Productions
         protected override void ModifyRecordBeforeProgression()
         {
             var requiredWorker = Required.workerCount;
-            recordReference.worker.typeAndCount = new Pair<WorkerType, int>(basicWorkerType, requiredWorker);
+            recordReference.worker = new Pair<WorkerType, int>(basicWorkerType, requiredWorker);
             playerFarmReference.workerInventory.TryDecrease(basicWorkerType, requiredWorker);
             ProductionItemValuePair = new Pair<Item, int>(queueItem, WeightCapacity);
             recordReference.Time.Discount = new UnityTimeSpan();
@@ -264,8 +259,8 @@ namespace Soul.Controller.Runtime.Productions
         {
             var convertInfo = ConvertInfo;
             var reward = GetReward(convertInfo);
-            var takenWorker = recordReference.worker.typeAndCount;
-            playerFarmReference.workerInventory.AddOrIncrease(takenWorker.Key, takenWorker.Value);
+            var takenWorker = recordReference.worker;
+            playerFarmReference.workerInventory.AddOrIncrease(takenWorker);
             playerFarmReference.inventory.AddOrIncrease(reward.Key, reward.Value);
             playerFarmReference.levelXp.AddXp((int)XpTotal);
             playerFarmReference.coins.Value += 10;

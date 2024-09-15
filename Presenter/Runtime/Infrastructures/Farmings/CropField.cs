@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
-    public class CropField : FarmingBaseSelectableComponent, IProductionRecordReference<RecordProduction>,
+    public class CropField : FarmingComponent, IProductionRecordReference<RecordProduction>,
         ILoadComponent,
         IAllowedToDropReference<Item>, IDropAble<Item>
     {
@@ -117,6 +117,16 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
         public override void OnUnlockUpgradeComplete(int _)
         {
             if (!cropProductionManager.IsLoaded) SetupProduction(level);
+        }
+
+        public override void ShowUpgradeUnlockPreView(RectTransform parent)
+        {
+            
+        }
+
+        public override void HideUpgradeUnlockPreView()
+        {
+            
         }
 
 

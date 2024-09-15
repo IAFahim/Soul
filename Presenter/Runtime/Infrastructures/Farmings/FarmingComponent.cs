@@ -18,7 +18,7 @@ using UnityEngine.Serialization;
 namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
     [RequireComponent(typeof(BoxCollider))]
-    public abstract class FarmingBaseSelectableComponent : UnlockUpgradeAbleBaseSelectableComponent,IBusy, IInfoPanelReference,
+    public abstract class FarmingComponent : UnlockUpgradeAbleComponent,IBusy, IInfoPanelReference,
         IUpgradeRecordReference<RecordUpgrade>, IRequirementForUpgradeScriptableReference
     {
         [Title("FarmingBuilding")] [SerializeField]

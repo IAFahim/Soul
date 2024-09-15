@@ -57,21 +57,21 @@ namespace Soul.Presenter.Runtime.Panels
         private IUpgrade _upgradeReference;
         private IUnlock _unlockReference;
 
-        public Pair<Currency, int> CurrencyRequirement(int level) =>
-            _requirementForUpgradeReference.RequirementForUpgrades.GetRequirement(level).currency;
+        private int CoinRequirement(int level) =>
+            _requirementForUpgradeReference.RequirementForUpgrades.GetRequirement(level).coin;
 
-        public Pair<Item, int>[] ItemsRequirement(int level) =>
+        private Pair<Item, int>[] ItemsRequirement(int level) =>
             _requirementForUpgradeReference.RequirementForUpgrades.GetRequirement(level).items;
 
         public void Show(RectTransform parentRect, Transform currentSelectedTransform,
-            PlayerFarmReference playerFarmReference, EventShowItemRequired eventShowItemRequired,
+            PlayerFarmReference playerFarm, EventShowItemRequired eventShowItemRequired,
             ITitle titleReference, ILevel levelReference,
             Action<bool> onStartButtonPressed, Action onCancelButtonPressed)
         {
             _onStartButtonPressed = onStartButtonPressed;
             _onCancelButtonPressed = onCancelButtonPressed;
             _levelReference = levelReference;
-            this.playerFarmReference = playerFarmReference;
+            this.playerFarmReference = playerFarm;
             _eventShowItemRequired = eventShowItemRequired;
             SetPanel(parentRect, currentSelectedTransform, titleReference, levelReference, onStartButtonPressed);
         }

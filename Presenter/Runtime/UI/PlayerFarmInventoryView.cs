@@ -7,12 +7,13 @@ using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Limits;
 using Soul.Model.Runtime.Peoples.Workers;
+using Soul.Presenter.Runtime.UI.StatsViews;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.UI
 {
-    public class ProfileInventoryManager : GameComponent, ILoadComponent
+    public class PlayerFarmInventoryView : GameComponent, ILoadComponent
     {
         [FormerlySerializedAs("playerInventoryReference")]
         public PlayerFarmReference playerFarmReference;
@@ -180,7 +181,7 @@ namespace Soul.Presenter.Runtime.UI
 
         void ILoadComponent.OnLoadComponents()
         {
-            levelXpDayViewUI.LoadComponents(gameObject);
+            levelXpDayViewUI.LoadComponents(gameObject, "level");
             // StoreFormat();
         }
     }

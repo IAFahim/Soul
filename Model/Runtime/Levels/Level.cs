@@ -7,15 +7,16 @@ namespace Soul.Model.Runtime.Levels
     public class Level : Limit
     {
         public bool IsLocked => IsZero();
-        public event Action<int> OnLevelChange;
+        public event Action<int, int> OnLevelChange;
 
         public override int Current
         {
             get => base.Current;
             set
             {
+                var old = base.Current;
                 base.Current = value;
-                InvokeOnLevelChange();
+                OnLevelChange?.Invoke(old, Current);
             }
         }
 
@@ -29,12 +30,6 @@ namespace Soul.Model.Runtime.Levels
         public static implicit operator int(Level level)
         {
             return level.Current;
-        }
-
-
-        public void InvokeOnLevelChange()
-        {
-            OnLevelChange?.Invoke(Current);
         }
     }
 }

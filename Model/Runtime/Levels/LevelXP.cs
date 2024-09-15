@@ -1,75 +1,117 @@
 ﻿using System;
+using Pancake.Common;
+using Soul.Model.Runtime.Containers;
+using Soul.Model.Runtime.SaveAndLoad;
 using UnityEngine;
-using Soul.Model.Runtime.Limits;
 
 namespace Soul.Model.Runtime.Levels
 {
     [Serializable]
-    public class LevelXp : Level
+    public class LevelXp : Level, ISaveAble
     {
-        [SerializeField] private float baseXp = 100f; // Starting XP for level 2
-        [SerializeField] private float xpMultiplier = 1.5f; // How much XP increases each level
+        [SerializeField, Pancake.Guid] private string guid;
+        [SerializeField] private float baseXp = 100f;
+        [SerializeField] private float xpMultiplier = 1.5f;
 
-        public int Xp { get; private set; }
-        public int XpToNextLevel { get; private set; }
-        public float XpProgress { get; private set; } // New property for XP progress
+        [SerializeField] private int xp;
+        public float XpProgress { get; private set; }
+        private int _xpToNextLevel;
 
         public event Action<int> OnXpChange;
 
-        public override int Current 
-        { 
-            get => base.Current; 
+        public override int Current
+        {
+            get => base.Current;
             set
             {
+                if (value > Max)
+                {
+                    value = Max;
+                }
+
                 base.Current = value;
                 CalculateXpToNextLevel();
             }
         }
 
+        public int XpToNextLevel => _xpToNextLevel;
+        public int Xp => xp;
+
         public void AddXp(int amount)
         {
-            Xp += amount;
-            CalculateXpProgress(); // Update progress after XP changes
-            OnXpChange?.Invoke(Xp);
+            if (IsMax) return;
+
+            xp = Xp + amount;
+            CalculateXpProgress();
 
             while (Xp >= XpToNextLevel && !IsMax)
             {
-                Xp -= XpToNextLevel;
+                xp = Xp - XpToNextLevel;
                 IncreaseLevelByOne();
             }
+
+            OnXpChange?.Invoke(Xp);
         }
 
         private void CalculateXpToNextLevel()
         {
-            if (IsMax) 
+            if (IsMax)
             {
-                XpToNextLevel = 0; // No more levels
-                XpProgress = 1f; // Full progress at max level
+                _xpToNextLevel = int.MaxValue;
+                XpProgress = 1f;
                 return;
             }
 
-            // Formula: XP = BaseXP * Multiplier^(Level - 1) 
-            XpToNextLevel = Mathf.RoundToInt(baseXp * Mathf.Pow(xpMultiplier, Current)); 
-            CalculateXpProgress(); // Update progress after XP to next level changes
+            _xpToNextLevel = Mathf.RoundToInt(baseXp * Mathf.Pow(xpMultiplier, Current - 1));
+            CalculateXpProgress();
         }
 
         private void CalculateXpProgress()
         {
-            if (XpToNextLevel == 0) // Handle cases where XpToNextLevel is 0 (e.g., max level)
-            {
-                XpProgress = 1f;
-            }
-            else
-            {
-                XpProgress = Mathf.Clamp01((float)Xp / XpToNextLevel); 
-            }
+            XpProgress = IsMax ? 1f : Mathf.Clamp01((float)Xp / XpToNextLevel);
         }
 
         public void ResetXp()
         {
-            Xp = 0;
-            CalculateXpProgress(); // Update progress after reset
+            xp = 0;
+            CalculateXpProgress();
             OnXpChange?.Invoke(Xp);
         }
+
+        public int GetTotalXpForLevel(int level)
+        {
+            if (level <= 1) return 0;
+            return Mathf.RoundToInt(baseXp * (Mathf.Pow(xpMultiplier, level - 1) - 1) / (xpMultiplier - 1));
+        }
+
+        public override string ToString()
+        {
+            return $"Level: {Current}/{Max}, XP: {Xp}/{XpToNextLevel}, Progress: {XpProgress:P2}";
+        }
+        
+        public void Save(string key = default)
+        {
+            key ??= guid;
+            Pair<int, int> data = new Pair<int, int>(Current, Xp);
+            Data.Save(key, data);
+        }
+        
+        private void Initialize(int startLevel = 1, int startXp = 0)
+        {
+            Current = startLevel;
+            xp = startXp;
+            CalculateXpToNextLevel();
+            CalculateXpProgress();
+        }
+
+        public void Load(string key = default)
+        {
+            key ??= guid;
+            Pair<int, int> data = Data.Load(key, new Pair<int, int>(1, 0));
+            Initialize(data.First, data.Second);
+        }
+        
+        public Pair<int, int> ToPair() => new(Current, Xp);
+        public void FromPair(Pair<int, int> pair) => Initialize(pair.First, pair.Second);
     }
 }

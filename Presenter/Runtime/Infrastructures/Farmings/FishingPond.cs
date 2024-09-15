@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
-    public class FishingPond : FarmingBaseSelectableComponent, IProductionRecordReference<RecordProduction>,
+    public class FishingPond : FarmingComponent, IProductionRecordReference<RecordProduction>,
         IAllowedToDropReference<Item>, IDropAble<Item>
     {
         [SerializeField] private AllowedItemLists allowedItemLists;
@@ -27,6 +27,16 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
         }
 
         public override void OnUnlockUpgradeComplete(int toLevel)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void ShowUpgradeUnlockPreView(RectTransform parent)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void HideUpgradeUnlockPreView()
         {
             throw new System.NotImplementedException();
         }

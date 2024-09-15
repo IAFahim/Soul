@@ -118,7 +118,7 @@ namespace Soul.Model.Runtime.Selectors
         {
             var reSelectedCallBacks = hitTransform.GetComponents<IReSelectedCallBack>();
             foreach (var receiver in reSelectedCallBacks) receiver.OnReSelected(raycastHit);
-            onSelected.Invoke(hitTransform);
+            SelectInvoke(raycastHit, hitTransform);
         }
     }
 }

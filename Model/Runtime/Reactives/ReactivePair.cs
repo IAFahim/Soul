@@ -7,13 +7,13 @@ namespace Soul.Model.Runtime.Reactives
     [Serializable]
     public class ReactivePair<T, TV>
     {
-        [SerializeField] private Pair<T, TV> pair;
+        [SerializeField] protected Pair<T, TV> pair;
 
         public event Action<T, TV, TV> OnChange;
 
         public T Key => pair.Key;
 
-        public TV Value
+        public virtual TV Value
         {
             get => pair.Value;
             set

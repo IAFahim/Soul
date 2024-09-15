@@ -9,6 +9,7 @@ using Soul.Controller.Runtime.Addressables;
 using Soul.Controller.Runtime.Constructions;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Requirements;
+using Soul.Controller.Runtime.Rewards;
 using Soul.Model.Runtime.Progressions;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -36,7 +37,7 @@ namespace Soul.Controller.Runtime.Upgrades
 
 
         public RequirementForUpgrade Required => _requirementForUpgrades.GetRequirement(LevelReference);
-
+        
         public override UnityTimeSpan FullTimeRequirement => Required.fullTime;
 
 
@@ -87,21 +88,23 @@ namespace Soul.Controller.Runtime.Upgrades
 
         public override bool HasEnough()
         {
-            var currentCoin = playerFarm.coins;
-            if (currentCoin.Key != Required.currency.Key) return false;
-            return currentCoin >= Required.currency.Value;
+            return playerFarm.coins >= Required.coin && playerFarm.gems >= Required.gem &&
+                   playerFarm.workerInventory.HasEnough(Required.worker) &&
+                   playerFarm.inventory.HasEnough(Required.items);
         }
 
         protected override void TakeRequirement()
         {
-            playerFarm.coins.Value -= Required.currency.Value;
+            playerFarm.coins.Value -= Required.coin;
         }
 
         protected override void ModifyRecordBeforeProgression()
         {
-            base.ModifyRecordBeforeProgression();
-            recordReference.worker.Set(Required.workerCount);
+            playerFarm.workerInventory.TryDecrease(Required.worker);
+            recordReference.worker = Required.worker;
+            playerFarm.inventory.TryDecrease(Required.items);
             recordReference.toLevel = LevelReference + 1;
+            base.ModifyRecordBeforeProgression();
         }
 
         public override void OnTimerStart(float progressRatio)

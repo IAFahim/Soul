@@ -10,10 +10,10 @@ using UnityEngine;
 
 namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
-    public abstract class UnlockUpgradeAbleBaseSelectableComponent : BaseSelectableComponent, ICurrentLevelReference<int>, ISaveAble,
+    public abstract class UnlockUpgradeAbleComponent : BaseSelectableComponent, ICurrentLevelReference<int>, ISaveAble,
         ISaveAbleReference, IUpgrade, ILocked, IUnlock
     {
-        [Title("UnlockUpgradeAbleBuilding")]
+        [Title("UnlockUpgradeAbleComponent")]
         #region ICurrentLevelReference
 
         public abstract int CurrentLevel { get; set; }
@@ -51,6 +51,9 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
         public abstract void OnUnlockUpgradeStart();
         public abstract void OnUnlockUpgradeComplete(int toLevel);
 
+        public abstract void ShowUpgradeUnlockPreView(RectTransform parent);
+        public abstract void HideUpgradeUnlockPreView();
+
         #endregion
 
         #region ILocked
@@ -66,5 +69,7 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
         public abstract void Unlock();
 
         #endregion
+
+        
     }
 }

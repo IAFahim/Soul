@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
-    public class WeightStorageBaseSelectableComponent : FarmingBaseSelectableComponent
+    public class WeightStorageComponent : FarmingComponent
     {
         [Title("WeightStorageBuilding")] [SerializeField]
         private BuildingAndProductionRecord buildingAndProductionRecord;
@@ -23,6 +23,16 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 
         public override void OnUnlockUpgradeComplete(int toLevel)
         {
+        }
+
+        public override void ShowUpgradeUnlockPreView(RectTransform parent)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void HideUpgradeUnlockPreView()
+        {
+            throw new System.NotImplementedException();
         }
 
         public override RecordUpgrade UpgradeRecord

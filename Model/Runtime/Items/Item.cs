@@ -13,7 +13,6 @@ namespace Soul.Model.Runtime.Items
 
         [TextArea(3, 5)] public string description;
         public Sprite icon;
-        [Range(0, 100)] public float probabilityWeight=1;
         public Sprite Icon => icon;
 
         public string Title => title;

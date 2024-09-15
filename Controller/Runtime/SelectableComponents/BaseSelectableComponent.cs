@@ -8,7 +8,7 @@ namespace Soul.Controller.Runtime.SelectableComponents
 {
     public abstract class BaseSelectableComponent : GameComponent, IGuid, ITitle, ISelectCallBack
     {
-        [Title("Building")]
+        [Title("BaseSelectableComponent")]
         [SerializeField, Guid] protected string guid;
 
         #region GUID

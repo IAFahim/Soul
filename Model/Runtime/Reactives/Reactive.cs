@@ -6,17 +6,17 @@ namespace Soul.Model.Runtime.Reactives
     [Serializable]
     public class Reactive<T>
     {
-        [SerializeField] private T value;
+        [SerializeField] protected T value;
         public event Action<T, T> OnChange;
 
-        public T Value
+        public virtual T Value
         {
             get => value;
             set
             {
-                var oldValue = this.value;
+                T oldValue = this.value;
                 this.value = value;
-                OnChange?.Invoke(oldValue, value);
+                OnChange?.Invoke(oldValue, this.value);
             }
         }
 

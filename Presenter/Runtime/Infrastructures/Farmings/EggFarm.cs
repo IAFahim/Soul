@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
-    public class EggFarm : FarmingBaseSelectableComponent, IProductionRecordReference<RecordProduction>, ILoadComponent
+    public class EggFarm : FarmingComponent, IProductionRecordReference<RecordProduction>, ILoadComponent
     {
         [Title("EggFarm")] [SerializeField]
         private BuildingAndProductionRecord buildingAndProductionRecord;
@@ -65,6 +65,16 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
         public override void OnUnlockUpgradeComplete(int obj)
         {
             eggProductionManager.TryStartProgression();
+        }
+
+        public override void ShowUpgradeUnlockPreView(RectTransform parent)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void HideUpgradeUnlockPreView()
+        {
+            throw new System.NotImplementedException();
         }
 
 

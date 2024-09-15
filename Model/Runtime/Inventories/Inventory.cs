@@ -16,25 +16,22 @@ namespace Soul.Model.Runtime.Inventories
         [SerializeField] protected UnityDictionary<TKey, TValue> items = new();
 
         public bool RemoveIfZero { get; set; } = true;
-
         public int Count => items.Count;
-
-        [Button]
-        public void Save(string key)
-        {
-            Data.Save(key, ToList());
-        }
 
         public event Action<InventoryChangeEventArgs<TKey, TValue>> OnItemChanged;
         public event Action OnInventoryCleared;
 
-        public bool TryGetValue(TKey key, out TValue amount)
+        [Button]
+        public void Save(string key = default)
         {
-            return items.TryGetValue(key, out amount);
+            key ??= GetDefaultSaveKey();
+            Data.Save(key, ToList());
         }
 
+        public bool TryGetValue(TKey key, out TValue amount) => items.TryGetValue(key, out amount);
+
         [Button]
-        public bool AddOrIncrease(TKey key, TValue addAmount)
+        public bool AddOrIncrease(TKey key, TValue addAmount, bool saveOnSuccess = true)
         {
             if (items.TryGetValue(key, out var currentAmount))
             {
@@ -50,16 +47,31 @@ namespace Soul.Model.Runtime.Inventories
                     key, addAmount, addAmount, InventoryChangeType.Added));
             }
 
+            if (saveOnSuccess) Save();
+
             return true;
         }
 
+        public bool AddOrIncrease(Pair<TKey, TValue> item, bool saveOnSuccess = true)
+        {
+            return AddOrIncrease(item.Key, item.Value, saveOnSuccess);
+        }
+
+        public bool AddOrIncrease(IEnumerable<Pair<TKey, TValue>> requiredItems, bool saveOnSuccess = true)
+        {
+            var success = requiredItems.All(item => AddOrIncrease(item.Key, item.Value, false));
+            if (success && saveOnSuccess) Save();
+
+            return success;
+        }
+
         [Button]
-        public bool TryDecrease(TKey key, TValue subtractAmount)
+        public bool TryDecrease(TKey key, TValue subtractAmount, bool saveOnSuccess = true)
         {
             if (!items.TryGetValue(key, out var currentAmount)) return false;
 
             var newAmount = SubtractValues(currentAmount, subtractAmount);
-            if (newAmount.CompareTo(default) <= 0 && RemoveIfZero)
+            if (RemoveIfZero && newAmount.CompareTo(default) <= 0)
             {
                 items.Remove(key);
                 OnItemChanged?.Invoke(new InventoryChangeEventArgs<TKey, TValue>(
@@ -72,7 +84,22 @@ namespace Soul.Model.Runtime.Inventories
                     key, newAmount, subtractAmount, InventoryChangeType.Decreased));
             }
 
+            if (saveOnSuccess) Save();
+
             return true;
+        }
+
+        public bool TryDecrease(Pair<TKey, TValue> item, bool saveOnSuccess = true)
+        {
+            return TryDecrease(item.Key, item.Value, saveOnSuccess);
+        }
+
+        public bool TryDecrease(IEnumerable<Pair<TKey, TValue>> requiredItems, bool saveOnSuccess = true)
+        {
+            var success = requiredItems.All(item => TryDecrease(item.Key, item.Value, false));
+            if (success && saveOnSuccess) Save();
+
+            return success;
         }
 
         public bool HasEnough(TKey key, TValue amount)
@@ -80,25 +107,32 @@ namespace Soul.Model.Runtime.Inventories
             return items.TryGetValue(key, out var currentAmount) && currentAmount.CompareTo(amount) >= 0;
         }
 
+        public bool HasEnough(Pair<TKey, TValue> requiredItem) => HasEnough(requiredItem.Key, requiredItem.Value);
+
         public bool HasEnough(IEnumerable<Pair<TKey, TValue>> requiredItems)
         {
             return requiredItems.All(kvp => HasEnough(kvp.Key, kvp.Value));
         }
 
         [Button]
-        public bool Remove(TKey key)
+        public bool Remove(TKey key, bool saveOnSuccess = true)
         {
             if (!items.Remove(key, out var amount)) return false;
             OnItemChanged?.Invoke(new InventoryChangeEventArgs<TKey, TValue>(
                 key, default, amount, InventoryChangeType.Removed));
+
+            if (saveOnSuccess) Save();
+
             return true;
         }
 
         [Button]
-        public void Clear()
+        public void Clear(bool saveOnSuccess = true)
         {
             items.Clear();
             OnInventoryCleared?.Invoke();
+
+            if (saveOnSuccess) Save();
         }
 
         public IEnumerable<KeyValuePair<TKey, TValue>> GetAll()
@@ -120,8 +154,9 @@ namespace Soul.Model.Runtime.Inventories
         protected abstract TValue SubtractValues(TValue a, TValue b);
 
         [Button]
-        public bool Load(string key)
+        public bool Load(string key = default)
         {
+            key ??= GetDefaultSaveKey();
             var loadedItems = Data.Load<List<Pair<TKey, TValue>>>(key);
             if (loadedItems == null) return false;
 
@@ -129,6 +164,11 @@ namespace Soul.Model.Runtime.Inventories
             foreach (var item in loadedItems.Where(item => item.Key != null)) items[item.Key] = item.Value;
 
             return true;
+        }
+
+        protected virtual string GetDefaultSaveKey()
+        {
+            return $"Inventory_{typeof(TKey).Name}_{typeof(TValue).Name}";
         }
     }
 

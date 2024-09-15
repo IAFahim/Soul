@@ -1,5 +1,5 @@
-﻿using Soul.Controller.Runtime.Inventories.Peoples;
-using Soul.Model.Runtime.Items;
+﻿using Alchemy.Inspector;
+using Soul.Controller.Runtime.Inventories.Peoples;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Limits;
 using Soul.Model.Runtime.Reactives;
@@ -10,10 +10,10 @@ namespace Soul.Controller.Runtime.Inventories
     [CreateAssetMenu(fileName = "itemInventory", menuName = "Soul/Player/Farm Reference")]
     public class PlayerFarmReference : ScriptableObject
     {
-        public ReactivePair<Currency, int> coins;
-        public ReactivePair<Currency, int> coinPreview;
-        public ReactivePair<Item, int> gems;
-        public ReactivePair<Item, int> gemsPreview;
+        public ReactiveSaveAble<int> coins;
+        public Reactive<int> coinPreview;
+        public ReactiveSaveAble<int> gems;
+        public Reactive<int> gemsPreview;
         public ItemInventory inventory;
         public LevelXp levelXp;
         public Reactive<float> xpPreview;
@@ -28,5 +28,29 @@ namespace Soul.Controller.Runtime.Inventories
         public static implicit operator WorkerInventory(PlayerFarmReference reference) =>
             reference.workerInventory;
         
+        [Button]
+        public void Load()
+        {
+            inventory.Load();
+            workerInventory.Load();
+            workerInventoryPreview.Load();
+            coins.Load();
+            gems.Load();
+        }
+
+        private void OnEnable()
+        {
+            Load();
+        }
+        
+        [Button]
+        public void Save()
+        {
+            inventory.Save();
+            workerInventory.Save();
+            workerInventoryPreview.Save();
+            coins.Save();
+            gems.Save();
+        }
     }
 }
