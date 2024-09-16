@@ -35,7 +35,7 @@ namespace Soul.Presenter.Runtime.UI
             totalText.StoreFormat();
         }
 
-        public void Setup(Item item, int newAmount, int added, LimitIntStruct limitInt,
+        public void Setup(Item item, int newAmount, int added, Limit limitInt,
             IRemoveCallBack<Item> removeCallBack)
         {
             if (_textIncreaseMotionHandle.IsActive()) _textIncreaseMotionHandle.Cancel();
@@ -44,7 +44,7 @@ namespace Soul.Presenter.Runtime.UI
             addedText.TMP.SetText("+" + addedText, added);
 
             icon.sprite = item.Icon;
-            progressBar.Value = limitInt;
+            progressBar.Value = limitInt.Progress;
             itemReference = item;
             _removeCallBack = removeCallBack;
             App.Delay(3f, OnComplete);

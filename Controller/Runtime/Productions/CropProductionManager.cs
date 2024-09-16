@@ -67,7 +67,7 @@ namespace Soul.Controller.Runtime.Productions
 
         public RequirementForProduction Required => requiredAndRewardForProductions.GetRequirement(LevelReference - 1);
         public Pair<Currency, int> CurrencyRequirement => Required.currency;
-        
+
 
         public int WeightCapacity => Required.weightCapacity;
         public RewardForProduction RewardForProduction => requiredAndRewardForProductions.GetReward(LevelReference - 1);
@@ -127,8 +127,9 @@ namespace Soul.Controller.Runtime.Productions
         {
             RewardClaim();
             queueItem = seed;
+            ProductionItemValuePair = new Pair<Item, int>(seed, Required.weightCapacity);
             _indicatorProgressCapacity.Change(seed);
-            playerFarmReference.workerInventoryPreview.TryDecrease(basicWorkerType, Required.workerCount);
+            playerFarmReference.workerPreview.Value = Required.workerCount;
         }
 
         /// <summary>

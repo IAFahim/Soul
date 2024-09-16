@@ -7,7 +7,7 @@ namespace Soul.Model.Runtime.Limits
     public class Limit
     {
         [BarAttribute.Bar] [SerializeField] protected Vector2Int currentAndMax;
-        
+
         public Vector2Int SetWithoutNotify(int current, int max)
         {
             currentAndMax.x = current;
@@ -28,6 +28,7 @@ namespace Soul.Model.Runtime.Limits
         }
 
         public bool IsMax => currentAndMax.x >= currentAndMax.y;
+        public float Progress => (float)Current / Max;
 
         public bool IsZero()
         {

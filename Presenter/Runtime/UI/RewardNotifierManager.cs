@@ -52,7 +52,7 @@ namespace Soul.Presenter.Runtime.UI
 
             rewardNotifier.Value++;
             await UniTask.WaitForEndOfFrame(this);
-            LimitIntStruct weightLimitInt = playerFarmReference.weight;
+            Limit weightLimitInt = playerFarmReference.weight;
             rewardNotifier.Key.Setup(item, newAmount, changeAmount, weightLimitInt, this);
         }
 

@@ -20,6 +20,7 @@ namespace Soul.Presenter.Runtime.UI.StatsViews
         public void SetupPreview(Reactive<int> previewReference)
         {
             PreviewReference = previewReference;
+            UpdatePreview(0, 0);
             PreviewReference.OnChange += UpdatePreview;
         }
 
