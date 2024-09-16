@@ -91,7 +91,7 @@ namespace Soul.Controller.Runtime.Productions
         }
 
         public ConvertTimedInfo<Item, int> ConvertInfo => itemToItemConverter.Convert(ProductionItemValuePair.Key);
-        public float XpTotal => itemToItemConverter.Convert(ProductionItemValuePair.Key).GetXpFrom(WeightCapacity);
+        public int XpTotal => itemToItemConverter.Convert(ProductionItemValuePair.Key).GetXpFrom(WeightCapacity);
 
         #endregion
 

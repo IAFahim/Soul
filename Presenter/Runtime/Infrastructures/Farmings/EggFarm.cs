@@ -15,6 +15,7 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
         private BuildingAndProductionRecord buildingAndProductionRecord;
 
         [SerializeField] private EggProductionManager eggProductionManager;
+        
         private readonly bool _loadDataOnEnable = true;
 
         public async void Start()

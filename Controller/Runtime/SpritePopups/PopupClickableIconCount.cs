@@ -84,7 +84,7 @@ namespace Soul.Controller.Runtime.SpritePopups
         protected virtual void StartTween()
         {
             if (_jumpOutMotionHandle.IsActive()) _jumpOutMotionHandle.Cancel();
-            _jumpOutMotionHandle = PureTween.TweenHeight(transform, jumpOutStartHeight,jumpOutHeight, jumpOutDuration, jumpEase);
+            _jumpOutMotionHandle = PureTween.TweenHeight(transform, jumpOutStartHeight, jumpOutHeight, jumpOutDuration, jumpEase);
         }
 
         public override void OnSelected(RaycastHit selfRayCastHit)

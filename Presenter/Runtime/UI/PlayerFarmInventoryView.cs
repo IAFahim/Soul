@@ -19,6 +19,8 @@ namespace Soul.Presenter.Runtime.UI
         public PlayerFarmReference playerFarmReference;
 
         [SerializeField] public LevelXpDayViewUI levelXpDayViewUI;
+        [FormerlySerializedAs("currencyViewUI")] [SerializeField] public CurrencyViewUI coinViewUI;
+        [SerializeField] public CurrencyViewUI gemViewUI;
 
         [Header("Coin")] public Currency coin;
         public TMPFormat coinText;
@@ -46,22 +48,13 @@ namespace Soul.Presenter.Runtime.UI
         public TMPFormat xpGoingToBeAddedText;
         public CanvasGroup xpGoingToBeAddedCanvasGroup;
 
-        private void Awake()
-        {
-            // StoreFormat();
-        }
-
         public void OnEnable()
         {
             playerFarmReference.Load();
             CalculateTotalWeightInInventoryAndShow();
             levelXpDayViewUI.Setup(playerFarmReference.levelXp, playerFarmReference.xpPreview);
-            // playerFarmReference.inventory.OnItemChanged += InventoryOnItemChanged;
-            // playerFarmReference.workerInventory.OnItemChanged += WorkerInventoryOnOnItemChanged;
-            // playerFarmReference.weight.OnChange += WeightOnOnChange;
-            // playerInventoryReference.inventoryPreview.OnAddedOrIncreased += OnTempAddedOrIncreased;
-            // playerInventoryReference.inventory.OnDecreased += OnDecreased;
-            // SetAllAlpha(0);
+            coinViewUI.Setup(playerFarmReference.coins, playerFarmReference.coinPreview);
+            gemViewUI.Setup(playerFarmReference.gems, playerFarmReference.gemsPreview);
         }
 
         private void WorkerInventoryOnOnItemChanged(InventoryChangeEventArgs<WorkerType, int> workerType)
@@ -92,22 +85,9 @@ namespace Soul.Presenter.Runtime.UI
         public void OnDisable()
         {
             levelXpDayViewUI.Dispose();
-            // playerFarmReference.inventory.OnItemChanged -= InventoryOnItemChanged;
-            // playerFarmReference.weight.OnChange -= WeightOnOnChange;
-            // playerFarmReference.workerInventory.OnItemChanged -= WorkerInventoryOnOnItemChanged;
-            // playerInventoryReference.inventory.OnAddedOrIncreased -= OnAddedOrIncreased;
-            // playerInventoryReference.inventoryPreview.OnAddedOrIncreased -= OnTempAddedOrIncreased;
-            // playerInventoryReference.inventory.OnDecreased -= OnDecreased;
-        }
-
-        private void Start()
-        {
-            // coinText.SetTextInt(playerFarmReference.coins);
-            // gemText.SetTextInt(playerFarmReference.gems);
-            // workerText.SetTextInt(worker);
-            // weightText.SetTextInt(playerFarmReference.weight.Value.Current);
-            // maxWeightText.SetTextInt(playerFarmReference.weight.Value.Max);
-            // levelText.SetTextInt(level);
+            coinViewUI.Dispose();
+            gemViewUI.Dispose();
+            
         }
 
         private void OnAddedOrIncreased(Item item, int newAmount, int changeAmount)
@@ -153,36 +133,12 @@ namespace Soul.Presenter.Runtime.UI
             }
         }
 
-
-        private void SetAllAlpha(float alpha)
-        {
-            coinGoingToBeModifiedCanvasGroup.alpha = alpha;
-            gemGoingToBeModifiedCanvasGroup.alpha = alpha;
-            weightGoingToBeModifiedCanvasGroup.alpha = alpha;
-            workerGoingToBeModifiedCanvasGroup.alpha = alpha;
-            xpGoingToBeAddedCanvasGroup.alpha = alpha;
-        }
-
-        private void StoreFormat()
-        {
-            coinText.StoreFormat();
-            maxCoinText.StoreFormat();
-            coinGoingToBeModifiedText.StoreFormat();
-            gemText.StoreFormat();
-            gemGoingToBeModifiedText.StoreFormat();
-            workerText.StoreFormat();
-            maxWorkerText.StoreFormat();
-            workerGoingToBeModifiedText.StoreFormat();
-            weightText.StoreFormat();
-            maxWeightText.StoreFormat();
-            weightGoingToBeModifiedText.StoreFormat();
-            levelText.StoreFormat();
-            xpGoingToBeAddedText.StoreFormat();
-        }
-
         void ILoadComponent.OnLoadComponents()
         {
             levelXpDayViewUI.LoadComponents(gameObject, "level");
+            coinViewUI.LoadComponents(gameObject, "coin");
+            gemViewUI.LoadComponents(gameObject, "gem");
+            
             // StoreFormat();
         }
     }

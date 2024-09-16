@@ -16,7 +16,7 @@ namespace Soul.Controller.Runtime.Inventories
         public Reactive<int> gemsPreview;
         public ItemInventory inventory;
         public LevelXp levelXp;
-        public Reactive<float> xpPreview;
+        public Reactive<int> xpPreview;
     
         public WorkerInventory workerInventory;
         public WorkerInventory workerInventoryPreview;
@@ -35,6 +35,7 @@ namespace Soul.Controller.Runtime.Inventories
             workerInventoryPreview.Load();
             coins.Load();
             gems.Load();
+            levelXp.Load();
         }
         
         
@@ -46,6 +47,7 @@ namespace Soul.Controller.Runtime.Inventories
             workerInventoryPreview.Save();
             coins.Save();
             gems.Save();
+            levelXp.Save();
         }
     }
 }

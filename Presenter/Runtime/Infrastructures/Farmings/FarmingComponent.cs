@@ -106,7 +106,6 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 
         #endregion
 
-
         #region IUnlock
 
         public override bool CanUnlock => IsLocked && unlockAndUpgrade.HasEnough();

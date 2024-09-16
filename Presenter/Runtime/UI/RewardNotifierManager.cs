@@ -27,7 +27,7 @@ namespace Soul.Presenter.Runtime.UI
 
         private void OnAddedOrIncreased(InventoryChangeEventArgs<Item, int> inventoryChangeEventArgs)
         {
-            OnAdded(inventoryChangeEventArgs.Key, inventoryChangeEventArgs.NewAmount,
+            OnAdded(inventoryChangeEventArgs.Key,inventoryChangeEventArgs.NewAmount,
                 inventoryChangeEventArgs.ChangeAmount, inventoryChangeEventArgs.ChangeType);
         }
 

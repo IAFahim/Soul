@@ -1,6 +1,7 @@
 ﻿using System;
 using Alchemy.Inspector;
 using LitMotion;
+using LitMotion.Extensions;
 using Pancake.Common;
 using Soul.Controller.Runtime.UI;
 using Soul.Model.Runtime;
@@ -14,7 +15,7 @@ using UnityEngine.UI;
 namespace Soul.Presenter.Runtime.UI.StatsViews
 {
     [Serializable]
-    public class LevelXpDayViewUI : StatsView
+    public class LevelXpDayViewUI : PreviewStats
     {
         [Title("LevelXpDayViewUI")] [SerializeField]
         private Image xpBar;
@@ -23,55 +24,45 @@ namespace Soul.Presenter.Runtime.UI.StatsViews
         [SerializeField] private TMPFormat xpNextLevelText;
         [SerializeField] private TMPFormat dayText;
 
-        [SerializeField] private CanvasGroup previewCanvasGroup;
         [SerializeField] private TMPFormat previewXpText;
 
         private MotionHandle _toggleMotionHandle;
+        private MotionHandle _xpIncreaseMotionHandle;
 
         private LevelXp _levelXp;
-        private Reactive<float> _xpPreview;
         private DelayHandle _xpPreviewDelayHandle;
 
-        public void Setup(LevelXp levelXpReference, Reactive<float> xpPreviewReference)
+        public void Setup(LevelXp levelXpReference, Reactive<int> xpPreviewReference)
         {
             StoreFormat();
+            SetupToggle();
+            SetupPreview(xpPreviewReference);
             _levelXp = levelXpReference;
-            _xpPreview = xpPreviewReference;
             _levelXp.OnXpChange += LevelOnXpChange;
             _levelXp.Load();
-            LevelOnXpChange(_levelXp.Xp);
+            LevelOnXpChange(0, _levelXp.Xp);
             dayText.SetTextFloat(UserData.DaySinceInstall + 1);
-            _xpPreview.OnChange += UpdateXpPreview;
-            ToggleSetup();
+            
         }
 
-        private void LevelOnXpChange(int currentXp)
+        private void LevelOnXpChange(int oldXp, int currentXp)
         {
             levelText.SetTextInt(_levelXp.Current);
-            var xpNextLevel = _levelXp.XpToNextLevel;
-            xpNextLevelText.SetTextFloat(xpNextLevel - currentXp);
             xpBar.fillAmount = _levelXp.XpProgress;
-            UpdateXpPreview(0, _xpPreview.Value);
+            UpdatePreview(0, PreviewReference.Value);
+            if (_xpIncreaseMotionHandle.IsActive()) _xpIncreaseMotionHandle.Cancel();
+            _xpIncreaseMotionHandle = LMotion.Create(oldXp, currentXp, toggleDuration).WithEase(toggleEase)
+                .BindToText(xpNextLevelText);
             if (_xpPreviewDelayHandle is { IsCompleted: false }) _xpPreviewDelayHandle.Cancel();
-            _xpPreviewDelayHandle = App.Delay(.4f, OnXpPreViewDurationComplete);
+            _xpPreviewDelayHandle = App.Delay(toggleDuration, OnXpPreViewDurationComplete);
         }
+
 
         private void OnXpPreViewDurationComplete()
         {
-            UpdateXpPreview(0, 0);
+            UpdatePreview(0, 0);
         }
 
-        private void UpdateXpPreview(float oldValue, float newValue)
-        {
-            if (Mathf.Approximately(newValue, 0))
-            {
-                previewCanvasGroup.alpha = 0;
-                return;
-            }
-
-            previewCanvasGroup.alpha = 1;
-            previewXpText.SetTextFloat(newValue);
-        }
 
         private void StoreFormat()
         {
@@ -85,7 +76,6 @@ namespace Soul.Presenter.Runtime.UI.StatsViews
         {
             base.Dispose();
             _levelXp.OnXpChange -= LevelOnXpChange;
-            _xpPreview.OnChange -= UpdateXpPreview;
         }
 
         public override GameObject LoadComponents(GameObject gameObject, string title)
@@ -95,8 +85,6 @@ namespace Soul.Presenter.Runtime.UI.StatsViews
             levelText.TMP = container.GetComponentInChildrenWihtName<TMP_Text>("level");
             xpNextLevelText.TMP = container.GetComponentInChildrenWihtName<TMP_Text>("next");
             dayText.TMP = container.GetComponentInChildrenWihtName<TMP_Text>("day");
-            previewCanvasGroup = container.GetComponentInChildrenWihtName<CanvasGroup>("xp");
-            previewXpText.TMP = container.GetComponentInChildrenWihtName<TMP_Text>("xp");
             return container;
         }
     }

@@ -24,7 +24,7 @@ namespace Soul.Presenter.Runtime.UI.StatsViews
         [SerializeField] protected Ease toggleEase;
         protected MotionHandle ToggleMotionHandle;
         
-        protected void ToggleSetup()
+        protected void SetupToggle()
         {
             toggleExpandButton.onClick.AddListener(ToggleExpand);
             var expandedInt = PlayerPrefs.GetInt("isExpanded", 1);

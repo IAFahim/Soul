@@ -27,13 +27,19 @@ namespace Soul.Controller.Runtime.Productions
         IReward<Pair<Item, int>>
     {
         [SerializeField] private Transform parent;
-        [FormerlySerializedAs("playerInventoryReference")] [SerializeField] private PlayerFarmReference playerFarmReference;
+
+        [FormerlySerializedAs("playerInventoryReference")] [SerializeField]
+        private PlayerFarmReference playerFarmReference;
+
         [SerializeField] private RequiredAndRewardForProductions requiredAndRewardForProductions;
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
         [SerializeField] private bool isClaimable;
-        
-        [FormerlySerializedAs("popupClickableIndicatorPrefab")] [FormerlySerializedAs("popupIndicatorPrefab")] [FormerlySerializedAs("popupIndicator")] [SerializeField]
+
+        [FormerlySerializedAs("popupClickableIndicatorPrefab")]
+        [FormerlySerializedAs("popupIndicatorPrefab")]
+        [FormerlySerializedAs("popupIndicator")]
+        [SerializeField]
         private PopupClickableIconCount popupClickablePrefab;
 
         [SerializeField] protected Optional<AddressableParticleEffect> particleEffect;
@@ -126,8 +132,10 @@ namespace Soul.Controller.Runtime.Productions
 
         private void AddReward()
         {
-            playerFarmReference.inventory.AddOrIncrease(ProductionItemValuePair.Key,
-                ProductionItemValuePair.Value);
+            var pair = ProductionItemValuePair;
+            playerFarmReference.inventory.AddOrIncrease(pair.Key, pair.Value);
+            var convertInfo = itemToItemConverter.Convert(pair.Key);
+            playerFarmReference.levelXp.AddXp((int)(convertInfo.xp * ProductionItemValuePair.Value));
             popupClickableInstance.gameObject.SetActive(false);
         }
 

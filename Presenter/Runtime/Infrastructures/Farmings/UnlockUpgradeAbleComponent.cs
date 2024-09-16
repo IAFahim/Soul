@@ -41,7 +41,6 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 
         [SerializeField] protected Level level;
         public Level Level => level;
-        public event Action<int> OnLevelChanged;
 
         #endregion
 

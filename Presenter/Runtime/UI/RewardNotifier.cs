@@ -1,4 +1,6 @@
 ﻿using Alchemy.Inspector;
+using LitMotion;
+using LitMotion.Extensions;
 using Pancake;
 using Pancake.Common;
 using Pancake.Pools;
@@ -20,8 +22,12 @@ namespace Soul.Presenter.Runtime.UI
         [SerializeField] Image icon;
         [SerializeField] ProgressBar progressBar;
         [SerializeField, DisableInEditMode] Item itemReference;
+        [SerializeField] float duration = 3f;
+        [SerializeField] Ease ease = Ease.Linear;
 
         private IRemoveCallBack<Item> _removeCallBack;
+        private MotionHandle _textIncreaseMotionHandle;
+
 
         private void Awake()
         {
@@ -32,8 +38,11 @@ namespace Soul.Presenter.Runtime.UI
         public void Setup(Item item, int newAmount, int added, LimitIntStruct limitInt,
             IRemoveCallBack<Item> removeCallBack)
         {
-            totalText.TMP.SetText(totalText, newAmount);
+            if (_textIncreaseMotionHandle.IsActive()) _textIncreaseMotionHandle.Cancel();
+            _textIncreaseMotionHandle = LMotion.Create(newAmount - added, newAmount, duration / 3f).WithEase(ease)
+                .BindToText(totalText);
             addedText.TMP.SetText("+" + addedText, added);
+
             icon.sprite = item.Icon;
             progressBar.Value = limitInt;
             itemReference = item;
