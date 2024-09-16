@@ -23,9 +23,6 @@ namespace Soul.Controller.Runtime.SpritePopups
         [SerializeField] private float jumpOutHeight = 20f;
         [SerializeField] private Ease jumpEase;
         private MotionHandle _jumpOutMotionHandle;
-        
-        [FormerlySerializedAs("onCollectReturnToPool")] [SerializeField]
-        private bool onClickReturnToPool = true;
 
         private IRewardClaim _rewardClaimReference;
         private IReward<Pair<Item, int>> _rewardReference;
@@ -60,12 +57,10 @@ namespace Soul.Controller.Runtime.SpritePopups
 
         public Pair<Item, int> Reward => _rewardReference.Reward;
 
-        public void Setup(IRewardClaim rewardClaim, IReward<Pair<Item, int>> reward,
-            bool clickReturnToPool)
+        public void Setup(IRewardClaim rewardClaim, IReward<Pair<Item, int>> reward)
         {
             _rewardClaimReference = rewardClaim;
             _rewardReference = reward;
-            onClickReturnToPool = clickReturnToPool;
             Reload();
             StartTween();
         }
@@ -89,8 +84,12 @@ namespace Soul.Controller.Runtime.SpritePopups
 
         public override void OnSelected(RaycastHit selfRayCastHit)
         {
+            RewardClaim();
+        }
+
+        private void RewardClaim()
+        {
             if (_rewardClaimReference.CanClaim) _rewardClaimReference.RewardClaim();
-            if (onClickReturnToPool) ReturnToPool();
         }
 
 

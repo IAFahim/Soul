@@ -2,7 +2,6 @@
 using Alchemy.Inspector;
 using Pancake;
 using Pancake.UI;
-using Soul.Controller.Runtime.InfoPanels;
 using Soul.Model.Runtime.Bags;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.RequiredAndRewards.Rewards;
@@ -10,7 +9,7 @@ using UnityEngine;
 
 namespace Soul.Presenter.Runtime.Vehicles.ClickRewardVehicles
 {
-    public class Boat : Vehicle, IInfoPanelReference, IReward<Dictionary<Item, int>>
+    public class Boat : Vehicle, IReward<Dictionary<Item, int>>
     {
         public AdsRewardBag rewardBag;
         [SerializeField] public int rewardAmount;

@@ -12,6 +12,7 @@ using Soul.Model.Runtime.DragAndDrops;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Productions;
+using Soul.Model.Runtime.RequiredAndRewards.Rewards;
 using Soul.Model.Runtime.Tweens;
 using Soul.Model.Runtime.Tweens.Scriptable;
 using UnityEngine;
@@ -19,7 +20,7 @@ using UnityEngine;
 namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
     public class CropField : FarmingComponent, IProductionRecordReference<RecordProduction>,
-        ILoadComponent,
+        ILoadComponent, IRewardClaim,
         IAllowedToDropReference<Item>, IDropAble<Item>
     {
         [Title("CropField")] [SerializeField] private AllowedItemLists allowedItemLists;
@@ -195,5 +196,8 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
         {
             Reset();
         }
+
+        public bool CanClaim => cropProductionManager.CanClaim;
+        public void RewardClaim() => cropProductionManager.RewardClaim();
     }
 }

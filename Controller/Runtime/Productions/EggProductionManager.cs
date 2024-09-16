@@ -93,8 +93,7 @@ namespace Soul.Controller.Runtime.Productions
             {
                 popupClickableInstance = popupClickablePrefab.gameObject.Request(parent)
                     .GetComponent<PopupClickableIconCount>();
-                popupClickableInstance.Setup(this, this,
-                    false);
+                popupClickableInstance.Setup(this, this);
             }
             else
             {

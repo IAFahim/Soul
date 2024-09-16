@@ -4,13 +4,8 @@ using UnityEngine;
 
 namespace Soul.Model.Runtime.Indicators.Popups
 {
-    public abstract class IndicatorPopUpClickable : PoolAbleComponent, ISelectCallBack, IReSelectedCallBack
+    public abstract class IndicatorPopUpClickable : PoolAbleComponent, ISelectCallBack
     {
-        public virtual void OnReSelected(RaycastHit selfReRaycastHit)
-        {
-            OnSelected(selfReRaycastHit);
-        }
-
         public abstract void OnSelected(RaycastHit selfRayCastHit);
     }
 }

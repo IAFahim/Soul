@@ -1,30 +1,26 @@
 ﻿using Alchemy.Inspector;
 using LitMotion;
 using Soul.Controller.Runtime.InfoPanels;
-using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.SelectableComponents;
 using Soul.Model.Runtime.Buildings;
 using Soul.Model.Runtime.Tweens;
 using Soul.Model.Runtime.Tweens.Scriptable;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.Vehicles
 {
-    public class Vehicle : BaseSelectableComponent
+    public class Vehicle : BaseSelectableComponent, IInfoPanelReference
     {
-        [FormerlySerializedAs("playerInventoryReference")] [Title("Vehicle")]
-        public PlayerFarmReference playerFarmReference;
-        [SerializeField] protected LevelInfrastructureInfo infrastructureInfo;
+        [Title("Vehicle")] [SerializeField] protected LevelInfrastructureInfo infrastructureInfo;
         public InfoPanel infoPanel;
-        
+
         public IInfoPanel InfoPanelPrefab => infoPanel;
 
         public Vector3 InfoPanelWorldPosition =>
             transform.TransformPoint(infrastructureInfo.GetInfoPanelPositionOffset(0));
 
         public override string Title => infrastructureInfo.Title;
-        
+
         #region Selected Animation
 
         [SerializeField] protected TweenSettingCurveScriptableObject<Vector3> selectTweenSetting;

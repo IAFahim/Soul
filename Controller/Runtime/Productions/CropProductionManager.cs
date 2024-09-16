@@ -54,6 +54,9 @@ namespace Soul.Controller.Runtime.Productions
         private PlayerFarmReference playerFarmReference;
         
         private FarmerSpawner _farmerSpawner;
+
+        private PopupClickableIconCount _instantiatedRewardPopup;
+
         // Properties
         public Pair<Item, int> ProductionItemValuePair
         {
@@ -178,6 +181,7 @@ namespace Soul.Controller.Runtime.Productions
         public void RewardClaim()
         {
             if (!CanClaim) return;
+            _instantiatedRewardPopup.ReturnToPool();
             AddReward().Forget();
         }
 
@@ -218,9 +222,8 @@ namespace Soul.Controller.Runtime.Productions
             _indicatorProgressCapacity.gameObject.SetActive(false);
             if (onCompleteParticleEffect) onCompleteParticleEffect.Value.Load(true, _parent).Forget();
             CanClaim = true;
-            var instantiatedRewardPopup =
-                popupClickable.gameObject.Request(_parent).GetComponent<PopupClickableIconCount>();
-            instantiatedRewardPopup.Setup(this, this, true);
+            _instantiatedRewardPopup = popupClickable.gameObject.Request(_parent).GetComponent<PopupClickableIconCount>();
+            _instantiatedRewardPopup.Setup(this, this);
             meshPlantPointGridSystem.Complete();
         }
 
