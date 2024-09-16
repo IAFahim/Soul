@@ -1,6 +1,8 @@
 ﻿using System;
+using _Root.Scripts.NPC_Ai.Runtime;
 using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
+using Links.Runtime;
 using Pancake;
 using Pancake.Pools;
 using QuickEye.Utility;
@@ -43,12 +45,15 @@ namespace Soul.Controller.Runtime.Productions
         [SerializeField] private float height = 10;
         [SerializeField] private IndicatorProgressCapacity indicatorProgressCapacityPrefab;
 
+        [SerializeField] protected Optional<AddressableParticleEffect> onCompleteParticleEffect;
+        [SerializeField] ScriptableEventGetGameObject farmerSpawnerGetGameObject;
+        
         private bool _isLoaded;
         private Transform _parent;
         private IndicatorProgressCapacity _indicatorProgressCapacity;
         private PlayerFarmReference playerFarmReference;
-        [SerializeField] protected Optional<AddressableParticleEffect> onCompleteParticleEffect;
-
+        
+        private FarmerSpawner _farmerSpawner;
         // Properties
         public Pair<Item, int> ProductionItemValuePair
         {
@@ -104,6 +109,7 @@ namespace Soul.Controller.Runtime.Productions
             IProductionRecordReference<RecordProduction> recordProduction, Level level,
             ISaveAbleReference saveAbleReference)
         {
+            _farmerSpawner = farmerSpawnerGetGameObject.Get().GetComponent<FarmerSpawner>();
             _isLoaded = true;
             _parent = parentTransform;
             playerFarmReference = farmReference;
@@ -184,6 +190,7 @@ namespace Soul.Controller.Runtime.Productions
         protected override void ModifyRecordBeforeProgression()
         {
             var requiredWorker = Required.workerCount;
+            _farmerSpawner.GoToWork(requiredWorker);
             recordReference.worker = new Pair<WorkerType, int>(basicWorkerType, requiredWorker);
             playerFarmReference.workerInventory.TryDecrease(basicWorkerType, requiredWorker);
             ProductionItemValuePair = new Pair<Item, int>(queueItem, WeightCapacity);
@@ -200,6 +207,7 @@ namespace Soul.Controller.Runtime.Productions
                 LevelReference, Reward.Key, progressRatio, (float)FullTimeRequirement.TotalSeconds
             );
             ShowIndicatorCapacity();
+            if(Mathf.Approximately(progressRatio, 1)) _farmerSpawner.SpawnFarmers(Required.workerCount);
         }
 
         /// <summary>
@@ -262,6 +270,7 @@ namespace Soul.Controller.Runtime.Productions
             var reward = GetReward(convertInfo);
             var takenWorker = recordReference.worker;
             playerFarmReference.workerInventory.AddOrIncrease(takenWorker);
+            _farmerSpawner.RemoveFarmers();
             playerFarmReference.inventory.AddOrIncrease(reward.Key, reward.Value);
             playerFarmReference.levelXp.AddXp((int)XpTotal);
             playerFarmReference.coins.Value += 10;
