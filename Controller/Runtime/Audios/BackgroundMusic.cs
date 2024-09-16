@@ -10,6 +10,9 @@ namespace Soul.Controller.Runtime
 
         private void Start()
         {
+            AudioManager.MusicVolume = 1;
+            AudioManager.SfxVolume = 1;
+            
             bgm.Play();
         }
     }

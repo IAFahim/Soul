@@ -53,6 +53,7 @@ namespace Soul.Presenter.Runtime.UI
 
         public void OnEnable()
         {
+            playerFarmReference.Load();
             CalculateTotalWeightInInventoryAndShow();
             levelXpDayViewUI.Setup(playerFarmReference.levelXp, playerFarmReference.xpPreview);
             // playerFarmReference.inventory.OnItemChanged += InventoryOnItemChanged;

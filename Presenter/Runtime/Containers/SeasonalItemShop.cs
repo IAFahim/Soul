@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Pancake.Pools;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Lists;
@@ -9,6 +10,7 @@ using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.PoolAbles;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Soul.Presenter.Runtime.Containers
 {
@@ -18,10 +20,13 @@ namespace Soul.Presenter.Runtime.Containers
 
         [SerializeField] private float itemHeight = 199;
         [SerializeField] private float itemColumns = 5;
-        [SerializeField] private BuyComponent buyComponentPrefab;
-        [SerializeField] private Sprite buyBackground;
 
-        [SerializeField] private BuyComponent sellComponentPrefab;
+        [FormerlySerializedAs("buyComponentPrefab")] [SerializeField]
+        private BuySellComponent buySellComponentPrefab;
+
+        [FormerlySerializedAs("sellComponentPrefab")] [SerializeField]
+        private BuySellComponent sellSellComponentPrefab;
+
         [SerializeField] private Sprite sellBackground;
         [SerializeField] private RectTransform rectTransform;
 
@@ -29,57 +34,50 @@ namespace Soul.Presenter.Runtime.Containers
 
         private PlayerFarmReference _playerFarmReference;
         private PriceLookUpTable _priceLookUpTable;
-        private Dictionary<Item, BuyComponent> buyComponents = new();
-        private Dictionary<Item, BuyComponent> sellComponents = new();
+        private TMP_Text title;
+        private Dictionary<Item, BuySellComponent> buySellComponents = new();
 
-        public void Setup(bool isBuy, AllowedItemLists allowedItemLists, PlayerFarmReference playerFarmReference,
-            PriceLookUpTable priceLookUpTable)
+        public void Setup(bool isBuy, AllowedItemLists allowedItemLists, Sprite background,
+            PlayerFarmReference playerFarmReference, PriceLookUpTable priceLookUpTable)
         {
             _playerFarmReference = playerFarmReference;
             _priceLookUpTable = priceLookUpTable;
-            var title = seasonTitlePrefab.gameObject.Request<TMP_Text>(rectTransform.parent);
-
+            if (title == null) title = seasonTitlePrefab.gameObject.Request<TMP_Text>(rectTransform.parent);
             title.text = string.Format(text, allowedItemLists.CurrentList.Title);
             float columns = Mathf.Ceil(allowedItemLists.CurrentList.Count / itemColumns);
             rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, itemHeight * columns);
-            if (isBuy) BuySetup(allowedItemLists.CurrentList, playerFarmReference, priceLookUpTable);
-            else SellSetup(allowedItemLists.CurrentList);
+
+            Clear(buySellComponents);
+            Set(isBuy, allowedItemLists.CurrentList, background, playerFarmReference, priceLookUpTable);
 
             title.transform.SetAsFirstSibling();
-
-            // Clear(buyComponents);
-            // Clear(sellComponents);
         }
 
-        private void BuySetup(IList<Item> items, PlayerFarmReference playerFarmReference,
-            PriceLookUpTable priceLookUpTable)
-        {
-            Clear(sellComponents);
-            playerFarmReference.inventory.OnItemChanged += InventoryOnItemChanged;
-            foreach (var item in items)
-            {
-                var buyComponent = buyComponentPrefab.gameObject.Request<BuyComponent>(transform);
-                buyComponents.Add(item, buyComponent);
-                SetBuyComponent(playerFarmReference, priceLookUpTable, item, buyComponent);
-            }
-        }
-
-        private void SetBuyComponent(PlayerFarmReference playerFarmReference, PriceLookUpTable priceLookUpTable,
-            Item item, BuyComponent buyComponent
+        private void Set(bool isBuy, IList<Item> items, Sprite background,
+            PlayerFarmReference playerFarmReference, PriceLookUpTable priceLookUpTable
         )
         {
-            priceLookUpTable.TryGetValue(item, out var price);
-            playerFarmReference.inventory.TryGetValue(item, out var count);
-            playerFarmReference.inventory.TryGetMaxValue(item, out var max);
-            buyComponent.Setup(item.icon, price, buyBackground, count, max);
+            playerFarmReference.inventory.OnItemChanged -= InventoryOnBuyItemChanged;
+            playerFarmReference.inventory.OnItemChanged += InventoryOnBuyItemChanged;
+            foreach (var item in items)
+            {
+                var buySellComponent = buySellComponentPrefab.gameObject.Request<BuySellComponent>(transform);
+                buySellComponents.Add(item, buySellComponent);
+                buySellComponent.Setup(isBuy, playerFarmReference, priceLookUpTable, item, background);
+            }
         }
 
-        private void InventoryOnItemChanged(InventoryChangeEventArgs<Item, int> changeEventArgs)
+        private void InventoryOnBuyItemChanged(InventoryChangeEventArgs<Item, int> changeEventArgs)
         {
-            if (buyComponents.TryGetValue(changeEventArgs.Key, out var buyComponent))
+            if (buySellComponents.TryGetValue(changeEventArgs.Key, out var buyComponent))
             {
-                SetBuyComponent(_playerFarmReference, _priceLookUpTable, changeEventArgs.Key, buyComponent);
+                buyComponent.Set(changeEventArgs.Key, changeEventArgs.NewAmount);
             }
+        }
+
+        public void OnDisable()
+        {
+            _playerFarmReference.inventory.OnItemChanged -= InventoryOnBuyItemChanged;
         }
 
 
@@ -91,10 +89,6 @@ namespace Soul.Presenter.Runtime.Containers
             }
 
             components.Clear();
-        }
-
-        private void SellSetup(IList<Item> items)
-        {
         }
     }
 }

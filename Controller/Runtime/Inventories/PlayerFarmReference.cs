@@ -25,8 +25,7 @@ namespace Soul.Controller.Runtime.Inventories
         public Reactive<int> weightPreview;
         public static implicit operator ItemInventory(PlayerFarmReference reference) => reference.inventory;
 
-        public static implicit operator WorkerInventory(PlayerFarmReference reference) =>
-            reference.workerInventory;
+        public static implicit operator WorkerInventory(PlayerFarmReference reference) => reference.workerInventory;
         
         [Button]
         public void Load()
@@ -37,11 +36,7 @@ namespace Soul.Controller.Runtime.Inventories
             coins.Load();
             gems.Load();
         }
-
-        private void OnEnable()
-        {
-            Load();
-        }
+        
         
         [Button]
         public void Save()

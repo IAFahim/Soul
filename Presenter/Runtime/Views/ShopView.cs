@@ -22,8 +22,12 @@ namespace Soul.Presenter.Runtime.Views
         [SerializeField] private SeasonalItemShop seasonalItemShop;
         [SerializeField] private Button closeButton;
         [SerializeField] private RectTransform spawnRectTransform;
-        [SerializeField] private Pair<AllowedItemLists, AllowedItemLists>[] allowedItemBuySellLists;
+
+        [SerializeField]
+        private Pair<Pair<AllowedItemLists, Sprite>, Pair<AllowedItemLists, Sprite>>[] allowedItemBuySellLists;
+
         [SerializeField] private int productIndex;
+        private SeasonalItemShop _seasonalItemShopInstance;
 
         protected override UniTask Initialize()
         {
@@ -50,11 +54,14 @@ namespace Soul.Presenter.Runtime.Views
         [Button]
         private void Setup()
         {
-            var seasonalItemShopInstance = seasonalItemShop.gameObject.Request<SeasonalItemShop>(spawnRectTransform);
+            _seasonalItemShopInstance ??= seasonalItemShop.gameObject.Request<SeasonalItemShop>(spawnRectTransform);
             bool isBuy = PlayerPrefs.GetInt("isBuy", 0) == 1;
-            AllowedItemLists allowedItemLists =
+            Pair<AllowedItemLists, Sprite> allowedItemLists =
                 isBuy ? allowedItemBuySellLists[productIndex].First : allowedItemBuySellLists[productIndex].Second;
-            seasonalItemShopInstance.Setup(isBuy, allowedItemLists, playerFarmReference, priceLookUpTable);
+            _seasonalItemShopInstance.Setup(
+                isBuy, allowedItemLists, allowedItemLists,
+                playerFarmReference, priceLookUpTable
+            );
         }
 
         private void OnCloseButtonPressed()
