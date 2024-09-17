@@ -2,6 +2,7 @@
 using LitMotion;
 using LitMotion.Extensions;
 using Pancake.Common;
+using QuickEye.Utility;
 using Soul.Controller.Runtime.Inventories;
 using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.RequiresAndRewards;
@@ -10,6 +11,7 @@ using Soul.Model.Runtime.Containers;
 using Soul.Model.Runtime.Interfaces;
 using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
+using Soul.Model.Runtime.UpgradeAndUnlock;
 using Soul.Model.Runtime.UpgradeAndUnlock.Unlocks;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
 using TMPro;
@@ -26,11 +28,11 @@ namespace Soul.Presenter.Runtime.Panels
         public Ease ease = Ease.OutQuad;
         public Vector3 anchorStartPosition = new(-600, 0, 0);
         public Vector3 anchorEndPosition = new(-500, 0, 0);
-        public MotionHandle anchorMotionHandle;
+        private MotionHandle _anchorMotionHandle;
 
         public Vector3 scaleStart = new(0.1f, 0.1f, 0.1f);
         public Vector3 scaleEnd = new(1, 1, 1);
-        public MotionHandle scaleMotionHandle;
+        private MotionHandle _scaleMotionHandle;
 
         public TMP_Text upgradeTitle;
         public Color upgradeHighlightColor = new Color(0.01f, 0.63f, 0.02f, 1);
@@ -38,12 +40,19 @@ namespace Soul.Presenter.Runtime.Panels
         public string unlockTitleFormat = "Unlock <color={0}>{1}</color>";
         public string maxLevelTitleFormat = "{0} at {1} level is already at max";
 
+        public Color startColor = Color.green;
+        public Color endColor = Color.white;
+        private MotionHandle _nextLevelProgressBarMotionHandle;
         public ProgressBar upgradeLevelProgressBar;
+        public ProgressBar upgradeNextLevelProgressBar;
+        public Image upgradeNextLevelProgressBarImage;
         public TMP_Text upgradeTimeTitle;
         public TMPFormat upgradeTimeFormat;
 
         public TMP_Text startButtonTitle;
         public TMPFormat startCoinRequirementFormat;
+
+        [SerializeField] private RectTransform upgradeSlotParent;
 
         public Button startButton;
         public Button closeButton;
@@ -56,9 +65,25 @@ namespace Soul.Presenter.Runtime.Panels
         private IRequirementForUpgradeScriptableReference _requirementForUpgradeReference;
         private IUpgrade _upgradeReference;
         private IUnlock _unlockReference;
+        private IUpgradeUnlockPreview _upgradeUnlockPreview;
+
+        private void Awake()
+        {
+            startColor = upgradeNextLevelProgressBarImage.color;
+        }
 
         private int CoinRequirement(int level) =>
             _requirementForUpgradeReference.RequirementForUpgrades.GetRequirement(level).coin;
+
+        public UnityTimeSpan UpgradeTimeRequirement(int level) =>
+            _requirementForUpgradeReference.RequirementForUpgrades.GetRequirement(level).fullTime;
+
+        public int WokerRequirement(int level) =>
+            _requirementForUpgradeReference.RequirementForUpgrades.GetRequirement(level).worker.Value;
+
+        public int GemRequirement(int level) =>
+            _requirementForUpgradeReference.RequirementForUpgrades.GetRequirement(level).gem;
+
 
         private Pair<Item, int>[] ItemsRequirement(int level) =>
             _requirementForUpgradeReference.RequirementForUpgrades.GetRequirement(level).items;
@@ -74,6 +99,8 @@ namespace Soul.Presenter.Runtime.Panels
             this.playerFarmReference = playerFarm;
             _eventShowItemRequired = eventShowItemRequired;
             SetPanel(parentRect, currentSelectedTransform, titleReference, levelReference, onStartButtonPressed);
+            upgradeTimeFormat.SetTimeFormat(UpgradeTimeRequirement(levelReference.Level));
+            startCoinRequirementFormat.SetTextInt(CoinRequirement(levelReference.Level));
         }
 
         private void SetPanel(RectTransform parentRect, Transform currentSelectedTransform, ITitle titleReference,
@@ -103,12 +130,12 @@ namespace Soul.Presenter.Runtime.Panels
         {
             selfRectTransform.SetParent(parentRect);
 
-            if (anchorMotionHandle.IsActive()) anchorMotionHandle.Complete();
-            anchorMotionHandle = LMotion.Create(anchorStartPosition, anchorEndPosition, duration).WithEase(ease)
+            if (_anchorMotionHandle.IsActive()) _anchorMotionHandle.Complete();
+            _anchorMotionHandle = LMotion.Create(anchorStartPosition, anchorEndPosition, duration).WithEase(ease)
                 .BindToAnchoredPosition3D(selfRectTransform);
 
-            if (scaleMotionHandle.IsActive()) scaleMotionHandle.Complete();
-            scaleMotionHandle = LMotion.Create(scaleStart, scaleEnd, duration).WithEase(ease)
+            if (_scaleMotionHandle.IsActive()) _scaleMotionHandle.Complete();
+            _scaleMotionHandle = LMotion.Create(scaleStart, scaleEnd, duration).WithEase(ease)
                 .BindToLocalScale(selfRectTransform);
             gameObject.SetActive(true);
         }
@@ -156,17 +183,27 @@ namespace Soul.Presenter.Runtime.Panels
             return false;
         }
 
+        private void OnDisable()
+        {
+            if (_anchorMotionHandle.IsActive()) _anchorMotionHandle.Complete();
+            if (_scaleMotionHandle.IsActive()) _scaleMotionHandle.Complete();
+            if (_nextLevelProgressBarMotionHandle.IsActive()) _nextLevelProgressBarMotionHandle.Complete();
+        }
+
         private void SetItemRequirement(Transform currentSelectedTransform, Level level)
         {
             _requirementForUpgradeReference =
                 currentSelectedTransform.GetComponent<IRequirementForUpgradeScriptableReference>();
             _eventShowItemRequired.Trigger(ItemsRequirement(level));
+            _upgradeUnlockPreview = currentSelectedTransform.GetComponent<IUpgradeUnlockPreview>();
+            if (_upgradeUnlockPreview != null) _upgradeUnlockPreview.ShowUpgradeUnlockPreview(upgradeSlotParent);
         }
 
         private void Upgrade()
         {
             var canUpgrade = _upgradeReference.CanUpgrade;
             if (canUpgrade) _upgradeReference.Upgrade();
+            if (_upgradeUnlockPreview != null) _upgradeUnlockPreview.HideUpgradeUnlockPreview();
             _onStartButtonPressed?.Invoke(canUpgrade);
         }
 
@@ -208,6 +245,7 @@ namespace Soul.Presenter.Runtime.Panels
         private void Unlock()
         {
             var canUnlock = _unlockReference.CanUnlock;
+            if (_upgradeUnlockPreview != null) _upgradeUnlockPreview.HideUpgradeUnlockPreview();
             if (canUnlock)
             {
                 _unlockReference.Unlock();
@@ -218,18 +256,34 @@ namespace Soul.Presenter.Runtime.Panels
 
         private void SetProgressBar(Level level)
         {
-            upgradeLevelProgressBar.Value = (level.Current / (float)level.Max);
+            if (level.IsLocked)
+            {
+                upgradeLevelProgressBar.Value = 0.01f;
+                upgradeNextLevelProgressBar.Value = 0.02f;
+            }
+            else
+            {
+                upgradeLevelProgressBar.SetValueWithoutNotify(level.Current / (float)level.Max);
+                var maxIncrement = Mathf.Min(level.Max, level.Current + 1);
+                upgradeNextLevelProgressBar.SetValueWithoutNotify(maxIncrement / (float)level.Max);
+            }
+
+            _nextLevelProgressBarMotionHandle = LMotion.Create(startColor, endColor, duration)
+                .WithLoops(-1, LoopType.Yoyo)
+                .WithEase(ease).BindToColor(upgradeNextLevelProgressBarImage);
         }
 
 
         private void OnCancelButtonPressed()
         {
+            if (_upgradeUnlockPreview != null) _upgradeUnlockPreview.HideUpgradeUnlockPreview();
             _eventShowItemRequired.Trigger(null);
             _onCancelButtonPressed?.Invoke();
         }
 
         public void Hide()
         {
+            if (_upgradeUnlockPreview != null) _upgradeUnlockPreview.HideUpgradeUnlockPreview();
             gameObject.SetActive(false);
             transform.SetParent(null);
         }

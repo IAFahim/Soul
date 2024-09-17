@@ -2,7 +2,7 @@
 
 namespace Soul.Model.Runtime.UpgradeAndUnlock.Upgrades
 {
-    public interface IUpgrade : ILevel, IUpgradeUnlockPreView
+    public interface IUpgrade : ILevel, IUpgradeUnlockPreview
     {
         public bool CanUpgrade { get; }
         public bool IsUpgrading { get; }

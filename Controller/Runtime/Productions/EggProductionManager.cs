@@ -31,7 +31,7 @@ namespace Soul.Controller.Runtime.Productions
         [FormerlySerializedAs("playerInventoryReference")] [SerializeField]
         private PlayerFarmReference playerFarmReference;
 
-        [SerializeField] private RequiredAndRewardForProductions requiredAndRewardForProductions;
+        public RequiredAndRewardForProductions requiredAndRewardForProductions;
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
         [SerializeField] private bool isClaimable;

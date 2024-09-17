@@ -18,10 +18,21 @@ namespace Soul.Model.Runtime.RequiredAndRewards
         {
             return requiredAndRewards[index].First;
         }
+        
+        public TRequirement GetMaxRequirement()
+        {
+            return requiredAndRewards[^1].First;
+        }
+        
 
         public TReward GetReward(int index)
         {
             return requiredAndRewards[index].Second;
+        }
+        
+        public TReward GetMaxReward()
+        {
+            return requiredAndRewards[^1].Second;
         }
     }
 }

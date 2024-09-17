@@ -31,12 +31,12 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
             throw new System.NotImplementedException();
         }
 
-        public override void ShowUpgradeUnlockPreView(RectTransform parent)
+        public override void ShowUpgradeUnlockPreview(RectTransform parent)
         {
             throw new System.NotImplementedException();
         }
 
-        public override void HideUpgradeUnlockPreView()
+        public override void HideUpgradeUnlockPreview()
         {
             throw new System.NotImplementedException();
         }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
+using QuickEye.Utility;
 using TMPro;
 using UnityEngine;
 
@@ -19,6 +21,22 @@ namespace Soul.Controller.Runtime.UI
                 tmp = value;
                 StoreFormat();
             }
+        }
+
+        public void SetTimeFormat(UnityTimeSpan timeSpan)
+        {
+            //{0} 1d 2h 3m 4s
+            StringBuilder time = new StringBuilder();
+            if (timeSpan.Days > 0)
+                time.Append($"{timeSpan.Days}d ");
+            if (timeSpan.Hours > 0)
+                time.Append($"{timeSpan.Hours}h ");
+            if (timeSpan.Minutes > 0)
+                time.Append($"{timeSpan.Minutes}m ");
+            if (timeSpan.Seconds > 0)
+                time.Append($"{timeSpan.Seconds}s");
+            TMP.text = string.Format(format, time);
+            
         }
 
         public void StoreFormat() => format = TMP.text;

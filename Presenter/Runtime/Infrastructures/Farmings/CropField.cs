@@ -3,6 +3,7 @@ using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using Pancake.Common;
+using Pancake.Pools;
 using Soul.Controller.Runtime.Items;
 using Soul.Controller.Runtime.Lists;
 using Soul.Controller.Runtime.MeshPlanters;
@@ -15,12 +16,14 @@ using Soul.Model.Runtime.Productions;
 using Soul.Model.Runtime.RequiredAndRewards.Rewards;
 using Soul.Model.Runtime.Tweens;
 using Soul.Model.Runtime.Tweens.Scriptable;
+using Soul.Model.Runtime.UpgradeAndUnlock;
+using Soul.Presenter.Runtime.Slots;
 using UnityEngine;
 
 namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 {
     public class CropField : FarmingComponent, IProductionRecordReference<RecordProduction>,
-        ILoadComponent, IRewardClaim,
+        ILoadComponent, IRewardClaim, IUpgradeUnlockPreview,
         IAllowedToDropReference<Item>, IDropAble<Item>
     {
         [Title("CropField")] [SerializeField] private AllowedItemLists allowedItemLists;
@@ -28,6 +31,7 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
         [SerializeField] private BuildingAndProductionRecord buildingAndProductionRecord;
 
         [SerializeField] private CropProductionManager cropProductionManager;
+        
 
         private MotionHandle _dropMotionHandle;
         private readonly bool _loadDataOnEnable = true;
@@ -120,16 +124,66 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
             if (!cropProductionManager.IsLoaded) SetupProduction(level);
         }
 
-        public override void ShowUpgradeUnlockPreView(RectTransform parent)
+        #region UpgradeSlot
+
+        public override void ShowUpgradeUnlockPreview(RectTransform parent)
         {
-            
+            AddUpgradeSlots(parent);
         }
 
-        public override void HideUpgradeUnlockPreView()
+        private void AddUpgradeSlots(RectTransform parent)
         {
-            
+            float currentTimeRate = 0;
+            float currentCapacity = 0;
+            float currentProductionRate = 0;
+            if (!level.IsLocked)
+            {
+                var requiredCurrent = cropProductionManager.requiredAndRewardForProductions.GetRequirement(level - 1);
+                currentTimeRate = requiredCurrent.timeMultiplier;
+                currentCapacity = requiredCurrent.weightCapacity;
+                var rewardCurrent = cropProductionManager.requiredAndRewardForProductions.GetReward(level - 1);
+                currentProductionRate = rewardCurrent.productionMultiplier;
+            }
+
+            var maxRequirement = cropProductionManager.requiredAndRewardForProductions.GetMaxRequirement();
+            var maxReward = cropProductionManager.requiredAndRewardForProductions.GetMaxReward();
+            float maxTimeRate = maxRequirement.timeMultiplier;
+            float maxCapacity = maxRequirement.weightCapacity;
+            float maxProductionRate = maxReward.productionMultiplier;
+
+            float nextTimeRate;
+            float nextProductionRate;
+            float nextCapacity;
+            if (!level.IsMax)
+            {
+                var requiredAndRewardNext = cropProductionManager.requiredAndRewardForProductions.GetRequirement(level);
+                nextTimeRate = requiredAndRewardNext.timeMultiplier;
+                nextCapacity = requiredAndRewardNext.weightCapacity;
+                var rewardNext = cropProductionManager.requiredAndRewardForProductions.GetReward(level);
+                nextProductionRate = rewardNext.productionMultiplier;
+            }
+            else
+            {
+                nextTimeRate = maxTimeRate;
+                nextProductionRate = maxProductionRate;
+                nextCapacity = maxCapacity;
+            }
+
+            AddUpgradeSlot(parent, "Time Rate", currentTimeRate, nextTimeRate, maxTimeRate, true);
+            AddUpgradeSlot(parent, "Production Rate", currentProductionRate, nextProductionRate, maxProductionRate,
+                true);
+            AddUpgradeSlot(parent, "Capacity", currentCapacity, nextCapacity, maxCapacity, false);
         }
 
+        private void AddUpgradeSlot(RectTransform parent, string timeRate, float currentTimeRate, float nextTimeRate,
+            float maxTimeRate, bool percentage)
+        {
+            var upgradeSlot = upgradeSlotPrefab.gameObject.Request<UpgradeSlot>(parent);
+            upgradeSlot.Setup(timeRate, currentTimeRate, nextTimeRate, maxTimeRate, percentage);
+            upgradeSlots.Add(upgradeSlot);
+        }
+
+        #endregion
 
         #region IAllowedToDropReference<Item>
 
@@ -197,7 +251,11 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
             Reset();
         }
 
+        #region RewardClaim
+
         public bool CanClaim => cropProductionManager.CanClaim;
         public void RewardClaim() => cropProductionManager.RewardClaim();
+
+        #endregion
     }
 }

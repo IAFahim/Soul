@@ -33,7 +33,7 @@ namespace Soul.Controller.Runtime.Productions
         IRewardClaim, IReward<Pair<Item, int>>
     {
         // Serialized Fields
-        [SerializeField] private RequiredAndRewardForProductions requiredAndRewardForProductions;
+        public RequiredAndRewardForProductions requiredAndRewardForProductions;
         [SerializeField] private WorkerType basicWorkerType;
         [SerializeField] private ItemToItemConverter itemToItemConverter;
         [SerializeField] private Seed queueItem;

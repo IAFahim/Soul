@@ -1,4 +1,5 @@
-﻿using Alchemy.Inspector;
+﻿using System.Collections.Generic;
+using Alchemy.Inspector;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using Soul.Controller.Runtime.Addressables;
@@ -12,6 +13,7 @@ using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Tweens;
 using Soul.Model.Runtime.Tweens.Scriptable;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
+using Soul.Presenter.Runtime.Slots;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -37,7 +39,8 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
 
         [SerializeField] protected InfoPanel infoPanelPrefab;
 
-
+        
+        
         private readonly bool _loadDataOnEnable = true;
 
         #region Title

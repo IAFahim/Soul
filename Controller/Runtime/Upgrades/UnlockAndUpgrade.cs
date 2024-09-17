@@ -37,7 +37,7 @@ namespace Soul.Controller.Runtime.Upgrades
 
 
         public RequirementForUpgrade Required => _requirementForUpgrades.GetRequirement(LevelReference);
-        
+
         public override UnityTimeSpan FullTimeRequirement => Required.fullTime;
 
 
@@ -70,8 +70,9 @@ namespace Soul.Controller.Runtime.Upgrades
             else
             {
                 await ShowUnlocked();
-                if (upgradePartsManager) upgradePartsManager.Spawn(LevelReference - 1, info.boxCollider);
             }
+
+            if (upgradePartsManager) upgradePartsManager.Spawn(LevelReference - 1, info.boxCollider);
 
             return canStart;
         }
@@ -101,10 +102,18 @@ namespace Soul.Controller.Runtime.Upgrades
         protected override void ModifyRecordBeforeProgression()
         {
             playerFarm.workerInventory.TryDecrease(Required.worker);
+            playerFarm.gems.Value -= Required.gem;
+            playerFarm.coins.Value -= Required.coin;
             recordReference.worker = Required.worker;
             playerFarm.inventory.TryDecrease(Required.items);
             recordReference.toLevel = LevelReference + 1;
             base.ModifyRecordBeforeProgression();
+        }
+
+        public virtual void ModifyRecordAfterProgression()
+        {
+            playerFarm.workerInventory.AddOrIncrease(recordReference.worker);
+            recordReference.toLevel = LevelReference + 1;
         }
 
         public override void OnTimerStart(float progressRatio)
@@ -147,6 +156,7 @@ namespace Soul.Controller.Runtime.Upgrades
             if (LevelReference.IsLocked) OnCompleteUnlockingAsync().Forget();
             else OnCompleteUpgrading();
             info.onUnlockUpgradeComplete?.Invoke(LevelReference);
+            ModifyRecordAfterProgression();
         }
 
 

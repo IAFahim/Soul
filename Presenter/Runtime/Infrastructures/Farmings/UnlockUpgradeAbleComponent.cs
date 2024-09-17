@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Alchemy.Inspector;
 using Soul.Controller.Runtime.SelectableComponents;
 using Soul.Model.Runtime.Interfaces;
@@ -6,6 +7,7 @@ using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.SaveAndLoad;
 using Soul.Model.Runtime.UpgradeAndUnlock.Unlocks;
 using Soul.Model.Runtime.UpgradeAndUnlock.Upgrades;
+using Soul.Presenter.Runtime.Slots;
 using UnityEngine;
 
 namespace Soul.Presenter.Runtime.Infrastructures.Farmings
@@ -14,6 +16,9 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
         ISaveAbleReference, IUpgrade, ILocked, IUnlock
     {
         [Title("UnlockUpgradeAbleComponent")]
+        [SerializeField] protected UpgradeSlot upgradeSlotPrefab;
+        [SerializeField] protected List<UpgradeSlot> upgradeSlots;
+        
         #region ICurrentLevelReference
 
         public abstract int CurrentLevel { get; set; }
@@ -50,8 +55,13 @@ namespace Soul.Presenter.Runtime.Infrastructures.Farmings
         public abstract void OnUnlockUpgradeStart();
         public abstract void OnUnlockUpgradeComplete(int toLevel);
 
-        public abstract void ShowUpgradeUnlockPreView(RectTransform parent);
-        public abstract void HideUpgradeUnlockPreView();
+        public abstract void ShowUpgradeUnlockPreview(RectTransform parent);
+        
+        public virtual void HideUpgradeUnlockPreview()
+        {
+            foreach (var upgradeSlot in upgradeSlots) upgradeSlot.ReturnToPool();
+            upgradeSlots.Clear();
+        }
 
         #endregion
 
