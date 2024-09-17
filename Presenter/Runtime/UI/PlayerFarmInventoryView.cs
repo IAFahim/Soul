@@ -24,6 +24,7 @@ namespace Soul.Presenter.Runtime.UI
 
         public void OnEnable()
         {
+            
             playerFarmReference.Load();
             levelXpDayViewUI.Setup(playerFarmReference.levelXp, playerFarmReference.xpPreview);
             coinViewUI.Setup(playerFarmReference.coins, playerFarmReference.coinPreview);

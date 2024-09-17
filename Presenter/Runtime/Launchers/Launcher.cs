@@ -35,9 +35,9 @@ namespace Soul.Presenter.Runtime.Launchers
         private async void LoadScene()
         {
             await SceneManager.LoadSceneAsync(Constant.Scene.Persistent, LoadSceneMode.Single);
-            await SceneManager.LoadSceneAsync(Constant.Scene.Infrastructure, LoadSceneMode.Additive);
             await SceneManager.LoadSceneAsync(Constant.Scene.Environment, LoadSceneMode.Additive);
             await SceneManager.LoadSceneAsync(Constant.Scene.NPC, LoadSceneMode.Additive);
+            await SceneManager.LoadSceneAsync(Constant.Scene.Infrastructure, LoadSceneMode.Additive);
             SceneManager.sceneLoaded += OnMenuSceneLoaded;
             await UniTask.WaitUntil(() => _loading.IsLoadingCompleted);
             await SceneManager.LoadSceneAsync(Constant.Scene.Menu, LoadSceneMode.Additive);

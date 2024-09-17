@@ -1,7 +1,10 @@
 ﻿using Alchemy.Inspector;
 using Soul.Controller.Runtime.Inventories.Peoples;
+using Soul.Model.Runtime.Containers;
+using Soul.Model.Runtime.Items;
 using Soul.Model.Runtime.Levels;
 using Soul.Model.Runtime.Limits;
+using Soul.Model.Runtime.Peoples.Workers;
 using Soul.Model.Runtime.Reactives;
 using UnityEngine;
 
@@ -19,7 +22,7 @@ namespace Soul.Controller.Runtime.Inventories
         public Reactive<int> xpPreview;
 
         public WorkerInventory workerInventory;
-        public int maxWorker = 2;
+        public int maxWorker = 6;
         public Reactive<int> workerPreview;
 
         public Reactive<Limit> weight;
@@ -27,6 +30,19 @@ namespace Soul.Controller.Runtime.Inventories
         public static implicit operator ItemInventory(PlayerFarmReference reference) => reference.inventory;
 
         public static implicit operator WorkerInventory(PlayerFarmReference reference) => reference.workerInventory;
+
+
+        public WorkerType defaultWorkerType;
+        public Pair<Item, int> defaultItems;
+
+        private void FirstTime()
+        {
+            coins.Value = 100;
+            gems.Value = 10;
+            maxWorker = 6;
+            workerInventory.AddOrIncrease(defaultWorkerType, maxWorker);
+            inventory.AddOrIncrease(defaultItems.Key, defaultItems.Value);
+        }
 
         [Button]
         public void Load()
@@ -36,6 +52,14 @@ namespace Soul.Controller.Runtime.Inventories
             coins.Load();
             gems.Load();
             levelXp.Load();
+            var isFirstTime = PlayerPrefs.GetInt("isFirstTime", 1) == 1;
+            if (isFirstTime)
+            {
+                FirstTime();
+                PlayerPrefs.SetInt("isFirstTime", 0);
+            }
+
+            Save();
         }
 
 
